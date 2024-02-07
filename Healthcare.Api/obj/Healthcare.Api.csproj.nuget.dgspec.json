@@ -4,6 +4,216 @@
     "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api\\Healthcare.Api.csproj": {}
   },
   "projects": {
+    "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Core\\Healthcare.Api.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Core\\Healthcare.Api.Core.csproj",
+        "projectName": "Healthcare.Api.Core",
+        "projectPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Core\\Healthcare.Api.Core.csproj",
+        "packagesPath": "C:\\Users\\tinch\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\tinch\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Repository\\Healthcare.Api.Repository.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Repository\\Healthcare.Api.Repository.csproj",
+        "projectName": "Healthcare.Api.Repository",
+        "projectPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Repository\\Healthcare.Api.Repository.csproj",
+        "packagesPath": "C:\\Users\\tinch\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Repository\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\tinch\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Core\\Healthcare.Api.Core.csproj": {
+                "projectPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Core\\Healthcare.Api.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[6.0.26, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[6.0.26, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.26, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Service\\Healthcare.Api.Service.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Service\\Healthcare.Api.Service.csproj",
+        "projectName": "Healthcare.Api.Service",
+        "projectPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Service\\Healthcare.Api.Service.csproj",
+        "packagesPath": "C:\\Users\\tinch\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Service\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\tinch\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Core\\Healthcare.Api.Core.csproj": {
+                "projectPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Core\\Healthcare.Api.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[6.0.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api\\Healthcare.Api.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -32,7 +242,14 @@
         "frameworks": {
           "net6.0": {
             "targetAlias": "net6.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Repository\\Healthcare.Api.Repository.csproj": {
+                "projectPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Repository\\Healthcare.Api.Repository.csproj"
+              },
+              "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Service\\Healthcare.Api.Service.csproj": {
+                "projectPath": "C:\\Users\\tinch\\OneDrive\\Documentos\\HEALTHCARE\\Healthcare.Api.Service\\Healthcare.Api.Service.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
