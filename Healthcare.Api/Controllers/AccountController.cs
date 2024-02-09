@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Healthcare.Api.Core.ServiceInterfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -6,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
+    [AllowAnonymous]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -19,20 +22,20 @@ namespace Healthcare.Api.Controllers
         }
 
         // GET: api/<AccountController>
+        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<AccountController>/5
+        [Authorize(Roles = "Administrador")]
         [HttpGet("{id}")]
         public string Get(int id)
         {
             return "value";
         }
 
-        // POST api/<AccountController>
         [HttpPost]
         public void Post([FromBody] string value)
         {
