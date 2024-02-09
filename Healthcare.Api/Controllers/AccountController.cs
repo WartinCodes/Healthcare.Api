@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,6 +9,15 @@ namespace Healthcare.Api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        private readonly IUserService _userService;
+        private readonly IMapper _mapper;
+
+        public AccountController(IUserService userService, IMapper mapper)
+        {
+            _userService = userService;
+            _mapper = mapper;
+        }
+
         // GET: api/<AccountController>
         [HttpGet]
         public IEnumerable<string> Get()

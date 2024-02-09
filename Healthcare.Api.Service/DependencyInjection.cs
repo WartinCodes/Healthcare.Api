@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Healthcare.Api.Service
 {
@@ -6,9 +8,9 @@ namespace Healthcare.Api.Service
     {
         public static IServiceCollection AddService(this IServiceCollection services)
         {
-            //services.AddTransient<IUserService, UserService>();
-            //services.AddTransient<IRoleService, RoleService>();
-            //services.AddTransient<IUserRoleService, UserRoleService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IRoleService, RoleService>();
+            services.AddTransient<IUserRoleService, UserRoleService>();
 
             return services;
         }
