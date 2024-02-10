@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using Healthcare.Api.Contracts;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Healthcare.Api.Controllers
 {
@@ -37,8 +37,19 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] UserLoginRequest userLogin)
         {
+            var user = await _userService.FindUserByEmailOrDni(userLogin.NationalIdentityDocument, userLogin.Email);
+
+            if (user == null)
+            {
+                return NotFound("DNI/Email inválidos.");
+            }
+
+            var result = await _userService.PasswordSignInAsync(userLogin.NationalIdentityDocument, userLogin.Password);
+
+
+            return Ok(userLogin);
         }
 
         // PUT api/<AccountController>/5

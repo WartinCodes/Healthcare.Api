@@ -1,6 +1,7 @@
 ﻿using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Repository.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Api.Repository.Repositories
 {
@@ -13,7 +14,7 @@ namespace Healthcare.Api.Repository.Repositories
             _context = context;
         }
 
-        public Task<User> AddAsync(User entity)
+        public async Task<User> AddAsync(User entity)
         {
             throw new NotImplementedException();
         }
@@ -21,6 +22,11 @@ namespace Healthcare.Api.Repository.Repositories
         public void Edit(User entity)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<User> FindUserByEmailOrDni(string email, string dni)
+        {
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email || x.NationalIdentityDocument == dni);
         }
 
         public IQueryable<User> GetAsQueryable()
@@ -34,6 +40,11 @@ namespace Healthcare.Api.Repository.Repositories
         }
 
         public void Remove(User entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ValidateUser(string user, string password)
         {
             throw new NotImplementedException();
         }

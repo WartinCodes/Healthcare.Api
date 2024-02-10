@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Healthcare.Api.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
@@ -8,11 +9,9 @@ namespace Healthcare.Api.Repository.Context
     {
         private readonly IConfiguration _configuration;
         public const string _Schema = "healthcare";
-        //public DbSet<Brand> Brands { get; set; }
-        //public DbSet<Category> Categories { get; set; }
-        //public DbSet<Product> Products { get; set; }
-        //public DbSet<SubCategory> SubCategories { get; set; }
-        //public DbSet<Family> Families { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
         public HealthcareDbContext(IConfiguration configuration) : base()
         {
