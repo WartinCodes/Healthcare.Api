@@ -13,7 +13,7 @@ namespace Healthcare.Api.Repository.Repositories
             _context = context;
         }
 
-        public Task<Role> AddAsync(Role entity)
+        public async Task<Role> AddAsync(Role entity)
         {
             throw new NotImplementedException();
         }

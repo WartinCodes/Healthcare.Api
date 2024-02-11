@@ -17,12 +17,14 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.Property(u => u.NationalIdentityDocument).IsRequired();
             builder.Property(u => u.Email).IsRequired(false);
             builder.Property(u => u.EmailConfirmed).IsRequired();
+            builder.Property(u => u.BirthDate).IsRequired();
+            builder.Property(u => u.Photo).IsRequired(false);
             builder.Property(u => u.PasswordHash).IsRequired();
             builder.Property(u => u.PhoneNumber).IsRequired(false);
             builder.Property(u => u.LockoutEnabled).IsRequired();
             builder.Property(u => u.AccessFailedCount).IsRequired();
-            builder.Property(u => u.LastActivityDate);
-            builder.Property(u => u.LastLoginDate);
+            builder.Property(u => u.LastActivityDate).IsRequired(false);
+            builder.Property(u => u.LastLoginDate).IsRequired(false);
 
             builder.HasMany(x => x.UserRoles)
                 .WithOne(x => x.User)

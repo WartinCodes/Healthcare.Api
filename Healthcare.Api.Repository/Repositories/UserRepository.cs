@@ -23,7 +23,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public void Edit(User entity)
         {
-            throw new NotImplementedException();
+            _context.Users.Update(entity);
         }
 
         public async Task<User> FindUserByEmailOrDni(string email, string dni)
@@ -36,14 +36,20 @@ namespace Healthcare.Api.Repository.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<User>> GetAsync()
+        public async Task<IEnumerable<User>> GetAsync()
         {
-            throw new NotImplementedException();
+            return await base.GetAsync().ConfigureAwait(false);
+        }
+
+        public async Task<User> GetUserByIdAsync(int id)
+        {
+            var user = await base.GetByIdAsync(id);
+            return user;
         }
 
         public void Remove(User entity)
         {
-            throw new NotImplementedException();
+            base.Delete(entity.Id);
         }
 
         public async Task<Boolean> ValidateUserCredentials(string user, string password)

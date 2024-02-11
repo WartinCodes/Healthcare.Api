@@ -1,8 +1,6 @@
-﻿using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Repository;
+﻿using Healthcare.Api.Repository;
 using Healthcare.Api.Repository.Context;
 using Healthcare.Api.Service;
-using Healthcare.Api.Service.Services;
 using Helthcare.Api.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +40,7 @@ namespace Helthcare.Api
             services.AddService(this.Configuration);
             services.AddMappers();
             services.AddMvc();
+
             services.AddCors(o => o.AddPolicy(MyPolicy, builder =>
             {
                 if (Configuration.GetValue<bool>("isAllowAllCrossOrigins"))
@@ -84,7 +83,6 @@ namespace Helthcare.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-
 
             app.UseHttpsRedirection();
 

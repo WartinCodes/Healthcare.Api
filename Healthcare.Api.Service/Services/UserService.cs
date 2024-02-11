@@ -60,7 +60,7 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<IEnumerable<User>> GetAsync()
         {
-            return new List<User>();
+            return await _userRepository.GetAsync();
         }
 
         public void Remove(User entity)
@@ -73,6 +73,11 @@ namespace Healthcare.Api.Service.Services
         {
             var passwordHash = _authService.EncryptPassword(password);
             return await _unitOfWork.UserRepository.ValidateUserCredentials(user, passwordHash);
+        }
+
+        public async Task<User> GetUserByIdAsync(int id)
+        {
+            return await _userRepository.GetUserByIdAsync(id);
         }
     }
 }

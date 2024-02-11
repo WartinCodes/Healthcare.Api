@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Healthcare.Api.Contracts;
+using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -26,10 +27,12 @@ namespace Healthcare.Api.Controllers
 
         // GET: api/<AccountController>
         [Authorize(Roles = "Administrador")]
-        [HttpGet]
-        public IEnumerable<string> Get()
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<UserResponse>>> Get()
         {
-            return new string[] { "value1", "value2" };
+            var users = await _userService.GetAsync();
+
+            return Ok(_mapper.Map<IEnumerable<UserResponse>>(users));
         }
 
         [Authorize(Roles = "Administrador")]
@@ -39,10 +42,9 @@ namespace Healthcare.Api.Controllers
             return "value";
         }
 
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Post([FromBody] UserLoginRequest userLogin)
         {
-            // FALTA ACTUALIZAR LOS DATES DE LOGIN DEL USUARIO
             var user = await _userService.FindUserByEmailOrDni(userLogin.Email, userLogin.NationalIdentityDocument);
             if (user == null)
             {
@@ -51,6 +53,9 @@ namespace Healthcare.Api.Controllers
 
             if (await _userService.ValidateUserCredentials(user.NationalIdentityDocument, userLogin.Password))
             {
+                user.LastLoginDate = DateTime.Now;
+                user.LastActivityDate = DateTime.Now;
+                _userService.Edit(user);
                 var token = _jwtService.GenerateToken(userLogin.Email);
                 return Ok(token);
             }
@@ -73,16 +78,50 @@ namespace Healthcare.Api.Controllers
             return Ok(newUser);
         }
 
-        // PUT api/<AccountController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)
         {
+            try
+            {
+                var existingUser = await _userService.GetUserByIdAsync(id);
+
+                if (existingUser != null)
+                {
+                    userRequest.Id = id;
+                    _mapper.Map(userRequest, existingUser);
+                    _userService.Edit(existingUser);
+
+                    return Ok($"Usuario actualizado exitosamente.");
+                }
+
+                return NotFound($"Usuario inválido.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error al actualizar usuario: {ex.Message}");
+            }
         }
 
-        // DELETE api/<AccountController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            try
+            {
+                var existingUser = await _userService.GetUserByIdAsync(id);
+
+                if (existingUser == null)
+                {
+                    return NotFound($"Usuario no encontrado.");
+                }
+
+                _userService.Remove(existingUser);
+
+                return Ok($"Usuario con el DNI {existingUser.NationalIdentityDocument} borrado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error borrando el usuario: {ex.Message}");
+            }
         }
     }
 }

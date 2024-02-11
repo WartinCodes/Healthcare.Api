@@ -1,4 +1,4 @@
-﻿namespace Healthcare.Api.Contracts
+﻿namespace Healthcare.Api.Contracts.Requests
 {
     public class UserLoginRequest
     {
