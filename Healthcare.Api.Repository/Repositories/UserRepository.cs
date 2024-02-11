@@ -2,7 +2,6 @@
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace Healthcare.Api.Repository.Repositories
 {
@@ -17,7 +16,9 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<User> AddAsync(User entity)
         {
-            throw new NotImplementedException();
+            await _context.Users.AddAsync(entity);
+            await _context.SaveChangesAsync();
+            return entity;
         }
 
         public void Edit(User entity)

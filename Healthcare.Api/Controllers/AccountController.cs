@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts;
+using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Healthcare.Api.Controllers
 {
@@ -55,6 +55,21 @@ namespace Healthcare.Api.Controllers
             }
 
             return Unauthorized();
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Post([FromBody] UserRequest userRequest)
+        {
+            var user = await _userService.FindUserByEmailOrDni(userRequest.NationalIdentityDocument, userRequest.Email);
+            if (user != null)
+            {
+                return Conflict("DNI/Email ya existe.");
+            }
+            var newUser = _mapper.Map<User>(userRequest);
+
+            await _userService.AddAsync(newUser);
+
+            return Ok(newUser);
         }
 
         // PUT api/<AccountController>/5

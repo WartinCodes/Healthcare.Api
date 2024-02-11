@@ -20,20 +20,37 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<User> FindUserByEmailOrDni(string email, string dni)
         {
-            return await _unitOfWork.UserRepository.FindUserByEmailOrDni(email, dni);
+            return await _userRepository.FindUserByEmailOrDni(email, dni);
         }
 
         public async Task<User> AddAsync(User entity)
         {
-            var record = await _unitOfWork.UserRepository.AddAsync(entity);
-            _unitOfWork.Save();
+            var password = _authService.EncryptPassword(entity.PasswordHash);
+            var newUser = new User()
+            {
+                PasswordHash = password,
+                Email = entity.Email,
+                AccessFailedCount = 0,
+                BirthDate = entity.BirthDate,
+                EmailConfirmed = false,
+                FirstName = entity.FirstName,
+                LastActivityDate = DateTime.Now,
+                LastLoginDate = null,
+                LastName = entity.LastName,
+                LockoutEnabled = false,
+                NationalIdentityDocument = entity.NationalIdentityDocument,
+                Photo = String.Empty,
+                PhoneNumber = entity.PhoneNumber,
+                UserName = String.Empty,
+                UserRoles = new List<UserRole>()
+            };
+            var record = await _unitOfWork.UserRepository.AddAsync(newUser);
             return record;
         }
 
         public void Edit(User entity)
         {
             _unitOfWork.UserRepository.Edit(entity);
-            _unitOfWork.Save();
         }
 
         //public IQueryable<User> GetAsQueryable()

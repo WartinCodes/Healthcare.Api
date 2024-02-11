@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Healthcare.Api.Contracts;
+using Healthcare.Api.Core.Entities;
 
 namespace Helthcare.Api.Mappers
 {
@@ -12,10 +14,10 @@ namespace Helthcare.Api.Mappers
             //CreateMap<Product, ProductResponse>().ReverseMap();
             //CreateMap<SubCategory, SubCategoryResponse>().ReverseMap();
             //CreateMap<Family, FamilyResponse>().ReverseMap();
-            //#endregion
+            #endregion
 
-            //#region Requests
-            //CreateMap<Brand, BrandRequest>().ReverseMap();
+            #region Requests
+            CreateMap<User, UserRequest>().ReverseMap();
             //CreateMap<Category, CategoryRequest>().ReverseMap();
             //CreateMap<Product, ProductRequest>().ReverseMap();
             //CreateMap<SubCategory, SubCategoryRequest>().ReverseMap();

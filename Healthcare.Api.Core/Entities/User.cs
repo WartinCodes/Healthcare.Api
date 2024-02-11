@@ -8,13 +8,13 @@
         public string LastName { get; set; }
         public string NationalIdentityDocument { get; set; }
         public string Email { get; set; }
-        public bool EmailConfirmed { get; set; }
+        public bool? EmailConfirmed { get; set; }
         public string PasswordHash { get; set; }
         public string PhoneNumber { get; set; }
-        //public DateTime BirthDate { get; set; }
-        //public string Photo { get; set; }
-        public bool LockoutEnabled { get; set; }
-        public int AccessFailedCount { get; set; }
+        public DateTime BirthDate { get; set; }
+        public string Photo { get; set; }
+        public bool? LockoutEnabled { get; set; }
+        public int? AccessFailedCount { get; set; }
         public DateTime? LastActivityDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
 
