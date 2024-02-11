@@ -6,7 +6,6 @@ using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Healthcare.Api.Controllers
 {
@@ -82,19 +81,34 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Post([FromBody] UserRequest userRequest)
+        public async Task<IActionResult> Post([FromBody] User newUser)
         {
-            var user = await _userService.FindUserByEmailOrDni(userRequest.NationalIdentityDocument, userRequest.Email);
+            var user = await _userManager.FindByEmailAsync(newUser.Email);
+            //var user = await _userService.FindUserByEmailOrDni(userRequest.NationalIdentityDocument, userRequest.Email);
             if (user != null)
             {
                 return Conflict("DNI/Email ya existe.");
             }
-            var newUser = _mapper.Map<User>(userRequest);
-
-            await _userService.AddAsync(newUser);
+            await _signInManager.SignInAsync(newUser, isPersistent: false);
 
             return Ok(newUser);
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> Register([FromBody] UserRequest userRequest)
+        //{
+        //    var result = await _userManager.CreateAsync(user, vm.Password);
+        //    if (!result.Succeeded)
+        //    {
+        //        foreach (var item in result.Errors)
+        //        {
+        //            ModelState.AddModelError("", item.Description);
+        //        }
+        //        return View(vm);
+        //    }
+        //    await _userManager.AddToRoleAsync(user, UserRole.Member.ToString());
+        //    return RedirectToAction(nameof(Index), "Home");
+        //}
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)

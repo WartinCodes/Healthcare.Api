@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Healthcare.Api.Repository.Migrations
 {
     [DbContext(typeof(HealthcareDbContext))]
-    [Migration("20240211150103_InitialCreate")]
+    [Migration("20240211153825_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,6 @@ namespace Healthcare.Api.Repository.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
@@ -288,13 +287,13 @@ namespace Healthcare.Api.Repository.Migrations
             modelBuilder.Entity("Healthcare.Api.Core.Entities.UserRole", b =>
                 {
                     b.HasOne("Healthcare.Api.Core.Entities.Role", "Role")
-                        .WithMany("UserRoles")
+                        .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Healthcare.Api.Core.Entities.User", "User")
-                        .WithMany("UserRoles")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -353,16 +352,6 @@ namespace Healthcare.Api.Repository.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.Role", b =>
-                {
-                    b.Navigation("UserRoles");
-                });
-
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
-                {
-                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

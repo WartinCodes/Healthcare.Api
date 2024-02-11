@@ -23,30 +23,9 @@ namespace Healthcare.Api.Service.Services
             return await _userRepository.FindUserByEmailOrDni(email, dni);
         }
 
-        public async Task<User> AddAsync(User entity)
-        {
-            var password = _authService.EncryptPassword(entity.PasswordHash);
-            var newUser = new User()
-            {
-                PasswordHash = password,
-                Email = entity.Email,
-                AccessFailedCount = 0,
-                BirthDate = entity.BirthDate,
-                EmailConfirmed = false,
-                FirstName = entity.FirstName,
-                LastActivityDate = DateTime.Now,
-                LastLoginDate = null,
-                LastName = entity.LastName,
-                LockoutEnabled = false,
-                NationalIdentityDocument = entity.NationalIdentityDocument,
-                Photo = String.Empty,
-                PhoneNumber = entity.PhoneNumber,
-                UserName = String.Empty,
-                UserRoles = new List<UserRole>()
-            };
-            var record = await _unitOfWork.UserRepository.AddAsync(newUser);
-            return record;
-        }
+        //public async Task<User> AddAsync(User entity)
+        //{
+        //}
 
         public void Edit(User entity)
         {
@@ -78,6 +57,11 @@ namespace Healthcare.Api.Service.Services
         public async Task<User> GetUserByIdAsync(int id)
         {
             return await _userRepository.GetUserByIdAsync(id);
+        }
+
+        public Task<User> AddAsync(User entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

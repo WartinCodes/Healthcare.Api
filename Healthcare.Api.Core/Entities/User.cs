@@ -19,7 +19,5 @@ namespace Healthcare.Api.Core.Entities
         public int? AccessFailedCount { get; set; }
         public DateTime? LastActivityDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
-
-        public ICollection<UserRole> UserRoles { get; set; }
     }
 }

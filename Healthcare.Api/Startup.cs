@@ -37,6 +37,9 @@ namespace Helthcare.Api
             });
 
             services.AddIdentity<User, Role>()
+                .AddRoleManager<RoleManager<Role>>()
+                .AddSignInManager<SignInManager<User>>()
+                .AddUserManager<UserManager<User>>()
                 .AddEntityFrameworkStores<HealthcareDbContext>()
                 .AddDefaultTokenProviders();
 
