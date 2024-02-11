@@ -36,10 +36,17 @@ namespace Healthcare.Api.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet]
+        public async Task<ActionResult<UserResponse>> Get([FromQuery] int id)
         {
-            return "value";
+            var user = await _userService.GetUserByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<UserResponse>(user));
         }
 
         [HttpPost("login")]
@@ -56,7 +63,7 @@ namespace Healthcare.Api.Controllers
                 user.LastLoginDate = DateTime.Now;
                 user.LastActivityDate = DateTime.Now;
                 _userService.Edit(user);
-                var token = _jwtService.GenerateToken(userLogin.Email);
+                var token = _jwtService.GenerateToken(userLogin.Email, "TEST");
                 return Ok(token);
             }
 
