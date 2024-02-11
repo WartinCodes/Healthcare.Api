@@ -42,13 +42,14 @@ namespace Healthcare.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UserLoginRequest userLogin)
         {
-            var user = await _userService.FindUserByEmailOrDni(userLogin.NationalIdentityDocument, userLogin.Email);
+            // FALTA ACTUALIZAR LOS DATES DE LOGIN DEL USUARIO
+            var user = await _userService.FindUserByEmailOrDni(userLogin.Email, userLogin.NationalIdentityDocument);
             if (user == null)
             {
                 return NotFound("DNI/Email inválidos.");
             }
 
-            if (await _userService.ValidateUserCredentials(userLogin.NationalIdentityDocument, userLogin.Password))
+            if (await _userService.ValidateUserCredentials(user.NationalIdentityDocument, userLogin.Password))
             {
                 var token = _jwtService.GenerateToken(userLogin.Email);
                 return Ok(token);
