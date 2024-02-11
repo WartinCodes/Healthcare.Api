@@ -1,7 +1,10 @@
-﻿using Healthcare.Api.Core.ServiceInterfaces;
+﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Healthcare.Api.Service
 {
@@ -13,8 +16,11 @@ namespace Healthcare.Api.Service
             services.AddTransient<IRoleService, RoleService>();
             services.AddTransient<IUserRoleService, UserRoleService>();
 
+            services.TryAddScoped<UserManager<User>>();
+
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
             services.AddTransient<IAuthService>(provider => new AuthService(configuration));
+
 
             return services;
         }

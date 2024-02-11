@@ -1,6 +1,8 @@
-﻿namespace Healthcare.Api.Core.Entities
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace Healthcare.Api.Core.Entities
 {
-    public class User
+    public class User : IdentityUser<int>
     {
         public int Id { get; set; }
         public string UserName { get; set; }

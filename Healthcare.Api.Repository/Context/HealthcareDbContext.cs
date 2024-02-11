@@ -1,11 +1,12 @@
 ﻿using Healthcare.Api.Core.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 
 namespace Healthcare.Api.Repository.Context
 {
-    public class HealthcareDbContext : DbContext, IHealthcareDbContext
+    public class HealthcareDbContext : IdentityDbContext<User, Role, int>, IHealthcareDbContext
     {
         private readonly IConfiguration _configuration;
         public const string _Schema = "healthcare";

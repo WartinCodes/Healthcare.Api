@@ -4,6 +4,7 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -14,15 +15,24 @@ namespace Healthcare.Api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IUserService _userService;
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public AccountController(IUserService userService, IJwtService jwtService, IMapper mapper)
+        public AccountController(
+            IUserService userService,
+            IJwtService jwtService,
+            UserManager<User> userManager,
+            SignInManager<User> signInManager, 
+            IMapper mapper)
         {
             _userService = userService;
             _jwtService = jwtService;
             _mapper = mapper;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         // GET: api/<AccountController>
@@ -35,7 +45,6 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<UserResponse>>(users));
         }
 
-        [Authorize(Roles = "Administrador")]
         [HttpGet]
         public async Task<ActionResult<UserResponse>> Get([FromQuery] int id)
         {
@@ -52,7 +61,9 @@ namespace Healthcare.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Post([FromBody] UserLoginRequest userLogin)
         {
-            var user = await _userService.FindUserByEmailOrDni(userLogin.Email, userLogin.NationalIdentityDocument);
+            var result = await _userManager.FindByEmailAsync(userLogin.Email);
+
+            var user = await _userService.FindUserByEmailOrDni("puimop", userLogin.NationalIdentityDocument);
             if (user == null)
             {
                 return NotFound("DNI/Email inválidos.");
@@ -63,7 +74,7 @@ namespace Healthcare.Api.Controllers
                 user.LastLoginDate = DateTime.Now;
                 user.LastActivityDate = DateTime.Now;
                 _userService.Edit(user);
-                var token = _jwtService.GenerateToken(userLogin.Email, "TEST");
+                var token = _jwtService.GenerateToken(userLogin.Email);
                 return Ok(token);
             }
 

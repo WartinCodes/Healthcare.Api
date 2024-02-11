@@ -1,8 +1,10 @@
-﻿using Healthcare.Api.Repository;
+﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Repository;
 using Healthcare.Api.Repository.Context;
 using Healthcare.Api.Service;
 using Helthcare.Api.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -33,6 +35,10 @@ namespace Helthcare.Api
                             errorNumbersToAdd: null);
                     });
             });
+
+            services.AddIdentity<User, Role>()
+                .AddEntityFrameworkStores<HealthcareDbContext>()
+                .AddDefaultTokenProviders();
 
             services.SetupSwagger();
 
