@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,13 @@ namespace Healthcare.Api.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public AccountController(IUserService userService, IMapper mapper)
+        public AccountController(IUserService userService, IJwtService jwtService, IMapper mapper)
         {
             _userService = userService;
+            _jwtService = jwtService;
             _mapper = mapper;
         }
 
@@ -40,16 +43,18 @@ namespace Healthcare.Api.Controllers
         public async Task<IActionResult> Post([FromBody] UserLoginRequest userLogin)
         {
             var user = await _userService.FindUserByEmailOrDni(userLogin.NationalIdentityDocument, userLogin.Email);
-
             if (user == null)
             {
                 return NotFound("DNI/Email inválidos.");
             }
 
-            var result = await _userService.PasswordSignInAsync(userLogin.NationalIdentityDocument, userLogin.Password);
+            if (await _userService.ValidateUserCredentials(userLogin.NationalIdentityDocument, userLogin.Password))
+            {
+                var token = _jwtService.GenerateToken(userLogin.Email);
+                return Ok(token);
+            }
 
-
-            return Ok(userLogin);
+            return Unauthorized();
         }
 
         // PUT api/<AccountController>/5

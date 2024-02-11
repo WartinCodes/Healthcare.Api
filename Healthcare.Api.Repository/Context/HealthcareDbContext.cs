@@ -9,6 +9,7 @@ namespace Healthcare.Api.Repository.Context
     {
         private readonly IConfiguration _configuration;
         public const string _Schema = "healthcare";
+
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }

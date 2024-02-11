@@ -2,6 +2,7 @@
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Healthcare.Api.Repository.Repositories
 {
@@ -44,9 +45,11 @@ namespace Healthcare.Api.Repository.Repositories
             throw new NotImplementedException();
         }
 
-        public Task ValidateUser(string user, string password)
+        public async Task<Boolean> ValidateUserCredentials(string user, string password)
         {
-            throw new NotImplementedException();
+            var validCredentials = await _context.Users.FirstOrDefaultAsync(x => x.NationalIdentityDocument == user && x.PasswordHash == password);
+            if (validCredentials != null) { return true; }
+            return false;
         }
     }
 }

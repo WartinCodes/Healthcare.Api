@@ -1,8 +1,13 @@
-﻿using Healthcare.Api.Repository;
+﻿using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Repository;
 using Healthcare.Api.Repository.Context;
 using Healthcare.Api.Service;
+using Healthcare.Api.Service.Services;
 using Helthcare.Api.Configurations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Helthcare.Api
 {
@@ -34,9 +39,9 @@ namespace Helthcare.Api
             services.SetupSwagger();
 
             services.AddRepository();
-            services.AddService();
+            services.AddService(this.Configuration);
             services.AddMappers();
-
+            services.AddMvc();
             services.AddCors(o => o.AddPolicy(MyPolicy, builder =>
             {
                 if (Configuration.GetValue<bool>("isAllowAllCrossOrigins"))
@@ -52,7 +57,24 @@ namespace Helthcare.Api
                 }
             }));
 
-            services.AddControllers(options => options.EnableEndpointRouting = false);
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = "https://ecommerce-net.azurewebsites.net/",
+                    ValidAudience = "https://ecommerce-net.azurewebsites.net/",
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("tu_clave_secreta")),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,6 +93,7 @@ namespace Helthcare.Api
             app.UseCors(MyPolicy);
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseSwaggerConfig();
 
