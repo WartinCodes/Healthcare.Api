@@ -7,6 +7,5 @@ namespace Healthcare.Api.Repository.Context
     {
         DbSet<User> Users { get; set; }
         DbSet<Role> Roles { get; set; }
-        DbSet<UserRole> UserRoles { get; set; }
     }
 }

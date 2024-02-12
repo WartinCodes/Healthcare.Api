@@ -19,8 +19,6 @@ namespace Healthcare.Api.Service
             services.TryAddScoped<UserManager<User>>();
 
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
-            services.AddTransient<IAuthService>(provider => new AuthService(configuration));
-
 
             return services;
         }

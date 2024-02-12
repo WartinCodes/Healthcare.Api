@@ -10,13 +10,11 @@ namespace Healthcare.Api.Repository.UnitOfWorks
 
         public UnitOfWork(HealthcareDbContext context,
             IUserRepository userRepository,
-            IRoleRepository roleRepository,
-            IUserRoleRepository userRoleRepository)
+            IRoleRepository roleRepository)
         {
             _context = context;
             UserRepository = userRepository;
             RoleRepository = roleRepository;
-            UserRoleRepository = userRoleRepository;
         }
 
         public IUserRepository UserRepository { get; }

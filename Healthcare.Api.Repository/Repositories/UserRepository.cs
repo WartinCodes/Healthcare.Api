@@ -28,7 +28,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<User> FindUserByEmailOrDni(string email, string dni)
         {
-            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email || x.NationalIdentityDocument == dni);
+            return await _context.Users.FirstOrDefaultAsync(x => x.Email == email || x.UserName == dni);
         }
 
         public IQueryable<User> GetAsQueryable()
@@ -50,13 +50,6 @@ namespace Healthcare.Api.Repository.Repositories
         public void Remove(User entity)
         {
             base.Delete(entity.Id);
-        }
-
-        public async Task<Boolean> ValidateUserCredentials(string user, string password)
-        {
-            var validCredentials = await _context.Users.FirstOrDefaultAsync(x => x.NationalIdentityDocument == user && x.PasswordHash == password);
-            if (validCredentials != null) { return true; }
-            return false;
         }
     }
 }

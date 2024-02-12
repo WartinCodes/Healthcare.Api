@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
-    [AllowAnonymous]
     [ApiController]
     public class AccountController : ControllerBase
     {
@@ -35,104 +34,92 @@ namespace Healthcare.Api.Controllers
         }
 
         // GET: api/<AccountController>
-        [Authorize(Roles = "Administrador")]
-        [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<UserResponse>>> Get()
-        {
-            var users = await _userService.GetAsync();
+        //[Authorize(Roles = "Administrador")]
+        //[HttpGet("all")]
+        //public async Task<ActionResult<IEnumerable<UserResponse>>> Get()
+        //{
+        //    var users = await _userService.GetAsync();
 
-            return Ok(_mapper.Map<IEnumerable<UserResponse>>(users));
-        }
+        //    return Ok(_mapper.Map<IEnumerable<UserResponse>>(users));
+        //}
 
-        [HttpGet]
-        public async Task<ActionResult<UserResponse>> Get([FromQuery] int id)
-        {
-            var user = await _userService.GetUserByIdAsync(id);
+        //[HttpGet]
+        //public async Task<ActionResult<UserResponse>> Get([FromQuery] int id)
+        //{
+        //    var user = await _userService.GetUserByIdAsync(id);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(_mapper.Map<UserResponse>(user));
-        }
+        //    return Ok(_mapper.Map<UserResponse>(user));
+        //}
 
+        [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Post([FromBody] UserLoginRequest userLogin)
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest userLogin)
         {
-            var result = await _userManager.FindByEmailAsync(userLogin.Email);
+            var userEmail = await _userManager.FindByEmailAsync(userLogin.Email);
+            var userDocument = await _userManager.FindByNameAsync(userLogin.UserName);
 
-            var user = await _userService.FindUserByEmailOrDni("puimop", userLogin.NationalIdentityDocument);
-            if (user == null)
+            if (userEmail != null && await _userManager.CheckPasswordAsync(userEmail, userLogin.Password))
             {
-                return NotFound("DNI/Email inválidos.");
-            }
+                var roles = await _userManager.GetRolesAsync(userEmail);
+                var token = _jwtService.GenerateToken(userEmail, roles);
 
-            if (await _userService.ValidateUserCredentials(user.NationalIdentityDocument, userLogin.Password))
-            {
-                user.LastLoginDate = DateTime.Now;
-                user.LastActivityDate = DateTime.Now;
-                _userService.Edit(user);
-                var token = _jwtService.GenerateToken(userLogin.Email);
-                return Ok(token);
+                return Ok(new { Token = token });
             }
 
             return Unauthorized();
         }
 
+        //[Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return Ok();
+        }
+
+        //[Authorize(Roles = "Administrador")]
         [HttpPost("register")]
         public async Task<IActionResult> Post([FromBody] User newUser)
         {
             var user = await _userManager.FindByEmailAsync(newUser.Email);
-            //var user = await _userService.FindUserByEmailOrDni(userRequest.NationalIdentityDocument, userRequest.Email);
-            if (user != null)
+            var userDocument = await _userManager.FindByNameAsync(newUser.UserName);
+            if (user != null || userDocument != null)
             {
                 return Conflict("DNI/Email ya existe.");
             }
-            await _signInManager.SignInAsync(newUser, isPersistent: false);
+            var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
 
-            return Ok(newUser);
+            return Ok(result);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Register([FromBody] UserRequest userRequest)
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)
         //{
-        //    var result = await _userManager.CreateAsync(user, vm.Password);
-        //    if (!result.Succeeded)
+        //    try
         //    {
-        //        foreach (var item in result.Errors)
+        //        var existingUser = await _userService.GetUserByIdAsync(id);
+
+        //        if (existingUser != null)
         //        {
-        //            ModelState.AddModelError("", item.Description);
+        //            userRequest.Id = id;
+        //            _mapper.Map(userRequest, existingUser);
+        //            _userService.Edit(existingUser);
+
+        //            return Ok($"Usuario actualizado exitosamente.");
         //        }
-        //        return View(vm);
+
+        //        return NotFound($"Usuario inválido.");
         //    }
-        //    await _userManager.AddToRoleAsync(user, UserRole.Member.ToString());
-        //    return RedirectToAction(nameof(Index), "Home");
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest($"Error al actualizar usuario: {ex.Message}");
+        //    }
         //}
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)
-        {
-            try
-            {
-                var existingUser = await _userService.GetUserByIdAsync(id);
-
-                if (existingUser != null)
-                {
-                    userRequest.Id = id;
-                    _mapper.Map(userRequest, existingUser);
-                    _userService.Edit(existingUser);
-
-                    return Ok($"Usuario actualizado exitosamente.");
-                }
-
-                return NotFound($"Usuario inválido.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error al actualizar usuario: {ex.Message}");
-            }
-        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
@@ -140,15 +127,13 @@ namespace Healthcare.Api.Controllers
             try
             {
                 var existingUser = await _userService.GetUserByIdAsync(id);
-
                 if (existingUser == null)
                 {
                     return NotFound($"Usuario no encontrado.");
                 }
 
                 _userService.Remove(existingUser);
-
-                return Ok($"Usuario con el DNI {existingUser.NationalIdentityDocument} borrado exitosamente.");
+                return Ok($"Usuario con el DNI {existingUser.UserName} borrado exitosamente.");
             }
             catch (Exception ex)
             {

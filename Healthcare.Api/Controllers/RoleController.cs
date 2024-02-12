@@ -1,13 +1,13 @@
-﻿using Healthcare.Api.Core.Entities;
+﻿using AutoMapper;
+using Healthcare.Api.Contracts.Responses;
+using Healthcare.Api.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Healthcare.Api.Controllers
 {
-    [AllowAnonymous]
+    //[Authorize(Roles = "Administrador")]
     [Route("api/[controller]")]
     [ApiController]
     public class RoleController : ControllerBase
@@ -15,38 +15,31 @@ namespace Healthcare.Api.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<Role> _roleManager;
+        private readonly IMapper _mapper;
 
         public RoleController(UserManager<User> userManager,
             SignInManager<User> signInManager,
-            RoleManager<Role> roleManager)
+            RoleManager<Role> roleManager,
+            IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _mapper = mapper;
         }
 
-        // GET: api/<RoleController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<RoleResponse>> Get([FromQuery] int id)
         {
-            return new string[] { "value1", "value2" };
+            var role = await _roleManager.FindByIdAsync(id.ToString());
+
+            if (role == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<RoleResponse>(role));
         }
-
-        // GET api/<RoleController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<RoleController>
-        //[HttpPost]
-        //public async Task<IActionResult> Post([FromBody] Role newRole)
-        //{
-        //    var s = _roleManager.CreateAsync(newRole);
-
-        //    return Ok();
-        //}
 
         [HttpPost]
         public async Task<ActionResult> Create(string Name)
@@ -71,16 +64,16 @@ namespace Healthcare.Api.Controllers
             }
         }
 
-        // PUT api/<RoleController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        //// PUT api/<RoleController>/5
+        //[HttpPut("{id}")]
+        //public void Put(int id, [FromBody] string value)
+        //{
+        //}
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var role = await _roleManager.FindByIdAsync(id);
+            var role = await _roleManager.FindByIdAsync(id.ToString());
 
             if (role == null)
             {

@@ -1,7 +1,9 @@
-﻿namespace Healthcare.Api.Core.ServiceInterfaces
+﻿using Healthcare.Api.Core.Entities;
+
+namespace Healthcare.Api.Core.ServiceInterfaces
 {
     public interface IJwtService
     {
-        string GenerateToken(string userName);
+        string GenerateToken(User user, IList<string> roles);
     }
 }

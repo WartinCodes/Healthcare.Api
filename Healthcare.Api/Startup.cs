@@ -6,6 +6,8 @@ using Helthcare.Api.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -65,22 +67,23 @@ namespace Helthcare.Api
                 }
             }));
 
+            var jwtIssuer = Configuration.GetSection("Jwt:Issuer").Get<string>();
+            var jwtKey = Configuration.GetSection("Jwt:SecretKey").Get<string>();
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "https://ecommerce-net.azurewebsites.net/",
-                    ValidAudience = "https://ecommerce-net.azurewebsites.net/",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("tu_clave_secreta")),
-                    ClockSkew = TimeSpan.Zero
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
                 };
             });
         }
@@ -91,6 +94,8 @@ namespace Helthcare.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                //app.UseSwagger();
+                //app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();
@@ -99,8 +104,8 @@ namespace Helthcare.Api
 
             app.UseCors(MyPolicy);
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseSwaggerConfig();
 

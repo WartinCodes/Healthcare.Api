@@ -6,6 +6,5 @@ namespace Healthcare.Api.Core.RepositoryInterfaces
     {
         Task<User> GetUserByIdAsync(int id);
         Task<User> FindUserByEmailOrDni(string email, string dni);
-        Task<Boolean> ValidateUserCredentials(string user, string password);
     }
 }

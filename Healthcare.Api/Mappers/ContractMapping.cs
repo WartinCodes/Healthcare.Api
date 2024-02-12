@@ -11,6 +11,7 @@ namespace Helthcare.Api.Mappers
         {
             #region Responses
             CreateMap<User, UserResponse>().ReverseMap();
+            CreateMap<Role, RoleResponse>().ReverseMap();
             #endregion
 
             #region Requests

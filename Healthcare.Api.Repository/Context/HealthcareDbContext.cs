@@ -13,7 +13,6 @@ namespace Healthcare.Api.Repository.Context
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
 
         public HealthcareDbContext(IConfiguration configuration) : base()
         {

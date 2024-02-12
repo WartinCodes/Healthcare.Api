@@ -8,13 +8,11 @@ namespace Healthcare.Api.Service.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IAuthService _authService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(IUserRepository userRepository, IAuthService authService, IUnitOfWork unitOfWork)
+        public UserService(IUserRepository userRepository, IUnitOfWork unitOfWork)
         {
             _userRepository = userRepository;
-            _authService = authService;
             _unitOfWork = unitOfWork;
         }
 
@@ -46,12 +44,6 @@ namespace Healthcare.Api.Service.Services
         {
             _unitOfWork.UserRepository.Remove(entity);
             _unitOfWork.Save();
-        }
-
-        public async Task<Boolean> ValidateUserCredentials(string user, string password)
-        {
-            var passwordHash = _authService.EncryptPassword(password);
-            return await _unitOfWork.UserRepository.ValidateUserCredentials(user, passwordHash);
         }
 
         public async Task<User> GetUserByIdAsync(int id)
