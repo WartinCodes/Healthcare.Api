@@ -5,7 +5,5 @@ namespace Healthcare.Api.Repository.Context
 {
     public interface IHealthcareDbContext
     {
-        DbSet<User> Users { get; set; }
-        DbSet<Role> Roles { get; set; }
     }
 }

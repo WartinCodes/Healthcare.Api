@@ -15,18 +15,15 @@ namespace Healthcare.Api.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly IUserService _userService;
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
         public AccountController(
-            IUserService userService,
             IJwtService jwtService,
             UserManager<User> userManager,
             SignInManager<User> signInManager, 
             IMapper mapper)
         {
-            _userService = userService;
             _jwtService = jwtService;
             _mapper = mapper;
             _userManager = userManager;
@@ -97,48 +94,42 @@ namespace Healthcare.Api.Controllers
             return Ok(result);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)
-        //{
-        //    try
-        //    {
-        //        var existingUser = await _userService.GetUserByIdAsync(id);
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)
+        {
+            // AGREGAR VALIDACION DE SI DNI O EMAIL REPETIDO
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
+            {
+                return NotFound($"No se encontró el usuario con el ID: {id}");
+            }
 
-        //        if (existingUser != null)
-        //        {
-        //            userRequest.Id = id;
-        //            _mapper.Map(userRequest, existingUser);
-        //            _userService.Edit(existingUser);
+            _mapper.Map(userRequest, user);
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest($"Error al actualizar el usuario con el ID: {id}");
+            }
 
-        //            return Ok($"Usuario actualizado exitosamente.");
-        //        }
-
-        //        return NotFound($"Usuario inválido.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest($"Error al actualizar usuario: {ex.Message}");
-        //    }
-        //}
+            return Ok($"Usuario con el ID {id} actualizado exitosamente");
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
+            var user = await _userManager.FindByIdAsync(id.ToString());
+            if (user == null)
             {
-                var existingUser = await _userService.GetUserByIdAsync(id);
-                if (existingUser == null)
-                {
-                    return NotFound($"Usuario no encontrado.");
-                }
+                return NotFound($"No se encontró el usuario con el ID: {id}");
+            }
 
-                _userService.Remove(existingUser);
-                return Ok($"Usuario con el DNI {existingUser.UserName} borrado exitosamente.");
-            }
-            catch (Exception ex)
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
             {
-                return BadRequest($"Error borrando el usuario: {ex.Message}");
+                return BadRequest($"Error al eliminar el usuario con el ID: {id}");
             }
+
+            return Ok($"Usuario con el ID {id} eliminado exitosamente");
         }
     }
 }

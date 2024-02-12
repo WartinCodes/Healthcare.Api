@@ -8,18 +8,10 @@ namespace Healthcare.Api.Repository.UnitOfWorks
     {
         private readonly HealthcareDbContext _context;
 
-        public UnitOfWork(HealthcareDbContext context,
-            IUserRepository userRepository,
-            IRoleRepository roleRepository)
+        public UnitOfWork(HealthcareDbContext context)
         {
             _context = context;
-            UserRepository = userRepository;
-            RoleRepository = roleRepository;
         }
-
-        public IUserRepository UserRepository { get; }
-
-        public IRoleRepository RoleRepository { get; }
 
 
         public void Dispose()

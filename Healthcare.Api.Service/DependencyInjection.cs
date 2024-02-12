@@ -12,10 +12,6 @@ namespace Healthcare.Api.Service
     {
         public static IServiceCollection AddService(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IRoleService, RoleService>();
-            services.AddTransient<IUserRoleService, UserRoleService>();
-
             services.TryAddScoped<UserManager<User>>();
 
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
