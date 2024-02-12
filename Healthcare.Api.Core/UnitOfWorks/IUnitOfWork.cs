@@ -6,7 +6,6 @@ namespace Healthcare.Api.Core.UnitOfWorks
     {
         IUserRepository UserRepository { get; }
         IRoleRepository RoleRepository { get; }
-        IUserRoleRepository UserRoleRepository { get; }
         void Save();
         Task SaveAsync();
     }

@@ -21,7 +21,6 @@ namespace Healthcare.Api.Repository.UnitOfWorks
 
         public IRoleRepository RoleRepository { get; }
 
-        public IUserRoleRepository UserRoleRepository { get; }
 
         public void Dispose()
         {
