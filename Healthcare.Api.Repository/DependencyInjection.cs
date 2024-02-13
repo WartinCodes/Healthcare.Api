@@ -1,7 +1,9 @@
-﻿using Healthcare.Api.Core.UnitOfWorks;
+﻿using Healthcare.Api.Repository.UnitOfWorks;
+using Healthcare.Api.Core.UnitOfWorks;
 using Healthcare.Api.Repository.Context;
-using Healthcare.Api.Repository.UnitOfWorks;
 using Microsoft.Extensions.DependencyInjection;
+using Healthcare.Api.Core.RepositoryInterfaces;
+using Healthcare.Api.Repository.Repositories;
 
 namespace Healthcare.Api.Repository
 {

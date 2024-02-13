@@ -144,13 +144,13 @@ namespace Healthcare.Api.Controllers
             return Ok($"Usuario con el ID {id} eliminado exitosamente");
         }
 
-        [HttpPost("forgot-password")]
+        [HttpPost("password/reset")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
+            // configurar SMTP
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                // Devuelve NotFound si el usuario no se encuentra
                 return NotFound($"Usuario con correo electrónico {email} no encontrado.");
             }
 

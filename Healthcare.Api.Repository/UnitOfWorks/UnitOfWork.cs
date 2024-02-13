@@ -13,7 +13,6 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             _context = context;
         }
 
-
         public void Dispose()
         {
             _context.Dispose();

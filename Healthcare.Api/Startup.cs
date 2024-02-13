@@ -89,7 +89,7 @@ namespace Helthcare.Api
                 };
             });
 
-            services.Configure<SmtpSettings>(Configuration.GetSection("SmtpSettings"));
+            services.Configure<SmtpSettings>(Configuration.GetSection(nameof(SmtpSettings)));
             services.AddTransient<IEmailSender, EmailSender>();
         }
 
