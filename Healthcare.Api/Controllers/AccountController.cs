@@ -3,8 +3,10 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,18 +19,21 @@ namespace Healthcare.Api.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IJwtService _jwtService;
+        private readonly IEmailSender _emailSender;
         private readonly IMapper _mapper;
 
         public AccountController(
             IJwtService jwtService,
             UserManager<User> userManager,
-            SignInManager<User> signInManager, 
+            SignInManager<User> signInManager,
+            IEmailSender emailSender,
             IMapper mapper)
         {
             _jwtService = jwtService;
             _mapper = mapper;
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailSender = emailSender;
         }
 
         [Authorize(Roles = "Administrador")]
@@ -137,6 +142,23 @@ namespace Healthcare.Api.Controllers
             }
 
             return Ok($"Usuario con el ID {id} eliminado exitosamente");
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                // Devuelve NotFound si el usuario no se encuentra
+                return NotFound($"Usuario con correo electrónico {email} no encontrado.");
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+            await _emailSender.SendEmailAsync(email, "Restablecer contraseña", $"Para restablecer tu contraseña, haz clic en el siguiente enlace: {token}");
+
+            return Ok("Correo electrónico de restablecimiento de contraseña enviado exitosamente.");
         }
     }
 }
