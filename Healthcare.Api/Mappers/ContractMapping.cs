@@ -10,7 +10,6 @@ namespace Helthcare.Api.Mappers
         public ContractMapping()
         {
             #region Responses
-            CreateMap<User, UserResponse>().ReverseMap();
             CreateMap<Role, RoleResponse>().ReverseMap();
             #endregion
 

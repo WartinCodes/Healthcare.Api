@@ -38,6 +38,19 @@ namespace Healthcare.Api.Controllers
             return await _userManager.Users.Select(x => x).ToListAsync();
         }
 
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("user")]
+        public async Task<ActionResult<User>> GetUserById([FromQuery] string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound($"Usuario con ID {id} no encontrado.");
+            }
+
+            return Ok(user);
+        }
+
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequest userLogin)

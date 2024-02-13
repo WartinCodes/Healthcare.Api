@@ -7,23 +7,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
 {
-    //[Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")]
     [Route("api/[controller]")]
     [ApiController]
     public class RoleController : ControllerBase
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
         private readonly RoleManager<Role> _roleManager;
         private readonly IMapper _mapper;
 
-        public RoleController(UserManager<User> userManager,
-            SignInManager<User> signInManager,
+        public RoleController(
             RoleManager<Role> roleManager,
             IMapper mapper)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
             _roleManager = roleManager;
             _mapper = mapper;
         }
@@ -32,7 +27,6 @@ namespace Healthcare.Api.Controllers
         public async Task<ActionResult<RoleResponse>> Get([FromQuery] int id)
         {
             var role = await _roleManager.FindByIdAsync(id.ToString());
-
             if (role == null)
             {
                 return NotFound();
@@ -44,31 +38,39 @@ namespace Healthcare.Api.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(string Name)
         {
-            try
+            var role = await _roleManager.RoleExistsAsync(Name);
+            if (role)
             {
-                var role = await _roleManager.RoleExistsAsync(Name);
-                if (role)
-                {
-                    return Conflict("El rol ya existe.");
-                }
-
-                Role newRole = new Role();
-                newRole.Name = Name;
-                await _roleManager.CreateAsync(newRole);
-
-                return Ok("Role creado con éxito.");
+                return Conflict("El rol ya existe.");
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+
+            Role newRole = new Role();
+            newRole.Name = Name;
+            await _roleManager.CreateAsync(newRole);
+
+            return Ok("Role creado con éxito.");
         }
 
-        //// PUT api/<RoleController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(string id, [FromBody] string roleName)
+        {
+            var role = await _roleManager.FindByIdAsync(id);
+            if (role == null)
+            {
+                return NotFound($"Rol con ID {id} no encontrado.");
+            }
+
+            role.Name = roleName;
+            var result = await _roleManager.UpdateAsync(role);
+            if (result.Succeeded)
+            {
+                return Ok($"Rol con ID {id} actualizado exitosamente.");
+            }
+            else
+            {
+                return BadRequest($"Error al actualizar el rol con ID {id}.");
+            }
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
