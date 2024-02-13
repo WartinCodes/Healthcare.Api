@@ -6,6 +6,7 @@ using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Api.Controllers
 {
@@ -30,48 +31,35 @@ namespace Healthcare.Api.Controllers
             _signInManager = signInManager;
         }
 
-        // GET: api/<AccountController>
-        //[Authorize(Roles = "Administrador")]
-        //[HttpGet("all")]
-        //public async Task<ActionResult<IEnumerable<UserResponse>>> Get()
-        //{
-        //    var users = await _userService.GetAsync();
-
-        //    return Ok(_mapper.Map<IEnumerable<UserResponse>>(users));
-        //}
-
-        //[HttpGet]
-        //public async Task<ActionResult<UserResponse>> Get([FromQuery] int id)
-        //{
-        //    var user = await _userService.GetUserByIdAsync(id);
-
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(_mapper.Map<UserResponse>(user));
-        //}
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<User>>> Get()
+        {
+            return await _userManager.Users.Select(x => x).ToListAsync();
+        }
 
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequest userLogin)
         {
-            var userEmail = await _userManager.FindByEmailAsync(userLogin.Email);
-            var userDocument = await _userManager.FindByNameAsync(userLogin.UserName);
-
-            if (userEmail != null && await _userManager.CheckPasswordAsync(userEmail, userLogin.Password))
+            var user = await _userManager.FindByEmailAsync(userLogin.Email);
+            if (user == null)
             {
-                var roles = await _userManager.GetRolesAsync(userEmail);
-                var token = _jwtService.GenerateToken(userEmail, roles);
-
-                return Ok(new { Token = token });
+                user = await _userManager.FindByNameAsync(userLogin.UserName);
             }
 
-            return Unauthorized();
+            if (user == null || !await _userManager.CheckPasswordAsync(user, userLogin.Password))
+            {
+                return Unauthorized();
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _jwtService.GenerateToken(user, roles);
+
+            return Ok(new { Token = token });
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -79,7 +67,7 @@ namespace Healthcare.Api.Controllers
             return Ok();
         }
 
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPost("register")]
         public async Task<IActionResult> Post([FromBody] User newUser)
         {
@@ -97,11 +85,17 @@ namespace Healthcare.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)
         {
-            // AGREGAR VALIDACION DE SI DNI O EMAIL REPETIDO
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
             {
                 return NotFound($"No se encontró el usuario con el ID: {id}");
+            }
+
+            var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
+            var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
+            if (existEmail != null || existDocument != null)
+            {
+                return Conflict("DNI/Email ya existe.");
             }
 
             _mapper.Map(userRequest, user);

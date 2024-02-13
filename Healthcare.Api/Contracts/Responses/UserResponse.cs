@@ -1,4 +1,6 @@
-﻿namespace Healthcare.Api.Contracts.Responses
+﻿using Healthcare.Api.Core.Entities;
+
+namespace Healthcare.Api.Contracts.Responses
 {
     public class UserResponse
     {
