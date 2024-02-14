@@ -4,6 +4,7 @@ using Healthcare.Api.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Api.Controllers
 {
@@ -23,8 +24,14 @@ namespace Healthcare.Api.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<Role>>> Get()
+        {
+            return await _roleManager.Roles.Select(x => x).ToListAsync();
+        }
+
         [HttpGet]
-        public async Task<ActionResult<RoleResponse>> Get([FromQuery] int id)
+        public async Task<ActionResult<Role>> Get([FromQuery] int id)
         {
             var role = await _roleManager.FindByIdAsync(id.ToString());
             if (role == null)
@@ -32,7 +39,7 @@ namespace Healthcare.Api.Controllers
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<RoleResponse>(role));
+            return Ok(role);
         }
 
         [HttpPost]

@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace Healthcare.Api.Controllers
 {
@@ -154,9 +156,9 @@ namespace Healthcare.Api.Controllers
                 return NotFound($"Usuario con correo electrónico {email} no encontrado.");
             }
 
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            await _emailSender.SendEmailAsync(email, "Restablecer contraseña", $"Para restablecer tu contraseña, haz clic en el siguiente enlace: {token}");
+            await _emailSender.SendEmailAsync(email, "Restablecer contraseña", $"Para restablecer tu contraseña, haz clic en el siguiente enlace: {code}");
 
             return Ok("Correo electrónico de restablecimiento de contraseña enviado exitosamente.");
         }
