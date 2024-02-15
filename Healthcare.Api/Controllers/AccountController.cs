@@ -62,12 +62,7 @@ namespace Healthcare.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginRequest userLogin)
         {
-            var user = await _userManager.FindByEmailAsync(userLogin.Email);
-            if (user == null)
-            {
-                user = await _userManager.FindByNameAsync(userLogin.UserName);
-            }
-
+            var user = await _userManager.FindByEmailAsync(userLogin.UserName) ?? await _userManager.FindByNameAsync(userLogin.UserName);
             if (user == null || !await _userManager.CheckPasswordAsync(user, userLogin.Password))
             {
                 return Unauthorized();
@@ -88,6 +83,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
+        [ValidateAntiForgeryToken]
         [HttpPost("register")]
         public async Task<IActionResult> Post([FromBody] User newUser)
         {
@@ -146,7 +142,7 @@ namespace Healthcare.Api.Controllers
             return Ok($"Usuario con el ID {id} eliminado exitosamente");
         }
 
-        [HttpPost("password/reset")]
+        [HttpPost("forgot/password")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
             // configurar SMTP
@@ -161,6 +157,22 @@ namespace Healthcare.Api.Controllers
             await _emailSender.SendEmailAsync(email, "Restablecer contraseña", $"Para restablecer tu contraseña, haz clic en el siguiente enlace: {code}");
 
             return Ok("Correo electrónico de restablecimiento de contraseña enviado exitosamente.");
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("pacientes")]
+        public async Task<IActionResult> GetPatients()
+        {
+            var patients = await _userManager.GetUsersInRoleAsync(RoleEnum.Paciente);
+            return Ok(patients);
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet("medicos")]
+        public async Task<IActionResult> GetMedics()
+        {
+            var medics = await _userManager.GetUsersInRoleAsync(RoleEnum.Medico);
+            return Ok(medics);
         }
     }
 }
