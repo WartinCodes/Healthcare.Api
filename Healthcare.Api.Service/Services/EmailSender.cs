@@ -16,20 +16,29 @@ namespace Healthcare.Api.Service.Services
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            var mailMessage = new MailMessage
+            try
             {
-                From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
-                Subject = subject,
-                Body = htmlMessage,
-                IsBodyHtml = true
-            };
-            mailMessage.To.Add(email);
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
+                    Subject = subject,
+                    Body = htmlMessage,
+                    IsBodyHtml = true
+                };
+                mailMessage.To.Add(email);
 
-            using (var client = new SmtpClient(_smtpSettings.Server, _smtpSettings.Port))
+                using (var client = new SmtpClient(_smtpSettings.Server, _smtpSettings.Port))
+                {
+                    client.EnableSsl = _smtpSettings.UseSsl;
+                    client.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
+                    await client.SendMailAsync(mailMessage);
+                }
+            }
+            catch (Exception ex)
             {
-                client.EnableSsl = _smtpSettings.UseSsl;
-                client.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
-                await client.SendMailAsync(mailMessage);
+                // Log the exception for troubleshooting
+                Console.WriteLine($"Error sending email: {ex}");
+                throw; // Rethrow the exception to propagate it further if needed
             }
         }
     }
