@@ -37,7 +37,6 @@ namespace Healthcare.Api.Repository.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NationalIdentityDocument = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BirthDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Photo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastActivityDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -179,37 +178,6 @@ namespace Healthcare.Api.Repository.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "UserRoles",
-                schema: "healthcare",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    IdUser = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    IdRole = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserRoles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserRoles_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalSchema: "healthcare",
-                        principalTable: "AspNetRoles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserRoles_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalSchema: "healthcare",
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 schema: "healthcare",
@@ -255,18 +223,6 @@ namespace Healthcare.Api.Repository.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserRoles_RoleId",
-                schema: "healthcare",
-                table: "UserRoles",
-                column: "RoleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserRoles_UserId",
-                schema: "healthcare",
-                table: "UserRoles",
-                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -289,10 +245,6 @@ namespace Healthcare.Api.Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens",
-                schema: "healthcare");
-
-            migrationBuilder.DropTable(
-                name: "UserRoles",
                 schema: "healthcare");
 
             migrationBuilder.DropTable(

@@ -93,6 +93,7 @@ namespace Healthcare.Api.Controllers
             {
                 return Conflict("DNI/Email ya existe.");
             }
+            newUser.PasswordHash = newUser.UserName;
             var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
 
             return Ok(result);

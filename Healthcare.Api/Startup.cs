@@ -47,6 +47,16 @@ namespace Helthcare.Api
                 .AddEntityFrameworkStores<HealthcareDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Lockout.MaxFailedAccessAttempts = 3;
+                options.User.RequireUniqueEmail = true;
+            });
+
             services.SetupSwagger();
 
             services.AddRepository();
