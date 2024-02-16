@@ -69,8 +69,8 @@ namespace Helthcare.Api
                 }
             }));
 
-            var jwtIssuer = Configuration.GetSection("Jwt:Issuer").Get<string>();
-            var jwtKey = Configuration.GetSection("Jwt:SecretKey").Get<string>();
+            var jwtIssuer = Configuration.GetSection("JWT:Issuer").Get<string>();
+            var jwtKey = Configuration.GetSection("JWT:SecretKey").Get<string>();
 
             services.AddAuthentication(options =>
             {

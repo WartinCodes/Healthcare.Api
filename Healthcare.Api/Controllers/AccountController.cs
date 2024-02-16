@@ -160,7 +160,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
-        [HttpGet("pacientes")]
+        [HttpGet("patients")]
         public async Task<IActionResult> GetPatients()
         {
             var patients = await _userManager.GetUsersInRoleAsync(RoleEnum.Paciente);
@@ -168,7 +168,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [Authorize(Roles = "Administrador")]
-        [HttpGet("medicos")]
+        [HttpGet("medics")]
         public async Task<IActionResult> GetMedics()
         {
             var medics = await _userManager.GetUsersInRoleAsync(RoleEnum.Medico);

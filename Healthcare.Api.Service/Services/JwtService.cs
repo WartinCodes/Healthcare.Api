@@ -34,8 +34,8 @@ namespace Healthcare.Api.Service.Services
             }
 
             var token = new JwtSecurityToken(
-                _configuration["JwtSettings:Issuer"],
-                _configuration["JwtSettings:Audience"],
+                _configuration["JWT:Issuer"],
+                _configuration["JWT:Audience"],
                 claims,
                 expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JWT:DurationInMinutes"])),
                 signingCredentials: credentials
