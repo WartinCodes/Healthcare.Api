@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Api.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    //[Authorize(Roles = "Administrador")]
     [Route("api/[controller]")]
     [ApiController]
     public class RoleController : ControllerBase

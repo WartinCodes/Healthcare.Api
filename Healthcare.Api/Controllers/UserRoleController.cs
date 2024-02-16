@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    //[Authorize(Roles = "Administrador")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserRoleController : ControllerBase
