@@ -1,9 +1,9 @@
-﻿using Healthcare.Api.Repository.UnitOfWorks;
+﻿using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
 using Healthcare.Api.Repository.Context;
-using Microsoft.Extensions.DependencyInjection;
-using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Repository.Repositories;
+using Healthcare.Api.Repository.UnitOfWorks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Healthcare.Api.Repository
 {
@@ -21,6 +21,10 @@ namespace Healthcare.Api.Repository
 
         private static IServiceCollection AddReppositories(this IServiceCollection services)
         {
+            services.AddTransient<IPatientRepository, PatientRepository>();
+            services.AddTransient<ISpecialityRepository, SpecialityRepository>();
+            services.AddTransient<IDoctorRepository, DoctorRepository>();
+
             return services;
         }
 

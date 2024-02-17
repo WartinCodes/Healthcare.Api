@@ -9,6 +9,10 @@ namespace Healthcare.Api.Service
     {
         public static IServiceCollection AddService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddTransient<IDoctorService, DoctorService>();
+            services.AddTransient<ISpecialityService, SpecialityService>();
+            services.AddTransient<IPatientService, PatientService>();
+
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
 
             return services;

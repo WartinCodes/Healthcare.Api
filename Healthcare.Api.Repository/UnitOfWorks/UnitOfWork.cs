@@ -8,10 +8,21 @@ namespace Healthcare.Api.Repository.UnitOfWorks
     {
         private readonly HealthcareDbContext _context;
 
-        public UnitOfWork(HealthcareDbContext context)
+        public UnitOfWork(
+            HealthcareDbContext context,
+            IPatientRepository patientRepository,
+            IDoctorRepository doctorRepository,
+            ISpecialityRepository specialityRepository)
         {
             _context = context;
+            PatientRepository = patientRepository;
+            DoctorRepository = doctorRepository;
+            SpecialityRepository = specialityRepository;
         }
+
+        public ISpecialityRepository SpecialityRepository { get; }
+        public IPatientRepository PatientRepository { get; }
+        public IDoctorRepository DoctorRepository { get; }
 
         public void Dispose()
         {

@@ -11,6 +11,10 @@ namespace Healthcare.Api.Repository.Context
         private readonly IConfiguration _configuration;
         public const string _Schema = "healthcare";
 
+        public DbSet<Patient> Patient { get; set; }
+        public DbSet<Doctor> Doctor { get; set; }
+        public DbSet<Speciality> Speciality { get; set; }
+
         public HealthcareDbContext(IConfiguration configuration) : base()
         {
             this._configuration = configuration;
