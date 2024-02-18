@@ -62,6 +62,20 @@ namespace Healthcare.Api.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "HealthInsurance",
+                schema: "healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HealthInsurance", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 schema: "healthcare",
                 columns: table => new
@@ -178,6 +192,154 @@ namespace Healthcare.Api.Repository.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Doctor",
+                schema: "healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Doctor", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Doctor_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "healthcare",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Patient",
+                schema: "healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CUIL = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Patient", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Patient_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "healthcare",
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HealthPlan",
+                schema: "healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HealthInsuranceId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HealthPlan", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_HealthPlan_HealthInsurance_HealthInsuranceId",
+                        column: x => x.HealthInsuranceId,
+                        principalSchema: "healthcare",
+                        principalTable: "HealthInsurance",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Speciality",
+                schema: "healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Speciality", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Speciality_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalSchema: "healthcare",
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Speciality_Doctor_RoleId",
+                        column: x => x.RoleId,
+                        principalSchema: "healthcare",
+                        principalTable: "Doctor",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DoctorHealthPlan",
+                schema: "healthcare",
+                columns: table => new
+                {
+                    DoctorId = table.Column<int>(type: "int", nullable: false),
+                    HealthPlanId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DoctorHealthPlan", x => new { x.DoctorId, x.HealthPlanId });
+                    table.ForeignKey(
+                        name: "FK_DoctorHealthPlan_Doctor_DoctorId",
+                        column: x => x.DoctorId,
+                        principalSchema: "healthcare",
+                        principalTable: "Doctor",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DoctorHealthPlan_HealthPlan_HealthPlanId",
+                        column: x => x.HealthPlanId,
+                        principalSchema: "healthcare",
+                        principalTable: "HealthPlan",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PatientHealthPlan",
+                schema: "healthcare",
+                columns: table => new
+                {
+                    PatientId = table.Column<int>(type: "int", nullable: false),
+                    HealthPlanId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PatientHealthPlan", x => new { x.PatientId, x.HealthPlanId });
+                    table.ForeignKey(
+                        name: "FK_PatientHealthPlan_HealthPlan_HealthPlanId",
+                        column: x => x.HealthPlanId,
+                        principalSchema: "healthcare",
+                        principalTable: "HealthPlan",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PatientHealthPlan_Patient_PatientId",
+                        column: x => x.PatientId,
+                        principalSchema: "healthcare",
+                        principalTable: "Patient",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 schema: "healthcare",
@@ -223,6 +385,44 @@ namespace Healthcare.Api.Repository.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Doctor_UserId",
+                schema: "healthcare",
+                table: "Doctor",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DoctorHealthPlan_HealthPlanId",
+                schema: "healthcare",
+                table: "DoctorHealthPlan",
+                column: "HealthPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HealthPlan_HealthInsuranceId",
+                schema: "healthcare",
+                table: "HealthPlan",
+                column: "HealthInsuranceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Patient_UserId",
+                schema: "healthcare",
+                table: "Patient",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PatientHealthPlan_HealthPlanId",
+                schema: "healthcare",
+                table: "PatientHealthPlan",
+                column: "HealthPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Speciality_RoleId",
+                schema: "healthcare",
+                table: "Speciality",
+                column: "RoleId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -248,7 +448,35 @@ namespace Healthcare.Api.Repository.Migrations
                 schema: "healthcare");
 
             migrationBuilder.DropTable(
+                name: "DoctorHealthPlan",
+                schema: "healthcare");
+
+            migrationBuilder.DropTable(
+                name: "PatientHealthPlan",
+                schema: "healthcare");
+
+            migrationBuilder.DropTable(
+                name: "Speciality",
+                schema: "healthcare");
+
+            migrationBuilder.DropTable(
+                name: "HealthPlan",
+                schema: "healthcare");
+
+            migrationBuilder.DropTable(
+                name: "Patient",
+                schema: "healthcare");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles",
+                schema: "healthcare");
+
+            migrationBuilder.DropTable(
+                name: "Doctor",
+                schema: "healthcare");
+
+            migrationBuilder.DropTable(
+                name: "HealthInsurance",
                 schema: "healthcare");
 
             migrationBuilder.DropTable(

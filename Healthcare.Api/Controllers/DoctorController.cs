@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,16 +9,18 @@ using Microsoft.AspNetCore.Mvc;
 namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "Administrador")]
+    //[Authorize(Roles = "Administrador")]
     [ApiController]
     public class DoctorController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+        private readonly IDoctorService _doctorService;
         private readonly IMapper _mapper;
 
-        public DoctorController(UserManager<User> userManager, IMapper mapper)
+        public DoctorController(UserManager<User> userManager, IMapper mapper, IDoctorService doctorService)
         {
             _userManager = userManager;
+            _doctorService = doctorService;
             _mapper = mapper;
         }
 
@@ -29,21 +32,33 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Post([FromBody] User newUser)
+        public async Task<IActionResult> Post([FromBody] DoctorRequest userRequest)
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(newUser.Email);
-                var userDocument = await _userManager.FindByNameAsync(newUser.UserName);
+                var user = await _userManager.FindByEmailAsync(userRequest.Email);
+                var userDocument = await _userManager.FindByNameAsync(userRequest.UserName);
                 if (user != null || userDocument != null)
                 {
                     return Conflict("DNI/Email ya existe.");
                 }
+
+                var newUser = _mapper.Map<User>(userRequest);
                 newUser.PasswordHash = newUser.UserName;
+
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(newUser, RoleEnum.Medico);
+                    var doctor = new Doctor
+                    {
+                        UserId = newUser.Id,
+                        Specialities = null,
+                        HealthPlans = null
+                    };
+
+                    await _doctorService.Add(doctor);
+
                     return Ok("Médico creado exitosamente.");
                 }
                 else
@@ -59,7 +74,7 @@ namespace Healthcare.Api.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)
+        public async Task<IActionResult> Put(int id, [FromBody] DoctorRequest userRequest)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)

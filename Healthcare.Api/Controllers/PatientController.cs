@@ -2,7 +2,6 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +16,10 @@ namespace Healthcare.Api.Controllers
         private readonly IPatientService _patientService;
         private readonly IMapper _mapper;
 
-        public PatientController(UserManager<User> userManager, IMapper mapper)
+        public PatientController(UserManager<User> userManager, IMapper mapper, IPatientService patientService)
         {
             _userManager = userManager;
+            _patientService = patientService;
             _mapper = mapper;
         }
 
@@ -31,24 +31,33 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Post([FromBody] User newUser)
+        public async Task<IActionResult> Post([FromBody] PatientRequest userRequest)
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(newUser.Email);
-                var userDocument = await _userManager.FindByNameAsync(newUser.UserName);
+                var user = await _userManager.FindByEmailAsync(userRequest.Email);
+                var userDocument = await _userManager.FindByNameAsync(userRequest.UserName);
                 if (user != null || userDocument != null)
                 {
                     return Conflict("DNI/Email ya existe.");
                 }
+
+                var newUser = _mapper.Map<User>(userRequest);
                 newUser.PasswordHash = newUser.UserName;
+
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
                 {
-                    var newPatient = await _userManager.FindByNameAsync(newUser.UserName);
                     await _userManager.AddToRoleAsync(newUser, RoleEnum.Paciente);
-                    Patient patient = new Patient(newPatient.Id, String.Empty, null);
+                    var patient = new Patient
+                    {
+                        UserId = newUser.Id,
+                        CUIL = String.Empty,
+                        HealthPlans = null 
+                    };
+
                     await _patientService.Add(patient);
+
                     return Ok("Paciente creado exitosamente.");
                 }
                 else
@@ -63,12 +72,12 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)
+        public async Task<IActionResult> Put(int id, [FromBody] PatientRequest userRequest)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
             {
-                return NotFound($"No se encontró el médico con el ID: {id}");
+                return NotFound($"No se encontró el paciente con el ID: {id}");
             }
 
             var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
@@ -82,10 +91,10 @@ namespace Healthcare.Api.Controllers
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
-                return BadRequest($"Error al actualizar el médico: {user.UserName}");
+                return BadRequest($"Error al actualizar el paciente: {user.UserName}");
             }
 
-            return Ok($"Usuario con el ID {id} actualizado exitosamente");
+            return Ok($"Paciente con el ID {id} actualizado exitosamente");
         }
 
         [HttpDelete("{id}")]
