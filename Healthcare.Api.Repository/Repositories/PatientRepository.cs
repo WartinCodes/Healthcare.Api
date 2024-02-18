@@ -26,7 +26,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<Patient> GetPatientByIdAsync(int id)
         {
-            return await _context.Patient.Where(x => x.Id == id).AsNoTracking().FirstOrDefaultAsync();
+            return await _context.Patient.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public void Remove(Patient entity)

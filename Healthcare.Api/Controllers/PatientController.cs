@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = "Administrador")]
+    //[Authorize(Roles = "Administrador")]
     [ApiController]
     public class PatientController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
+        private readonly IPatientService _patientService;
         private readonly IMapper _mapper;
 
         public PatientController(UserManager<User> userManager, IMapper mapper)
@@ -43,7 +45,10 @@ namespace Healthcare.Api.Controllers
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
                 {
+                    var newPatient = await _userManager.FindByNameAsync(newUser.UserName);
                     await _userManager.AddToRoleAsync(newUser, RoleEnum.Paciente);
+                    Patient patient = new Patient(newPatient.Id, String.Empty, null);
+                    await _patientService.Add(patient);
                     return Ok("Paciente creado exitosamente.");
                 }
                 else

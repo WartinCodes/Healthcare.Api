@@ -57,6 +57,7 @@ namespace Healthcare.Api.Controllers
             }
         }
 
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] UserRequest userRequest)
         {

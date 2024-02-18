@@ -36,9 +36,8 @@ namespace Healthcare.Api.Service.Services
             }
             catch (Exception ex)
             {
-                // Log the exception for troubleshooting
                 Console.WriteLine($"Error sending email: {ex}");
-                throw; // Rethrow the exception to propagate it further if needed
+                throw;
             }
         }
     }

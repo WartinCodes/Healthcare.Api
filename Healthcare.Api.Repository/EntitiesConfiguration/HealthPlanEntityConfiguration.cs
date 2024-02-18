@@ -4,18 +4,18 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Healthcare.Api.Repository.EntitiesConfiguration
 {
-    public class SpecialityEntityConfiguration : IEntityTypeConfiguration<Speciality>
+    public class HealthPlanEntityConfiguration : IEntityTypeConfiguration<HealthPlan>
     {
-        public void Configure(EntityTypeBuilder<Speciality> builder)
+        public void Configure(EntityTypeBuilder<HealthPlan> builder)
         {
-            builder.ToTable("Speciality").HasKey(x => x.Id);
+            builder.ToTable("HealthPlan").HasKey(x => x.Id);
             builder.Property(x => x.Id).UseIdentityColumn().ValueGeneratedOnAdd();
 
             builder.Property(x => x.Name).IsRequired();
 
-            builder.HasOne(s => s.Role)
-                .WithMany(r => r.Specialities)
-                .HasForeignKey(s => s.RoleId)
+            builder.HasOne(x => x.HealthInsurance)
+                .WithMany(x => x.HealthPlans)
+                .HasForeignKey(x => x.HealthInsuranceId)
                 .IsRequired();
         }
     }
