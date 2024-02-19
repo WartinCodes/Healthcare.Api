@@ -7,6 +7,8 @@ namespace Healthcare.Api.Core.UnitOfWorks
         IPatientRepository PatientRepository { get; }
         IDoctorRepository DoctorRepository { get; }
         ISpecialityRepository SpecialityRepository { get; }
+        IHealthInsuranceRepository HealthInsuranceRepository { get; }
+        IHealthPlanRepository HealthPlanRepository { get; }
 
         void Save();
         Task SaveAsync();

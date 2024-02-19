@@ -19,12 +19,14 @@ namespace Healthcare.Api.Service.Services
         public async Task<Patient> Add(Patient entity)
         {
             var record = await _unitOfWork.PatientRepository.AddAsync(entity);
+            await _unitOfWork.SaveAsync();
             return record;
         }
 
         public void Edit(Patient entity)
         {
             _unitOfWork.PatientRepository.Edit(entity);
+            _unitOfWork.Save();
         }
 
         public IQueryable<Patient> GetAsQueryable()
@@ -45,6 +47,7 @@ namespace Healthcare.Api.Service.Services
         public void Remove(Patient entity)
         {
             _unitOfWork.PatientRepository.Remove(entity);
+            _unitOfWork.Save();
         }
     }
 }

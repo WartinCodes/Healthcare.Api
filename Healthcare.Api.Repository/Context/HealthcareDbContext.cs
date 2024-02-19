@@ -14,6 +14,8 @@ namespace Healthcare.Api.Repository.Context
         public DbSet<Patient> Patient { get; set; }
         public DbSet<Doctor> Doctor { get; set; }
         public DbSet<Speciality> Speciality { get; set; }
+        public DbSet<HealthInsurance> HealthInsurance { get; set; }
+        public DbSet<HealthPlan> HealthPlan { get ; set; }
 
         public HealthcareDbContext(IConfiguration configuration) : base()
         {

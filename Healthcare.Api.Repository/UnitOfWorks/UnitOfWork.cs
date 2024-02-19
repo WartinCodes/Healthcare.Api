@@ -1,6 +1,7 @@
 ﻿using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
 using Healthcare.Api.Repository.Context;
+using Healthcare.Api.Repository.Repositories;
 
 namespace Healthcare.Api.Repository.UnitOfWorks
 {
@@ -12,17 +13,24 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             HealthcareDbContext context,
             IPatientRepository patientRepository,
             IDoctorRepository doctorRepository,
-            ISpecialityRepository specialityRepository)
+            ISpecialityRepository specialityRepository,
+            IHealthInsuranceRepository healthInsuranceRepository,
+            IHealthPlanRepository healthPlanRepository)
         {
             _context = context;
             PatientRepository = patientRepository;
             DoctorRepository = doctorRepository;
             SpecialityRepository = specialityRepository;
+            HealthInsuranceRepository = healthInsuranceRepository;
+            HealthPlanRepository = healthPlanRepository;
         }
 
         public ISpecialityRepository SpecialityRepository { get; }
         public IPatientRepository PatientRepository { get; }
         public IDoctorRepository DoctorRepository { get; }
+        public IHealthInsuranceRepository HealthInsuranceRepository { get; }
+        public IHealthPlanRepository HealthPlanRepository { get; }
+
 
         public void Dispose()
         {

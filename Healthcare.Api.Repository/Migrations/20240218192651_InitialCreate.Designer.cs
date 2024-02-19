@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Healthcare.Api.Repository.Migrations
 {
     [DbContext(typeof(HealthcareDbContext))]
-    [Migration("20240218170410_InitialCreate")]
+    [Migration("20240218192651_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,6 +57,21 @@ namespace Healthcare.Api.Repository.Migrations
                     b.HasIndex("HealthPlanId");
 
                     b.ToTable("DoctorHealthPlan", "healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorSpeciality", b =>
+                {
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SpecialityId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DoctorId", "SpecialityId");
+
+                    b.HasIndex("SpecialityId");
+
+                    b.ToTable("DoctorSpeciality", "healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.HealthInsurance", b =>
@@ -177,7 +192,7 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoleId")
+                    b.Property<int?>("RoleId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -409,6 +424,25 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("HealthPlan");
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorSpeciality", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.Doctor", "Doctor")
+                        .WithMany("DoctorSpecialities")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Healthcare.Api.Core.Entities.Speciality", "Speciality")
+                        .WithMany("DoctorSpecialities")
+                        .HasForeignKey("SpecialityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Speciality");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.HealthPlan", b =>
                 {
                     b.HasOne("Healthcare.Api.Core.Entities.HealthInsurance", "HealthInsurance")
@@ -452,19 +486,9 @@ namespace Healthcare.Api.Repository.Migrations
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Speciality", b =>
                 {
-                    b.HasOne("Healthcare.Api.Core.Entities.Doctor", null)
+                    b.HasOne("Healthcare.Api.Core.Entities.Role", null)
                         .WithMany("Specialities")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Healthcare.Api.Core.Entities.Role", "Role")
-                        .WithMany("Specialities")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
+                        .HasForeignKey("RoleId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -520,7 +544,7 @@ namespace Healthcare.Api.Repository.Migrations
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Doctor", b =>
                 {
-                    b.Navigation("Specialities");
+                    b.Navigation("DoctorSpecialities");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.HealthInsurance", b =>
@@ -531,6 +555,11 @@ namespace Healthcare.Api.Repository.Migrations
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Role", b =>
                 {
                     b.Navigation("Specialities");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Speciality", b =>
+                {
+                    b.Navigation("DoctorSpecialities");
                 });
 #pragma warning restore 612, 618
         }

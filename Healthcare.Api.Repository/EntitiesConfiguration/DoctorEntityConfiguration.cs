@@ -16,11 +16,6 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                .HasForeignKey<Doctor>(p => p.UserId)
                .IsRequired();
 
-            builder.HasMany(d => d.Specialities)
-                .WithOne()
-                .HasForeignKey(s => s.RoleId)
-                .IsRequired();
-
             builder.HasMany(d => d.HealthPlans)
                 .WithMany(hp => hp.Doctors)
                 .UsingEntity<DoctorHealthPlan>(
@@ -38,6 +33,10 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                         j.ToTable("DoctorHealthPlan");
                     }
                 );
+
+            builder.HasMany(d => d.DoctorSpecialities)
+                .WithOne(ds => ds.Doctor)
+                .HasForeignKey(ds => ds.DoctorId);
         }
     }
 }

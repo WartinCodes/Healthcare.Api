@@ -53,7 +53,7 @@ namespace Healthcare.Api.Controllers
                     var doctor = new Doctor
                     {
                         UserId = newUser.Id,
-                        Specialities = null,
+                        DoctorSpecialities = null,
                         HealthPlans = null
                     };
 

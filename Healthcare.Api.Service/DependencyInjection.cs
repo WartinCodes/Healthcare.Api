@@ -12,6 +12,8 @@ namespace Healthcare.Api.Service
             services.AddTransient<IDoctorService, DoctorService>();
             services.AddTransient<ISpecialityService, SpecialityService>();
             services.AddTransient<IPatientService, PatientService>();
+            services.AddTransient<IHealthInsuranceService, HealthInsuranceService>();
+            services.AddTransient<IHealthPlanService, HealthPlanService>();
 
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
 

@@ -99,6 +99,27 @@ namespace Healthcare.Api.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Speciality",
+                schema: "healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Speciality", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Speciality_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalSchema: "healthcare",
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 schema: "healthcare",
                 columns: table => new
@@ -258,30 +279,28 @@ namespace Healthcare.Api.Repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Speciality",
+                name: "DoctorSpeciality",
                 schema: "healthcare",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    DoctorId = table.Column<int>(type: "int", nullable: false),
+                    SpecialityId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Speciality", x => x.Id);
+                    table.PrimaryKey("PK_DoctorSpeciality", x => new { x.DoctorId, x.SpecialityId });
                     table.ForeignKey(
-                        name: "FK_Speciality_AspNetRoles_RoleId",
-                        column: x => x.RoleId,
+                        name: "FK_DoctorSpeciality_Doctor_DoctorId",
+                        column: x => x.DoctorId,
                         principalSchema: "healthcare",
-                        principalTable: "AspNetRoles",
+                        principalTable: "Doctor",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Speciality_Doctor_RoleId",
-                        column: x => x.RoleId,
+                        name: "FK_DoctorSpeciality_Speciality_SpecialityId",
+                        column: x => x.SpecialityId,
                         principalSchema: "healthcare",
-                        principalTable: "Doctor",
+                        principalTable: "Speciality",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -400,6 +419,12 @@ namespace Healthcare.Api.Repository.Migrations
                 column: "HealthPlanId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DoctorSpeciality_SpecialityId",
+                schema: "healthcare",
+                table: "DoctorSpeciality",
+                column: "SpecialityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_HealthPlan_HealthInsuranceId",
                 schema: "healthcare",
                 table: "HealthPlan",
@@ -452,7 +477,15 @@ namespace Healthcare.Api.Repository.Migrations
                 schema: "healthcare");
 
             migrationBuilder.DropTable(
+                name: "DoctorSpeciality",
+                schema: "healthcare");
+
+            migrationBuilder.DropTable(
                 name: "PatientHealthPlan",
+                schema: "healthcare");
+
+            migrationBuilder.DropTable(
+                name: "Doctor",
                 schema: "healthcare");
 
             migrationBuilder.DropTable(
@@ -469,10 +502,6 @@ namespace Healthcare.Api.Repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles",
-                schema: "healthcare");
-
-            migrationBuilder.DropTable(
-                name: "Doctor",
                 schema: "healthcare");
 
             migrationBuilder.DropTable(
