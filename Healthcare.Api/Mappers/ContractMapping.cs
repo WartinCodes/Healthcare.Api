@@ -13,6 +13,7 @@ namespace Helthcare.Api.Mappers
             CreateMap<Role, RoleResponse>().ReverseMap();
             CreateMap<HealthPlan, HealthPlanResponse>();
             CreateMap<HealthInsurance, HealthInsuranceResponse>().ReverseMap();
+            CreateMap<Speciality, SpecialityResponse>().ReverseMap();
             #endregion
 
             #region Requests

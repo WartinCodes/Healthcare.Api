@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
@@ -30,10 +31,10 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<User>>> Get()
+        public async Task<ActionResult<IEnumerable<SpecialityResponse>>> Get()
         {
             var specialities = await _specialityService.GetAsync();
-            return Ok(specialities);
+            return Ok(_mapper.Map<IEnumerable<SpecialityResponse>>(specialities));
         }
 
         [HttpPost("create")]
