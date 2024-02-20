@@ -21,7 +21,9 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<IEnumerable<HealthPlan>> GetAsync()
         {
-            return await base.GetAsync().ConfigureAwait(false);
+            return await _context.HealthPlan
+                .Include(x => x.HealthInsurance)
+                .ToListAsync();
         }
 
         public async Task<HealthPlan> GetHealthPlanByIdAsync(int id)
@@ -41,6 +43,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<HealthPlan> AddAsync(HealthPlan entity)
         {
+            _context.Attach(entity.HealthInsurance);
             return await base.InsertAsync(entity).ConfigureAwait(false);
         }
     }

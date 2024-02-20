@@ -26,7 +26,8 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<HealthInsurance> GetHealthInsuranceByIdAsync(int id)
         {
-            return await _context.HealthInsurance.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.HealthInsurance.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public void Remove(HealthInsurance entity)

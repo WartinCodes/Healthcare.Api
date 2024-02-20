@@ -9,5 +9,6 @@ namespace Healthcare.Api.Repository.Context
         DbSet<Doctor> Doctor { get; set; }
         DbSet<Speciality> Speciality { get; set; }
         DbSet<HealthInsurance> HealthInsurance { get; set; }
+        DbSet<HealthPlan> HealthPlan { get; set; }
     }
 }

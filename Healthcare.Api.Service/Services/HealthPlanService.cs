@@ -2,6 +2,7 @@
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Api.Service.Services
 {

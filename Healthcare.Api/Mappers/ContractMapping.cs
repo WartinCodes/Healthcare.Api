@@ -11,6 +11,8 @@ namespace Helthcare.Api.Mappers
         {
             #region Responses
             CreateMap<Role, RoleResponse>().ReverseMap();
+            CreateMap<HealthPlan, HealthPlanResponse>();
+            CreateMap<HealthInsurance, HealthInsuranceResponse>().ReverseMap();
             #endregion
 
             #region Requests
@@ -18,7 +20,10 @@ namespace Helthcare.Api.Mappers
             CreateMap<User, DoctorRequest>().ReverseMap();
             CreateMap<Speciality, SpecialityRequest>().ReverseMap();
             CreateMap<HealthInsurance, HealthInsuranceRequest>().ReverseMap();
+            CreateMap<HealthPlan, HealthPlanRequest>().ReverseMap();
 
+            CreateMap<HealthPlanRequest, HealthPlan>()
+                .ForMember(dest => dest.HealthInsurance, opt => opt.MapFrom(src => src.HealthInsuranceRequest));
             #endregion
         }
     }

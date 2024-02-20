@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -11,19 +12,21 @@ namespace Healthcare.Api.Controllers
     public class HealthPlanController : ControllerBase
     {
         private readonly IHealthPlanService _healthPlanService;
+        private readonly IHealthInsuranceService _healthInsuranceService;
         private readonly IMapper _mapper;
 
-        public HealthPlanController(IMapper mapper, IHealthPlanService healthPlanService)
+        public HealthPlanController(IMapper mapper, IHealthPlanService healthPlanService, IHealthInsuranceService healthInsuranceService)
         {
             _healthPlanService = healthPlanService;
             _mapper = mapper;
+            _healthInsuranceService = healthInsuranceService;
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<HealthPlan>>> Get()
+        public async Task<ActionResult<IEnumerable<HealthPlanResponse>>> Get()
         {
             var healthPlans = await _healthPlanService.GetAsync();
-            return Ok(healthPlans);
+            return Ok(_mapper.Map<IEnumerable<HealthPlanResponse>>(healthPlans));
         }
 
         [HttpPost("create")]
@@ -31,6 +34,12 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
+                var healthInsurance = await _healthInsuranceService.GetHealthInsuranceByIdAsync(healthPlanRequest.HealthInsuranceRequest.Id);
+                if (healthInsurance == null)
+                {
+                    return BadRequest("La obra social especificado no existe.");
+                }
+
                 var newHealthPlan = _mapper.Map<HealthPlan>(healthPlanRequest);
                 await _healthPlanService.Add(newHealthPlan);
 
