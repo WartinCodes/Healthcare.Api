@@ -8,6 +8,9 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
     {
         public void Configure(EntityTypeBuilder<DoctorSpeciality> builder)
         {
+            builder.HasKey(ds => ds.Id);
+            builder.Property(ds => ds.Id).ValueGeneratedOnAdd();
+
             builder.HasKey(ds => new { ds.DoctorId, ds.SpecialityId });
         }
     }

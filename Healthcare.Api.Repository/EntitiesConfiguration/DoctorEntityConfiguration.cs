@@ -37,6 +37,10 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.HasMany(d => d.DoctorSpecialities)
                 .WithOne(ds => ds.Doctor)
                 .HasForeignKey(ds => ds.DoctorId);
+
+            builder.HasOne(p => p.Address)
+                .WithMany()
+                .HasForeignKey(p => p.IdAddress);
         }
     }
 }

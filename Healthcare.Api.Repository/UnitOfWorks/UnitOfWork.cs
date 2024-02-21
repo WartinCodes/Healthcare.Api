@@ -15,7 +15,8 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             IDoctorRepository doctorRepository,
             ISpecialityRepository specialityRepository,
             IHealthInsuranceRepository healthInsuranceRepository,
-            IHealthPlanRepository healthPlanRepository)
+            IHealthPlanRepository healthPlanRepository,
+            IDoctorSpecialityRepository doctorSpecialityRepository)
         {
             _context = context;
             PatientRepository = patientRepository;
@@ -23,6 +24,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             SpecialityRepository = specialityRepository;
             HealthInsuranceRepository = healthInsuranceRepository;
             HealthPlanRepository = healthPlanRepository;
+            DoctorSpecialityRepository = doctorSpecialityRepository;
         }
 
         public ISpecialityRepository SpecialityRepository { get; }
@@ -30,6 +32,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         public IDoctorRepository DoctorRepository { get; }
         public IHealthInsuranceRepository HealthInsuranceRepository { get; }
         public IHealthPlanRepository HealthPlanRepository { get; }
+        public IDoctorSpecialityRepository DoctorSpecialityRepository { get; }
 
 
         public void Dispose()
