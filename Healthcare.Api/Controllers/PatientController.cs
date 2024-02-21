@@ -2,6 +2,7 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,18 +16,20 @@ namespace Healthcare.Api.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IPatientService _patientService;
         private readonly IMapper _mapper;
+        private readonly IAddressService _addressService;
 
-        public PatientController(UserManager<User> userManager, IMapper mapper, IPatientService patientService)
+        public PatientController(UserManager<User> userManager, IMapper mapper, IPatientService patientService, IAddressService addressService)
         {
             _userManager = userManager;
             _patientService = patientService;
             _mapper = mapper;
+            _addressService = addressService;
         }
 
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<User>>> Get()
         {
-            var medics = await _userManager.GetUsersInRoleAsync(RoleEnum.Paciente);
+            var medics = await _patientService.GetAsync();
             return Ok(medics);
         }
 
@@ -49,11 +52,16 @@ namespace Healthcare.Api.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(newUser, RoleEnum.Paciente);
+
+                    var address = _mapper.Map<Address>(userRequest.Address);
+                    await _addressService.Add(address);
+
                     var patient = new Patient
                     {
                         UserId = newUser.Id,
                         CUIL = String.Empty,
-                        HealthPlans = null 
+                        HealthPlans = null,
+                        Address = address
                     };
 
                     await _patientService.Add(patient);

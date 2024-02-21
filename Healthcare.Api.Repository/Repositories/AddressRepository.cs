@@ -1,0 +1,54 @@
+﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.RepositoryInterfaces;
+using Healthcare.Api.Repository.Context;
+using Microsoft.EntityFrameworkCore;
+
+namespace Healthcare.Api.Repository.Repositories
+{
+    public class AddressRepository : BaseRepository<Address>, IAddressRepository
+    {
+        private readonly HealthcareDbContext _context;
+
+        public AddressRepository(HealthcareDbContext context) : base(context)
+        {
+            _context = context;
+        }
+
+        public IQueryable<Address> GetAsQueryable()
+        {
+            return _context.Address.AsQueryable();
+        }
+
+        public async Task<IEnumerable<Address>> GetAsync()
+        {
+            return await _context.Address
+                .Include(x => x.City)
+                .ThenInclude(x => x.State)
+                .ThenInclude(x => x.Country)
+                .ToListAsync();
+        }
+
+        public async Task<Address> GetAddressByIdAsync(int id)
+        {
+            return await _context.Address.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public void Remove(Address entity)
+        {
+            base.Delete(entity.Id);
+        }
+
+        public void Edit(Address entity)
+        {
+            _context.Address.Update(entity);
+        }
+
+        public async Task<Address> AddAsync(Address entity)
+        {
+            _context.Attach(entity.City);
+            _context.Attach(entity.City.State);
+            _context.Attach(entity.City.State.Country);
+            return await base.InsertAsync(entity).ConfigureAwait(false);
+        }
+    }
+}

@@ -15,19 +15,22 @@ namespace Healthcare.Api.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly IDoctorService _doctorService;
+        private readonly IAddressService _addressService;
+
         private readonly IMapper _mapper;
 
-        public DoctorController(UserManager<User> userManager, IMapper mapper, IDoctorService doctorService)
+        public DoctorController(UserManager<User> userManager, IMapper mapper, IDoctorService doctorService, IAddressService addressService)
         {
             _userManager = userManager;
             _doctorService = doctorService;
             _mapper = mapper;
+            _addressService = addressService;
         }
 
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<User>>> Get()
         {
-            var medics = await _userManager.GetUsersInRoleAsync(RoleEnum.Medico);
+            var medics = await _doctorService.GetAsync();
             return Ok(medics);
         }
 
@@ -50,11 +53,17 @@ namespace Healthcare.Api.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(newUser, RoleEnum.Medico);
+
+                    var address = _mapper.Map<Address>(userRequest.Address);
+                    await _addressService.Add(address);
+
                     var doctor = new Doctor
                     {
                         UserId = newUser.Id,
+                        Matricula = userRequest.Matricula,
                         DoctorSpecialities = null,
-                        HealthPlans = null
+                        HealthPlans = null,
+                        Address = address
                     };
 
                     await _doctorService.Add(doctor);

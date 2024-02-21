@@ -9,6 +9,7 @@
         public string PhoneNumber { get; set; }
         public DateTime BirthDate { get; set; }
         public string Photo { get; set; }
+        public AddressRequest Address { get; set; }
         // obra social
     }
 }

@@ -47,10 +47,5 @@ namespace Healthcare.Api.Controllers
             return Ok($"Especialidades asignadas al doctor exitosamente.");
         }
 
-        // DELETE api/<DoctorSpecialityController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

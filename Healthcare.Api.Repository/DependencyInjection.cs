@@ -27,6 +27,7 @@ namespace Healthcare.Api.Repository
             services.AddTransient<IHealthInsuranceRepository, HealthInsuranceRepository>();
             services.AddTransient<IHealthPlanRepository, HealthPlanRepository>();
             services.AddTransient<IDoctorSpecialityRepository, DoctorSpecialityRepository>();
+            services.AddTransient<IAddressRepository, AddressRepository>();
 
             return services;
         }

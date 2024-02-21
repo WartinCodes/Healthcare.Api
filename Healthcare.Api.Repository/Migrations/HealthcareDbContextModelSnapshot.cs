@@ -23,6 +23,97 @@ namespace Healthcare.Api.Repository.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("Description");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("Number");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("PhoneNumber");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("Street");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.ToTable("Address", "healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("IdState")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(45)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(45)")
+                        .HasColumnName("Name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdState");
+
+                    b.ToTable("City", "healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(45)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(45)")
+                        .HasColumnName("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Country", "healthcare");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Doctor", b =>
                 {
                     b.Property<int>("Id")
@@ -31,10 +122,19 @@ namespace Healthcare.Api.Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("IdAddress")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Matricula")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdAddress");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -50,6 +150,12 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<int>("HealthPlanId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
                     b.HasKey("DoctorId", "HealthPlanId");
 
                     b.HasIndex("HealthPlanId");
@@ -64,6 +170,12 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.Property<int>("SpecialityId")
                         .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.HasKey("DoctorId", "SpecialityId");
 
@@ -122,10 +234,15 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<string>("CUIL")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("IdAddress")
+                        .HasColumnType("int");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdAddress");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -140,6 +257,12 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.Property<int>("HealthPlanId")
                         .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.HasKey("PatientId", "HealthPlanId");
 
@@ -190,14 +313,34 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RoleId")
+                    b.HasKey("Id");
+
+                    b.ToTable("Speciality", "healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.State", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("IdCountry")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(45)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(45)")
+                        .HasColumnName("Name");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("IdCountry");
 
-                    b.ToTable("Speciality", "healthcare");
+                    b.ToTable("State", "healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
@@ -392,13 +535,43 @@ namespace Healthcare.Api.Repository.Migrations
                     b.ToTable("AspNetUserTokens", "healthcare");
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Address", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.City", "City")
+                        .WithMany("Addresses")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.City", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.State", "State")
+                        .WithMany("Cities")
+                        .HasForeignKey("IdState")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("State");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Doctor", b =>
                 {
+                    b.HasOne("Healthcare.Api.Core.Entities.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("IdAddress")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Healthcare.Api.Core.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("Healthcare.Api.Core.Entities.Doctor", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Address");
 
                     b.Navigation("User");
                 });
@@ -454,11 +627,19 @@ namespace Healthcare.Api.Repository.Migrations
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
                 {
+                    b.HasOne("Healthcare.Api.Core.Entities.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("IdAddress")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Healthcare.Api.Core.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("Healthcare.Api.Core.Entities.Patient", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Address");
 
                     b.Navigation("User");
                 });
@@ -482,11 +663,15 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("Patient");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.Speciality", b =>
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.State", b =>
                 {
-                    b.HasOne("Healthcare.Api.Core.Entities.Role", null)
-                        .WithMany("Specialities")
-                        .HasForeignKey("RoleId");
+                    b.HasOne("Healthcare.Api.Core.Entities.Country", "Country")
+                        .WithMany("States")
+                        .HasForeignKey("IdCountry")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -540,6 +725,16 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.City", b =>
+                {
+                    b.Navigation("Addresses");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Country", b =>
+                {
+                    b.Navigation("States");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Doctor", b =>
                 {
                     b.Navigation("DoctorSpecialities");
@@ -550,14 +745,14 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("HealthPlans");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.Role", b =>
-                {
-                    b.Navigation("Specialities");
-                });
-
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Speciality", b =>
                 {
                     b.Navigation("DoctorSpecialities");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.State", b =>
+                {
+                    b.Navigation("Cities");
                 });
 #pragma warning restore 612, 618
         }

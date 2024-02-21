@@ -21,7 +21,14 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<IEnumerable<Patient>> GetAsync()
         {
-            return await base.GetAsync().ConfigureAwait(false);
+            return await _context.Patient
+                .Include(x => x.User)
+                .Include(x => x.Address)
+                .ThenInclude(x => x.City)
+                .ThenInclude(x => x.State)
+                .ThenInclude(x => x.Country)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<Patient> GetPatientByIdAsync(int id)
