@@ -4,7 +4,6 @@ namespace Healthcare.Api.Core.Entities
 {
     public class Address
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Street { get; set; }
         public string Number { get; set; }

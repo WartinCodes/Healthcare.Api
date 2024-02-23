@@ -8,7 +8,6 @@ namespace Healthcare.Api.Core.Entities
         {
             Name = String.Empty;
         }
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string Name { get; set; }
         public int IdState { get; set; }

@@ -9,7 +9,7 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
         public void Configure(EntityTypeBuilder<Patient> builder)
         {
             builder.ToTable("Patient").HasKey(x => x.Id);
-            builder.Property(p => p.Id).UseIdentityColumn().ValueGeneratedOnAdd();
+            builder.Property(p => p.Id).ValueGeneratedOnAdd();
 
             builder.Property(p => p.CUIL).IsRequired(false);
 

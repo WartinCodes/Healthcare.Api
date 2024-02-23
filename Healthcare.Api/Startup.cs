@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
 using System.Text;
 
 namespace Helthcare.Api
@@ -28,17 +29,9 @@ namespace Helthcare.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<HealthcareDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString(nameof(HealthcareDbContext)),
-                    sqlServerOptionsAction: sqlOptions =>
-                    {
-                        sqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 5,
-                            maxRetryDelay: TimeSpan.FromSeconds(30),
-                            errorNumbersToAdd: null);
-                    });
-            });
+
+            services.AddDbContext<HealthcareDbContext>(options => 
+                options.UseMySQL(Configuration.GetConnectionString(nameof(HealthcareDbContext))));
 
             services.AddIdentity<User, Role>()
                 .AddRoleManager<RoleManager<Role>>()

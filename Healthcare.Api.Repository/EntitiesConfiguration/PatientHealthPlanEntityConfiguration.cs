@@ -12,7 +12,10 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.HasKey(ph => ph.Id);
             builder.Property(ph => ph.Id).ValueGeneratedOnAdd();
 
-            builder.HasKey(ph => new { ph.PatientId, ph.HealthPlanId });
+            builder.Property(ph => ph.PatientId);
+            builder.Property(ph => ph.HealthPlanId);
+
+            builder.HasIndex(ph => new { ph.PatientId, ph.HealthPlanId }).IsUnique();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Healthcare.Api.Repository.Context
     public class HealthcareDbContext : IdentityDbContext<User, Role, int>, IHealthcareDbContext
     {
         private readonly IConfiguration _configuration;
-        public const string _Schema = "healthcare";
+        public const string _Schema = "Healthcare";
 
         public DbSet<Patient> Patient { get; set; }
         public DbSet<Doctor> Doctor { get; set; }
