@@ -8,7 +8,6 @@ COPY Healthcare.Api/*.csproj ./Healthcare.Api.Api/
 COPY Healthcare.Api.Service/*.csproj ./Healthcare.Api.Service/
 COPY Healthcare.Api.Core/*.csproj ./Healthcare.Api.Core/
 COPY Healthcare.Api.Repository/*.csproj ./Healthcare.Api.Repository/
-COPY SolutionItems/. ./SolutionItems/
 
 RUN dotnet restore *.sln
 
