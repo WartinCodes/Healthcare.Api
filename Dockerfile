@@ -1,28 +1,25 @@
+# Use the .NET 6 SDK image
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /app
 
-# copy csproj and restore as distinct layers
+# Copy the solution file and restore dependencies
 COPY *.sln .
-# COPY DockerTest/*.csproj ./DockerTest/
-COPY Healthcare.Api/*.csproj ./Healthcare.Api.Api/
-COPY Healthcare.Api.Service/*.csproj ./Healthcare.Api.Service/
+COPY Healthcare.Api/*.csproj ./Healthcare.Api/
 COPY Healthcare.Api.Core/*.csproj ./Healthcare.Api.Core/
+COPY Healthcare.Api.Service/*.csproj ./Healthcare.Api.Service/
 COPY Healthcare.Api.Repository/*.csproj ./Healthcare.Api.Repository/
 
-RUN dotnet restore *.sln
+# Restore NuGet packages
+RUN dotnet restore
 
-# copy everything else and build app
-COPY Healthcare.Api/. ./Healthcare.Api.Api/
-COPY Healthcare.Api.Service/. ./Healthcare.Api.Service/
-COPY Healthcare.Api.Core/. ./Healthcare.Api.Core/
-COPY Healthcare.Api.Repository/. ./Healthcare.Api.Repository/
+# Copy the remaining source code
+COPY . .
 
-WORKDIR /app/Healthcare.Api
-RUN dotnet publish -c Release -o /release
+# Build the application
+RUN dotnet publish -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0
-
+# Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
 WORKDIR /app
-
-COPY --from=build /release ./   
+COPY --from=build /app/out ./
 ENTRYPOINT ["dotnet", "Healthcare.Api.dll"]
