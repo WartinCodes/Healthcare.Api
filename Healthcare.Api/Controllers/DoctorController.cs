@@ -28,10 +28,10 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<User>>> Get()
+        public async Task<ActionResult<IEnumerable<Doctor>>> Get()
         {
-            var medics = await _doctorService.GetAsync();
-            return Ok(medics);
+            var doctors = await _doctorService.GetAsync();
+            return Ok(doctors);
         }
 
         [HttpPost("create")]
