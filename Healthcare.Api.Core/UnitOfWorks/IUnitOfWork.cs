@@ -11,6 +11,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
         IHealthPlanRepository HealthPlanRepository { get; }
         IDoctorSpecialityRepository DoctorSpecialityRepository { get; }
         IAddressRepository AddressRepository { get; }
+        ILaboratoryDetailRepository LaboratoryDetailRepository { get; }
 
         void Save();
         Task SaveAsync();

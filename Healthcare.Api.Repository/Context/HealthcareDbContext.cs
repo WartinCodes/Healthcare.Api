@@ -21,6 +21,7 @@ namespace Healthcare.Api.Repository.Context
         public DbSet<City> City { get; set; }
         public DbSet<State> State { get; set; }
         public DbSet<Country> Country { get; set; }
+        public DbSet<LaboratoryDetail> LaboratoryDetail { get; set; }
 
 
         public HealthcareDbContext(IConfiguration configuration) : base()
