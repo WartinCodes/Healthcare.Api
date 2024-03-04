@@ -19,7 +19,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("upload-pdf")]
-        public IActionResult UploadPdf([FromForm] Microsoft.AspNetCore.Http.IFormFile file)
+        public IActionResult UploadPdf([FromForm] IFormFile file)
         {
             if (file == null || file.Length <= 0)
             {
