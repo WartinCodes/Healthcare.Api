@@ -19,13 +19,23 @@ namespace Healthcare.Api.Controllers
         private readonly IPatientService _patientService;
         private readonly IMapper _mapper;
         private readonly IAddressService _addressService;
+        private readonly IHealthPlanService _healthPlanService;
+        private readonly IPatientHealthPlanService _patientHealthPlanService;
 
-        public PatientController(UserManager<User> userManager, IMapper mapper, IPatientService patientService, IAddressService addressService)
+        public PatientController(
+            UserManager<User> userManager,
+            IMapper mapper,
+            IPatientService patientService,
+            IPatientHealthPlanService patientHealthPlanService,
+            IAddressService addressService,
+            IHealthPlanService healthPlanService)
         {
             _userManager = userManager;
             _patientService = patientService;
             _mapper = mapper;
             _addressService = addressService;
+            _healthPlanService = healthPlanService;
+            _patientHealthPlanService = patientHealthPlanService;
         }
 
         [HttpGet("all")]
@@ -103,6 +113,18 @@ namespace Healthcare.Api.Controllers
                     };
 
                     await _patientService.Add(patient);
+
+                    foreach (var healthPlanId in userRequest.HealthPlans)
+                    {
+                        var healthPlan = await _healthPlanService.GetHealthPlanByIdAsync(healthPlanId);
+                        if (healthPlan == null)
+                        {
+                            return BadRequest($"Plan con ID {healthPlanId} no encontrada.");
+                        }
+
+                        var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlanId };
+                        await _patientHealthPlanService.Add(patientHealthPlan);
+                    }
 
                     return Ok("Paciente creado exitosamente.");
                 }

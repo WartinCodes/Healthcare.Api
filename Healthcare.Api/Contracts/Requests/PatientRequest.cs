@@ -10,6 +10,6 @@
         public DateTime BirthDate { get; set; }
         public string Photo { get; set; }
         public AddressRequest Address { get; set; }
-        // obra social
+        public int[] HealthPlans { get; set; }
     }
 }

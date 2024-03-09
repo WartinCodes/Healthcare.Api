@@ -5,18 +5,19 @@ namespace Healthcare.Api.Core.UnitOfWorks
 {
     public interface IUnitOfWork : IDisposable
     {
-        IPatientRepository PatientRepository { get; }
         IDoctorRepository DoctorRepository { get; }
+        IDoctorHealthPlanRepository DoctorHealthPlanRepository { get; }
+        IDoctorSpecialityRepository DoctorSpecialityRepository { get; }
         ISpecialityRepository SpecialityRepository { get; }
         IHealthInsuranceRepository HealthInsuranceRepository { get; }
         IHealthPlanRepository HealthPlanRepository { get; }
-        IDoctorSpecialityRepository DoctorSpecialityRepository { get; }
         IAddressRepository AddressRepository { get; }
         ILaboratoryDetailRepository LaboratoryDetailRepository { get; }
         ICityRepository CityRepository { get; }
         ICountryRepository CountryRepository { get; }
         IStateRepository StateRepository { get; }
-        IDoctorHealthPlanRepository DoctorHealthPlanRepository { get; }
+        IPatientRepository PatientRepository { get; }
+        IPatientHealthPlanRepository PatientHealthPlanRepository { get; }
 
         void Save();
         Task SaveAsync();

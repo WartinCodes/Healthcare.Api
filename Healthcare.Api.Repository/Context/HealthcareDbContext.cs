@@ -12,13 +12,14 @@ namespace Healthcare.Api.Repository.Context
         public const string _Schema = "Healthcare";
 
         public DbSet<Address> Address { get; set; }
+        public DbSet<City> City { get; set; }
         public DbSet<Patient> Patient { get; set; }
+        public DbSet<PatientHealthPlan> PatientHealthPlan { get; set; }
         public DbSet<Doctor> Doctor { get; set; }
         public DbSet<DoctorSpeciality> DoctorSpeciality { get; set; }
         public DbSet<DoctorHealthPlan> DoctorHealthPlan { get; set; }
         public DbSet<HealthInsurance> HealthInsurance { get; set; }
         public DbSet<HealthPlan> HealthPlan { get ; set; }
-        public DbSet<City> City { get; set; }
         public DbSet<State> State { get; set; }
         public DbSet<Country> Country { get; set; }
         public DbSet<LaboratoryDetail> LaboratoryDetail { get; set; }
