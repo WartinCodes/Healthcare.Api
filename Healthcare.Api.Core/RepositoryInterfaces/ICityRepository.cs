@@ -6,5 +6,6 @@ namespace Healthcare.Api.Core.RepositoryInterfaces
     {
         Task<City> GetCityByIdAsync(int id);
         Task<IEnumerable<City>> GetAllCitiesAsync();
+        Task<IEnumerable<City>> GetCitiesByStateId(int stateId);
     }
 }

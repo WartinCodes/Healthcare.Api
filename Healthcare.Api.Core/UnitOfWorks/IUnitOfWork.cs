@@ -1,4 +1,5 @@
 ﻿using Healthcare.Api.Core.RepositoryInterfaces;
+using Healthcare.Api.Core.ServiceInterfaces;
 
 namespace Healthcare.Api.Core.UnitOfWorks
 {
@@ -15,6 +16,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
         ICityRepository CityRepository { get; }
         ICountryRepository CountryRepository { get; }
         IStateRepository StateRepository { get; }
+        IDoctorHealthPlanRepository DoctorHealthPlanRepository { get; }
 
         void Save();
         Task SaveAsync();

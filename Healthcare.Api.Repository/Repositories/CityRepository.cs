@@ -52,5 +52,12 @@ namespace Healthcare.Api.Repository.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public async Task<IEnumerable<City>> GetCitiesByStateId(int stateId)
+        {
+            return await _context.City
+                .Where(x => x.IdState == stateId)
+                .ToListAsync();
+        }
     }
 }

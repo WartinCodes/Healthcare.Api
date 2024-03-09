@@ -25,5 +25,10 @@ namespace Healthcare.Api.Service.Services
         {
             return _StateRepository.GetAllStateAsync();
         }
+
+        public Task<IEnumerable<State>> GetStatesByCountryId(int countryId)
+        {
+            return _StateRepository.GetStatesByCountryId(countryId);
+        }
     }
 }

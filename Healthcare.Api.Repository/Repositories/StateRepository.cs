@@ -31,6 +31,13 @@ namespace Healthcare.Api.Repository.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<State>> GetStatesByCountryId(int countryId)
+        {
+            return await _context.State
+                .Where(x => x.IdCountry == countryId)
+                .ToListAsync();
+        }
+
         public Task<State> AddAsync(State entity)
         {
             throw new NotImplementedException();

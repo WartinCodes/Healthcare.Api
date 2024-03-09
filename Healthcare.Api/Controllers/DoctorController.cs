@@ -3,6 +3,7 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,15 +18,31 @@ namespace Healthcare.Api.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IDoctorService _doctorService;
         private readonly IAddressService _addressService;
+        private readonly ISpecialityService _specialityService;
+        private readonly IDoctorSpecialityService _doctorSpecialityService;
+        private readonly IHealthPlanService _healthPlanService;
+        private readonly IDoctorHealthPlanService _doctorHealthPlanService;
 
         private readonly IMapper _mapper;
 
-        public DoctorController(UserManager<User> userManager, IMapper mapper, IDoctorService doctorService, IAddressService addressService)
+        public DoctorController(
+            UserManager<User> userManager, 
+            IMapper mapper, 
+            IDoctorService doctorService,
+            IAddressService addressService,
+            ISpecialityService specialityService, 
+            IHealthPlanService healthPlanService,
+            IDoctorSpecialityService doctorSpecialityService,
+            IDoctorHealthPlanService doctorHealthPlanService)
         {
-            _userManager = userManager;
-            _doctorService = doctorService;
-            _mapper = mapper;
             _addressService = addressService;
+            _doctorService = doctorService;
+            _doctorSpecialityService = doctorSpecialityService;
+            _doctorHealthPlanService = doctorHealthPlanService;
+            _healthPlanService = healthPlanService;
+            _mapper = mapper;
+            _specialityService = specialityService;
+            _userManager = userManager;
         }
 
         [HttpGet("all")]
@@ -73,6 +90,7 @@ namespace Healthcare.Api.Controllers
             return Ok(doctor);
         }
 
+        // REVISAR VALIDACIONES, EN EL CASO DE QUE HAYA UN ERROR QUE CANCELE TODO Y NO CREE NADA M{AS
         [HttpPost("create")]
         public async Task<IActionResult> Post([FromBody] DoctorRequest userRequest)
         {
@@ -106,6 +124,30 @@ namespace Healthcare.Api.Controllers
                     };
 
                     await _doctorService.Add(doctor);
+
+                    foreach (var specialityId in userRequest.Specialities)
+                    {
+                        var speciality = await _specialityService.GetSpecialityByIdAsync(specialityId);
+                        if (speciality == null)
+                        {
+                            return BadRequest($"Especialidad con ID {specialityId} no encontrada.");
+                        }
+
+                        var doctorSpeciality = new DoctorSpeciality { DoctorId = doctor.Id, SpecialityId = specialityId };
+                        await _doctorSpecialityService.Add(doctorSpeciality);
+                    }
+
+                    foreach (var healthPlanId in userRequest.HealthPlans)
+                    {
+                        var healthPlan = await _healthPlanService.GetHealthPlanByIdAsync(healthPlanId);
+                        if (healthPlan == null)
+                        {
+                            return BadRequest($"Plan con ID {healthPlanId} no encontrada.");
+                        }
+
+                        var doctorHealthPlan = new DoctorHealthPlan { DoctorId = doctor.Id, HealthPlanId = healthPlanId };
+                        await _doctorHealthPlanService.Add(doctorHealthPlan);
+                    }
 
                     return Ok("Médico creado exitosamente.");
                 }

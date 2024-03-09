@@ -16,5 +16,6 @@ namespace Healthcare.Api.Repository.Context
         DbSet<State> State { get; set; }
         DbSet<Country> Country { get; set; }
         DbSet<LaboratoryDetail> LaboratoryDetail { get; set; }
+        DbSet<DoctorHealthPlan> DoctorHealthPlan { get; set; }
     }
 }

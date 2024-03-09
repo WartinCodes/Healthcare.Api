@@ -26,6 +26,11 @@ namespace Healthcare.Api.Service.Services
             return _cityRepository.GetAllCitiesAsync();
         }
 
+        public Task<IEnumerable<City>> GetCitiesByStateId(int stateId)
+        {
+            return _cityRepository.GetCitiesByStateId(stateId);
+        }
+
         public Task<City> GetCityByIdAsync(int id)
         {
             return _cityRepository.GetCityByIdAsync(id);

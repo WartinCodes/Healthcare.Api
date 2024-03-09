@@ -11,7 +11,7 @@
         public string Photo { get; set; }
         public string Matricula { get; set; }
         public AddressRequest Address { get; set; }
-        // obra social con la que trabaja
-        // especialidad
+        public int[] Specialities { get; set; }
+        public int[] HealthPlans { get; set; }
     }
 }

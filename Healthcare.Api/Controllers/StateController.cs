@@ -25,5 +25,13 @@ namespace Healthcare.Api.Controllers
 
             return Ok(_mapper.Map<IEnumerable<StateResponse>>(states));
         }
+
+        [HttpGet("byCountry/{id}")]
+        public async Task<ActionResult<IEnumerable<StateResponse>>> GetStatesByCountry([FromRoute] int id)
+        {
+            var states = await _StateService.GetStatesByCountryId(id);
+
+            return Ok(_mapper.Map<IEnumerable<StateResponse>>(states));
+        }
     }
 }
