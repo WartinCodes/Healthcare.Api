@@ -125,27 +125,27 @@ namespace Healthcare.Api.Controllers
 
                     await _doctorService.Add(doctor);
 
-                    foreach (var specialityId in userRequest.Specialities)
+                    foreach (var speciality in userRequest.Specialities)
                     {
-                        var speciality = await _specialityService.GetSpecialityByIdAsync(specialityId);
-                        if (speciality == null)
+                        var specialityEntity = await _specialityService.GetSpecialityByIdAsync(speciality.Id);
+                        if (specialityEntity == null)
                         {
-                            return BadRequest($"Especialidad con ID {specialityId} no encontrada.");
+                            return BadRequest($"Especialidad con ID {specialityEntity} no encontrada.");
                         }
 
-                        var doctorSpeciality = new DoctorSpeciality { DoctorId = doctor.Id, SpecialityId = specialityId };
+                        var doctorSpeciality = new DoctorSpeciality { DoctorId = doctor.Id, SpecialityId = specialityEntity.Id };
                         await _doctorSpecialityService.Add(doctorSpeciality);
                     }
 
-                    foreach (var healthPlanId in userRequest.HealthPlans)
+                    foreach (var healthPlan in userRequest.HealthPlans)
                     {
-                        var healthPlan = await _healthPlanService.GetHealthPlanByIdAsync(healthPlanId);
-                        if (healthPlan == null)
+                        var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
+                        if (healthPlanEntity == null)
                         {
-                            return BadRequest($"Plan con ID {healthPlanId} no encontrada.");
+                            return BadRequest($"Plan con ID {healthPlanEntity} no encontrada.");
                         }
 
-                        var doctorHealthPlan = new DoctorHealthPlan { DoctorId = doctor.Id, HealthPlanId = healthPlanId };
+                        var doctorHealthPlan = new DoctorHealthPlan { DoctorId = doctor.Id, HealthPlanId = healthPlanEntity.Id };
                         await _doctorHealthPlanService.Add(doctorHealthPlan);
                     }
 

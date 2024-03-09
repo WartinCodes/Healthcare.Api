@@ -2,6 +2,7 @@
 {
     public class HealthPlanRequest
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public HealthInsuranceRequest HealthInsuranceRequest { get; set; }
     }

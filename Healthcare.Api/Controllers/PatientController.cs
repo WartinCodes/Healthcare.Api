@@ -114,15 +114,15 @@ namespace Healthcare.Api.Controllers
 
                     await _patientService.Add(patient);
 
-                    foreach (var healthPlanId in userRequest.HealthPlans)
+                    foreach (var healthPlan in userRequest.HealthPlans)
                     {
-                        var healthPlan = await _healthPlanService.GetHealthPlanByIdAsync(healthPlanId);
-                        if (healthPlan == null)
+                        var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
+                        if (healthPlanEntity == null)
                         {
-                            return BadRequest($"Plan con ID {healthPlanId} no encontrada.");
+                            return BadRequest($"Plan con ID {healthPlan.Id} no encontrada.");
                         }
 
-                        var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlanId };
+                        var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
                         await _patientHealthPlanService.Add(patientHealthPlan);
                     }
 

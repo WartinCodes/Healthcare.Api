@@ -1,4 +1,6 @@
-﻿namespace Healthcare.Api.Contracts.Requests
+﻿using Healthcare.Api.Core.Entities;
+
+namespace Healthcare.Api.Contracts.Requests
 {
     public class PatientRequest
     {
@@ -10,6 +12,6 @@
         public DateTime BirthDate { get; set; }
         public string Photo { get; set; }
         public AddressRequest Address { get; set; }
-        public int[] HealthPlans { get; set; }
+        public List<HealthPlan> HealthPlans { get; set; }
     }
 }

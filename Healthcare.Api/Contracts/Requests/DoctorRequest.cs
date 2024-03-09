@@ -11,7 +11,7 @@
         public string Photo { get; set; }
         public string Matricula { get; set; }
         public AddressRequest Address { get; set; }
-        public int[] Specialities { get; set; }
-        public int[] HealthPlans { get; set; }
+        public List<SpecialityRequest> Specialities { get; set; }
+        public List<HealthPlanRequest> HealthPlans { get; set; }
     }
 }
