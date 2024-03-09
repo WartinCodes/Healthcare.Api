@@ -4,6 +4,10 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using static iText.IO.Codec.TiffWriter;
 
 namespace Healthcare.Api.Controllers
 {
@@ -11,12 +15,6 @@ namespace Healthcare.Api.Controllers
     [ApiController]
     public class LaboratoryController : ControllerBase
     {
-        private readonly LaboratoryDetailRepository _repository;
-
-        public LaboratoryController(LaboratoryDetailRepository repository)
-        {
-            _repository = repository;
-        }
 
         [HttpPost("upload-pdf")]
         public IActionResult UploadPdf([FromForm] IFormFile file)
@@ -46,7 +44,6 @@ namespace Healthcare.Api.Controllers
                                 // extraído del PDF y convertirlo en un objeto LaboratoryDetails
                                 // que puedas guardar en el repositorio.
 
-                                // Ejemplo:
                                 var laboratoryDetails = ParsePdfText(text);
                                 //_repository.Save(laboratoryDetails);
                             }
@@ -62,17 +59,15 @@ namespace Healthcare.Api.Controllers
             }
         }
 
-
         private LaboratoryDetail ParsePdfText(string text)
         {
-            // Here you need to implement the logic to parse the text
-            // extracted from the PDF and convert it into LaboratoryDetails object.
-            // You can use regular expressions or any other parsing techniques
-            // to extract the required information.
-
-            // Example:
             var laboratoryDetails = new LaboratoryDetail();
-            // Parse the text and populate the laboratoryDetails object
+
+            foreach (var line in text.Split('\n'))
+            {
+
+            }
+
             return laboratoryDetails;
         }
     }

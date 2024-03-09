@@ -23,7 +23,6 @@ namespace Healthcare.Api.Repository.Context
         public DbSet<Country> Country { get; set; }
         public DbSet<LaboratoryDetail> LaboratoryDetail { get; set; }
 
-
         public HealthcareDbContext(IConfiguration configuration) : base()
         {
             this._configuration = configuration;

@@ -23,6 +23,10 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.Doctor
                 .Include(x => x.User)
+                .Include(x => x.DoctorSpecialities)
+                .ThenInclude(x => x.Speciality)
+                .Include(x => x.HealthPlans)
+                .ThenInclude(x => x.HealthInsurance)
                 .Include(x => x.Address)
                 .ThenInclude(x => x.City)
                 .ThenInclude(x => x.State)
@@ -33,7 +37,18 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<Doctor> GetDoctorByIdAsync(int id)
         {
-            return await _context.Doctor.Where(x => x.Id == id).AsNoTracking().FirstOrDefaultAsync();
+            return await _context.Doctor.Where(x => x.Id == id)
+                .Include(x => x.User)
+                .Include(x => x.DoctorSpecialities)
+                .ThenInclude(x => x.Speciality)
+                .Include(x => x.HealthPlans)
+                .ThenInclude(x => x.HealthInsurance)
+                .Include(x => x.Address)
+                .ThenInclude(x => x.City)
+                .ThenInclude(x => x.State)
+                .ThenInclude(x => x.Country)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
         }
 
         public void Remove(Doctor entity)

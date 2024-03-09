@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace Healthcare.Api.Controllers
 {
@@ -27,10 +29,46 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<Patient>>> Get()
+        public async Task<ActionResult<IEnumerable<PatientResponse>>> Get()
         {
-            var patients = await _patientService.GetAsync();
+            var patients = (await _patientService.GetAsync())
+                .Select(x => new PatientResponse()
+                {
+                    Id = x.Id,
+                    FirstName = x.User.FirstName,
+                    LastName = x.User.LastName,
+                    DNI = x.User.UserName,
+                    Address = _mapper.Map<AddressResponse>(x.Address),
+                    HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(x.HealthPlans),
+                    BirthDate = x.User.BirthDate,
+                    Email = x.User.Email,
+                    Photo = x.User.Photo,
+                    PhoneNumber = x.User.PhoneNumber
+                });
+            
             return Ok(patients);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<PatientResponse>> Get([FromRoute] int id)
+        {
+            var patientEntity = await _patientService.GetPatientByIdAsync(id);
+
+            var patient = new PatientResponse()
+            {
+                Id = patientEntity.Id,
+                FirstName = patientEntity.User.FirstName,
+                LastName = patientEntity.User.LastName,
+                DNI = patientEntity.User.UserName,
+                Address = _mapper.Map<AddressResponse>(patientEntity.Address),
+                HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(patientEntity.HealthPlans),
+                BirthDate = patientEntity.User.BirthDate,
+                Email = patientEntity.User.Email,
+                Photo = patientEntity.User.Photo,
+                PhoneNumber = patientEntity.User.PhoneNumber
+            };
+
+            return Ok(patient);
         }
 
         [HttpPost("create")]

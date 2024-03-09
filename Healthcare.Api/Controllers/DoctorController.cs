@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -28,10 +29,48 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<Doctor>>> Get()
+        public async Task<ActionResult<IEnumerable<DoctorResponse>>> Get()
         {
-            var doctors = await _doctorService.GetAsync();
+            var doctors = (await _doctorService.GetAsync())
+                .Select(x => new DoctorResponse()
+                {
+                    Id = x.Id,
+                    FirstName = x.User.FirstName,
+                    LastName = x.User.LastName,
+                    Matricula = x.Matricula,
+                    DNI = x.User.UserName,
+                    Address = _mapper.Map<AddressResponse>(x.Address),
+                    Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(x.DoctorSpecialities),
+                    HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(x.HealthPlans),
+                    Email = x.User.Email,
+                    PhoneNumber = x.User.PhoneNumber,
+                    Photo = x.User.Photo
+                });
+
             return Ok(doctors);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<DoctorResponse>> Get([FromRoute] int id)
+        {
+            var doctorEntity = await _doctorService.GetDoctorByIdAsync(id);
+
+            var doctor = new DoctorResponse()
+            {
+                Id = doctorEntity.Id,
+                FirstName = doctorEntity.User.FirstName,
+                LastName = doctorEntity.User.LastName,
+                Matricula = doctorEntity.Matricula,
+                DNI = doctorEntity.User.UserName,
+                Address = _mapper.Map<AddressResponse>(doctorEntity.Address),
+                Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(doctorEntity.DoctorSpecialities),
+                HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(doctorEntity.HealthPlans),
+                Email = doctorEntity.User.Email,
+                PhoneNumber = doctorEntity.User.PhoneNumber,
+                Photo = doctorEntity.User.Photo
+            };
+
+            return Ok(doctor);
         }
 
         [HttpPost("create")]

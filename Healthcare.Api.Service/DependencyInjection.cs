@@ -1,4 +1,5 @@
-﻿using Healthcare.Api.Core.ServiceInterfaces;
+﻿using Healthcare.Api.Core.RepositoryInterfaces;
+using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,9 @@ namespace Healthcare.Api.Service
             services.AddTransient<IHealthPlanService, HealthPlanService>();
             services.AddTransient<IDoctorSpecialityService, DoctorSpecialityService>();
             services.AddTransient<IAddressService, AddressService>();
+            services.AddTransient<ICountryService, CountryService>();
+            services.AddTransient<IStateService, StateService>();
+            services.AddTransient<ICityService, CityService>();
 
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
 
