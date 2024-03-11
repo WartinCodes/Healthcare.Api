@@ -1,9 +1,8 @@
 ﻿namespace Healthcare.Api.Contracts.Responses
 {
-    public class HealthPlanResponse
+    public class HealthInsuranceByHealthPlanResponse
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public HealthInsuranceByHealthPlanResponse HealthInsurance{ get; set; }
     }
 }

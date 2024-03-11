@@ -3,6 +3,7 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
@@ -29,27 +30,34 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<HealthPlanResponse>>(healthPlans));
         }
 
-        [HttpPost("create")]
-        public async Task<IActionResult> Post([FromBody] HealthPlanRequest healthPlanRequest)
+        [HttpGet("byHealthInsurance/{id}")]
+        public async Task<ActionResult<IEnumerable<HealthPlanResponse>>> GetHealthPlansByHealthInsurance([FromRoute] int id)
         {
-            try
-            {
-                var healthInsurance = await _healthInsuranceService.GetHealthInsuranceByIdAsync(healthPlanRequest.HealthInsurance.Id);
-                if (healthInsurance == null)
-                {
-                    return BadRequest("La obra social especificado no existe.");
-                }
-
-                var newHealthPlan = _mapper.Map<HealthPlan>(healthPlanRequest);
-                await _healthPlanService.Add(newHealthPlan);
-
-                return Ok("Plan de obra social creada exitosamente.");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"An error occurred while processing your request: {ex}");
-            }
+            var healthPlans = await _healthPlanService.GetHealthPlansByHealthInsuranceId(id);
+            return Ok(_mapper.Map<IEnumerable<HealthPlanResponse>>(healthPlans));
         }
+
+        //[HttpPost("create")]
+        //public async Task<IActionResult> Post([FromBody] HealthPlanRequest healthPlanRequest)
+        //{
+        //    try
+        //    {
+        //        var healthInsurance = await _healthInsuranceService.GetHealthInsuranceByIdAsync(healthPlanRequest.HealthInsurance.Id);
+        //        if (healthInsurance == null)
+        //        {
+        //            return BadRequest("La obra social especificado no existe.");
+        //        }
+
+        //        var newHealthPlan = _mapper.Map<HealthPlan>(healthPlanRequest);
+        //        await _healthPlanService.Add(newHealthPlan);
+
+        //        return Ok("Plan de obra social creada exitosamente.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"An error occurred while processing your request: {ex}");
+        //    }
+        //}
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] HealthPlanRequest healthPlanRequest)
