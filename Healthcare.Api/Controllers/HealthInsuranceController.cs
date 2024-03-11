@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +21,10 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<HealthInsurance>>> Get()
+        public async Task<ActionResult<IEnumerable<HealthInsuranceResponse>>> Get()
         {
             var healthInsurances = await _healthInsuranceService.GetAsync();
-            return Ok(healthInsurances);
+            return Ok(_mapper.Map<IEnumerable<HealthInsuranceResponse>>(healthInsurances));
         }
 
         [HttpPost("create")]

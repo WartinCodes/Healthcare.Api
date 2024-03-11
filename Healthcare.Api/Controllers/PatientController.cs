@@ -3,10 +3,8 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.X509;
 
 namespace Healthcare.Api.Controllers
 {

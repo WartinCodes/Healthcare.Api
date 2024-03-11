@@ -21,7 +21,9 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<IEnumerable<HealthInsurance>> GetAsync()
         {
-            return await base.GetAsync().ConfigureAwait(false);
+            return await _context.HealthInsurance
+                .Include(x => x.HealthPlans)
+                .ToListAsync();
         }
 
         public async Task<HealthInsurance> GetHealthInsuranceByIdAsync(int id)
