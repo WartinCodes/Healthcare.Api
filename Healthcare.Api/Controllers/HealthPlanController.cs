@@ -34,7 +34,7 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
-                var healthInsurance = await _healthInsuranceService.GetHealthInsuranceByIdAsync(healthPlanRequest.HealthInsuranceRequest.Id);
+                var healthInsurance = await _healthInsuranceService.GetHealthInsuranceByIdAsync(healthPlanRequest.HealthInsurance.Id);
                 if (healthInsurance == null)
                 {
                     return BadRequest("La obra social especificado no existe.");

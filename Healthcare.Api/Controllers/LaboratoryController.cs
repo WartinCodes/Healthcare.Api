@@ -5,9 +5,12 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using static iText.IO.Codec.TiffWriter;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Healthcare.Api.Controllers
 {
@@ -59,16 +62,35 @@ namespace Healthcare.Api.Controllers
             }
         }
 
+        // PAGE 1 READY
         private LaboratoryDetail ParsePdfText(string text)
         {
             var laboratoryDetails = new LaboratoryDetail();
-
-            foreach (var line in text.Split('\n'))
+            var properties = typeof(LaboratoryDetail).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            foreach (string line in text.Split('\n'))
             {
+                string cleanLine = line.Trim().ToLowerInvariant().Replace(".", "");
+                foreach (var property in properties)
+                {
+                    var displayNameAttribute = (DisplayNameAttribute)property.GetCustomAttribute(typeof(DisplayNameAttribute));
+                    string propertyNameToShow = displayNameAttribute != null ? displayNameAttribute.DisplayName : property.Name;
+
+                    if (cleanLine.Contains(propertyNameToShow.ToLowerInvariant()))
+                    {
+                        MatchCollection matches = Regex.Matches(cleanLine, @"m?\d+([,.]\d+)?");
+                        
+                        var numericValue = Convert.ChangeType(matches.First().Value, property.PropertyType, CultureInfo.InvariantCulture);
+                        property.SetValue(laboratoryDetails, numericValue);
+                    }
+                }
 
             }
 
             return laboratoryDetails;
         }
+
+        //public static IEnumerable<int> GetNumbersOfLine(string line)
+        //{
+        //}
     }
 }

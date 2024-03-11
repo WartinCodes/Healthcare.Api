@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public HealthInsuranceRequest HealthInsuranceRequest { get; set; }
+        public HealthInsuranceRequest HealthInsurance { get; set; }
     }
 }
