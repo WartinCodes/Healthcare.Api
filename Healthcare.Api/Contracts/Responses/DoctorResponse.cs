@@ -10,7 +10,7 @@
         public string Photo { get; set; }
         public string Email { get; set; }
         public AddressResponse Address { get; set; }
-        public ICollection<HealthPlanResponse> HealthPlans { get; set; }
+        public ICollection<HealthInsuranceResponse> HealthInsurances { get; set; }
         public ICollection<DoctorSpecialityResponse> Specialities { get; set; }
         public string PhoneNumber { get; set; }
     }

@@ -58,7 +58,7 @@ namespace Healthcare.Api.Controllers
                     DNI = x.User.UserName,
                     Address = _mapper.Map<AddressResponse>(x.Address),
                     Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(x.DoctorSpecialities),
-                    HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(x.HealthInsurances),
+                    HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(x.HealthInsurances),
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,
                     Photo = x.User.Photo
@@ -81,7 +81,7 @@ namespace Healthcare.Api.Controllers
                 DNI = doctorEntity.User.UserName,
                 Address = _mapper.Map<AddressResponse>(doctorEntity.Address),
                 Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(doctorEntity.DoctorSpecialities),
-                HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(doctorEntity.HealthInsurances),
+                HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(doctorEntity.HealthInsurances),
                 Email = doctorEntity.User.Email,
                 PhoneNumber = doctorEntity.User.PhoneNumber,
                 Photo = doctorEntity.User.Photo
