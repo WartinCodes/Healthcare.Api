@@ -4,17 +4,17 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Healthcare.Api.Repository.EntitiesConfiguration
 {
-    public class DoctorHealthPlanEntityConfiguration : IEntityTypeConfiguration<DoctorHealthPlan>
+    public class DoctorHealthInsuranceEntityConfiguration : IEntityTypeConfiguration<DoctorHealthInsurance>
     {
-        public void Configure(EntityTypeBuilder<DoctorHealthPlan> builder)
+        public void Configure(EntityTypeBuilder<DoctorHealthInsurance> builder)
         {
             builder.HasKey(dhp => dhp.Id);
             builder.Property(dhp => dhp.Id).ValueGeneratedOnAdd();
 
             builder.Property(dhp => dhp.DoctorId);
-            builder.Property(dhp => dhp.HealthPlanId);
+            builder.Property(dhp => dhp.HealthInsuranceId);
 
-            builder.HasIndex(dhp => new { dhp.DoctorId, dhp.HealthPlanId }).IsUnique();
+            builder.HasIndex(dhp => new { dhp.DoctorId, dhp.HealthInsuranceId }).IsUnique();
         }
     }
 }

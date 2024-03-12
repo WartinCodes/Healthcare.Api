@@ -4,7 +4,7 @@ using Healthcare.Api.Repository.Context;
 
 namespace Healthcare.Api.Repository.Repositories
 {
-    public class LaboratoryDetailRepository : BaseRepository<LaboratoryDetail>, ILaboratoryDetailRepository
+    public class LaboratoryDetailRepository : BaseRepository<Hemograma>, ILaboratoryDetailRepository
     {
         private readonly HealthcareDbContext _context;
 
@@ -13,27 +13,27 @@ namespace Healthcare.Api.Repository.Repositories
             _context = context;
         }
 
-        public IQueryable<LaboratoryDetail> GetAsQueryable()
+        public IQueryable<Hemograma> GetAsQueryable()
         {
             return _context.LaboratoryDetail.AsQueryable();
         }
 
-        public async Task<IEnumerable<LaboratoryDetail>> GetAsync()
+        public async Task<IEnumerable<Hemograma>> GetAsync()
         {
             return await base.GetAsync().ConfigureAwait(false);
         }
 
-        public void Remove(LaboratoryDetail entity)
+        public void Remove(Hemograma entity)
         {
             base.Delete(entity.Id);
         }
 
-        public void Edit(LaboratoryDetail entity)
+        public void Edit(Hemograma entity)
         {
             _context.LaboratoryDetail.Update(entity);
         }
 
-        public async Task<LaboratoryDetail> AddAsync(LaboratoryDetail entity)
+        public async Task<Hemograma> AddAsync(Hemograma entity)
         {
             return await base.InsertAsync(entity).ConfigureAwait(false);
         }

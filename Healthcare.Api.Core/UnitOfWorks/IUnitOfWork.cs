@@ -6,7 +6,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
     public interface IUnitOfWork : IDisposable
     {
         IDoctorRepository DoctorRepository { get; }
-        IDoctorHealthPlanRepository DoctorHealthPlanRepository { get; }
+        IDoctorHealthInsuranceRepository DoctorHealthInsuranceRepository { get; }
         IDoctorSpecialityRepository DoctorSpecialityRepository { get; }
         ISpecialityRepository SpecialityRepository { get; }
         IHealthInsuranceRepository HealthInsuranceRepository { get; }

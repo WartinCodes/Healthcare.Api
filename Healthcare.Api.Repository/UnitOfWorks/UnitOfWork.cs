@@ -21,7 +21,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             ICountryRepository countryRepository,
             IStateRepository stateRepository,
             ICityRepository cityRepository,
-            IDoctorHealthPlanRepository doctorHealthPlanRepository,
+            IDoctorHealthInsuranceRepository doctorHealthPlanRepository,
             IPatientHealthPlanRepository patientHealthPlanRepository)
         {
             _context = context;
@@ -36,7 +36,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             CountryRepository = countryRepository;
             StateRepository = stateRepository;
             CityRepository = cityRepository;
-            DoctorHealthPlanRepository = doctorHealthPlanRepository;
+            DoctorHealthInsuranceRepository = doctorHealthPlanRepository;
             PatientHealthPlanRepository = patientHealthPlanRepository;
         }
 
@@ -51,7 +51,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         public ICityRepository CityRepository { get; }
         public ICountryRepository CountryRepository { get; }
         public IStateRepository StateRepository { get; }
-        public IDoctorHealthPlanRepository DoctorHealthPlanRepository { get; }
+        public IDoctorHealthInsuranceRepository DoctorHealthInsuranceRepository { get; }
         public IPatientHealthPlanRepository PatientHealthPlanRepository { get; }
 
         public void Dispose()

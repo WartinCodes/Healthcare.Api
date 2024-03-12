@@ -2,7 +2,7 @@
 
 namespace Healthcare.Api.Core.RepositoryInterfaces
 {
-    public interface ILaboratoryDetailRepository : IRepository<LaboratoryDetail>
+    public interface ILaboratoryDetailRepository : IRepository<Hemograma>
     {
     }
 }

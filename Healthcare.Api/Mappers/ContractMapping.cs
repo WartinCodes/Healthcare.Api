@@ -28,7 +28,7 @@ namespace Helthcare.Api.Mappers
             CreateMap<User, DoctorRequest>().ReverseMap();
             CreateMap<Speciality, SpecialityRequest>().ReverseMap();
             CreateMap<HealthInsurance, HealthInsuranceRequest>().ReverseMap();
-            CreateMap<HealthPlan, HealthPlanRequest>().ReverseMap();
+            CreateMap<HealthPlan, HealthInsuranceRequest>().ReverseMap();
             CreateMap<Address, AddressRequest>().ReverseMap();
             CreateMap<City, CityRequest>().ReverseMap();
             CreateMap<State, StateRequest>().ReverseMap();

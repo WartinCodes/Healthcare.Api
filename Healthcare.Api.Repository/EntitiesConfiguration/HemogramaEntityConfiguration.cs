@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Healthcare.Api.Repository.EntitiesConfiguration
 {
-    public class LaboratoryDetailEntityConfiguration : IEntityTypeConfiguration<LaboratoryDetail>
+    public class HemogramaEntityConfiguration : IEntityTypeConfiguration<Hemograma>
     {
-        public void Configure(EntityTypeBuilder<LaboratoryDetail> builder)
+        public void Configure(EntityTypeBuilder<Hemograma> builder)
         {
-            builder.ToTable("LaboratoryDetail").HasKey(x => x.Id);
+            builder.ToTable("Hemograma").HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.Property(x => x.Metodo).HasColumnName("Metodo");

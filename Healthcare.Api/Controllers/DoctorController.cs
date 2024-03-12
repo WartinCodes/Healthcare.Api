@@ -21,7 +21,7 @@ namespace Healthcare.Api.Controllers
         private readonly ISpecialityService _specialityService;
         private readonly IDoctorSpecialityService _doctorSpecialityService;
         private readonly IHealthPlanService _healthPlanService;
-        private readonly IDoctorHealthPlanService _doctorHealthPlanService;
+        private readonly IDoctorHealthInsuranceService _doctorHealthPlanService;
 
         private readonly IMapper _mapper;
 
@@ -33,7 +33,7 @@ namespace Healthcare.Api.Controllers
             ISpecialityService specialityService, 
             IHealthPlanService healthPlanService,
             IDoctorSpecialityService doctorSpecialityService,
-            IDoctorHealthPlanService doctorHealthPlanService)
+            IDoctorHealthInsuranceService doctorHealthPlanService)
         {
             _addressService = addressService;
             _doctorService = doctorService;
@@ -58,7 +58,7 @@ namespace Healthcare.Api.Controllers
                     DNI = x.User.UserName,
                     Address = _mapper.Map<AddressResponse>(x.Address),
                     Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(x.DoctorSpecialities),
-                    HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(x.HealthPlans),
+                    HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(x.HealthInsurances),
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,
                     Photo = x.User.Photo
@@ -81,7 +81,7 @@ namespace Healthcare.Api.Controllers
                 DNI = doctorEntity.User.UserName,
                 Address = _mapper.Map<AddressResponse>(doctorEntity.Address),
                 Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(doctorEntity.DoctorSpecialities),
-                HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(doctorEntity.HealthPlans),
+                HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(doctorEntity.HealthInsurances),
                 Email = doctorEntity.User.Email,
                 PhoneNumber = doctorEntity.User.PhoneNumber,
                 Photo = doctorEntity.User.Photo
@@ -119,7 +119,7 @@ namespace Healthcare.Api.Controllers
                         UserId = newUser.Id,
                         Matricula = userRequest.Matricula,
                         DoctorSpecialities = null,
-                        HealthPlans = null,
+                        HealthInsurances = null,
                         Address = address
                     };
 
@@ -137,7 +137,7 @@ namespace Healthcare.Api.Controllers
                         await _doctorSpecialityService.Add(doctorSpeciality);
                     }
 
-                    foreach (var healthPlan in userRequest.HealthPlans)
+                    foreach (var healthPlan in userRequest.HealthInsurance)
                     {
                         var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
                         if (healthPlanEntity == null)
@@ -145,7 +145,7 @@ namespace Healthcare.Api.Controllers
                             return BadRequest($"Plan con ID {healthPlanEntity} no encontrada.");
                         }
 
-                        var doctorHealthPlan = new DoctorHealthPlan { DoctorId = doctor.Id, HealthPlanId = healthPlanEntity.Id };
+                        var doctorHealthPlan = new DoctorHealthInsurance { DoctorId = doctor.Id, HealthInsuranceId = healthPlanEntity.Id };
                         await _doctorHealthPlanService.Add(doctorHealthPlan);
                     }
 

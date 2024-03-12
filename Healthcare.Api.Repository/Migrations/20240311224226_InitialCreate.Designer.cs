@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Healthcare.Api.Repository.Migrations
 {
     [DbContext(typeof(HealthcareDbContext))]
-    [Migration("20240223170632_InitialCreate")]
+    [Migration("20240311224226_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -133,7 +133,7 @@ namespace Healthcare.Api.Repository.Migrations
                     b.ToTable("Doctor", "Healthcare");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorHealthPlan", b =>
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorHealthInsurance", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -142,17 +142,17 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<int>("DoctorId")
                         .HasColumnType("int");
 
-                    b.Property<int>("HealthPlanId")
+                    b.Property<int>("HealthInsuranceId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HealthPlanId");
+                    b.HasIndex("HealthInsuranceId");
 
-                    b.HasIndex("DoctorId", "HealthPlanId")
+                    b.HasIndex("DoctorId", "HealthInsuranceId")
                         .IsUnique();
 
-                    b.ToTable("DoctorHealthPlan", "Healthcare");
+                    b.ToTable("DoctorHealthInsurance", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorSpeciality", b =>
@@ -210,6 +210,87 @@ namespace Healthcare.Api.Repository.Migrations
                     b.HasIndex("HealthInsuranceId");
 
                     b.ToTable("HealthPlan", "Healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Hemograma", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Basofilos")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("Basofilos");
+
+                    b.Property<string>("CHCM")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("CHCM");
+
+                    b.Property<string>("Eosinofilos")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("Eosinofilos");
+
+                    b.Property<string>("GlobulosBlancos")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("GlobulosBlancos");
+
+                    b.Property<string>("GlobulosRojos")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("GlobulosRojos");
+
+                    b.Property<string>("HCM")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("HCM");
+
+                    b.Property<string>("Hematocrito")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("Hematocrito");
+
+                    b.Property<string>("Hemoglobina")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("Hemoglobina");
+
+                    b.Property<string>("Linfocitos")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("Linfocitos");
+
+                    b.Property<string>("Metodo")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("Metodo");
+
+                    b.Property<string>("Monocitos")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("Monocitos");
+
+                    b.Property<string>("NeutrofilosCayados")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("NeutrofilosCayados");
+
+                    b.Property<string>("NeutrofilosSegmentados")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("NeutrofilosSegmentados");
+
+                    b.Property<string>("VCM")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("VCM");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Hemograma", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
@@ -550,7 +631,7 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorHealthPlan", b =>
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorHealthInsurance", b =>
                 {
                     b.HasOne("Healthcare.Api.Core.Entities.Doctor", "Doctor")
                         .WithMany()
@@ -558,15 +639,15 @@ namespace Healthcare.Api.Repository.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Healthcare.Api.Core.Entities.HealthPlan", "HealthPlan")
+                    b.HasOne("Healthcare.Api.Core.Entities.HealthInsurance", "HealthInsurance")
                         .WithMany()
-                        .HasForeignKey("HealthPlanId")
+                        .HasForeignKey("HealthInsuranceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Doctor");
 
-                    b.Navigation("HealthPlan");
+                    b.Navigation("HealthInsurance");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorSpeciality", b =>

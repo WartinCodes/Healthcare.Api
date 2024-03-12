@@ -16,21 +16,21 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                .HasForeignKey<Doctor>(p => p.UserId)
                .IsRequired();
 
-            builder.HasMany(d => d.HealthPlans)
+            builder.HasMany(d => d.HealthInsurances)
                 .WithMany(hp => hp.Doctors)
-                .UsingEntity<DoctorHealthPlan>(
+                .UsingEntity<DoctorHealthInsurance>(
                     j => j
-                        .HasOne(dhp => dhp.HealthPlan)
+                        .HasOne(dhp => dhp.HealthInsurance)
                         .WithMany()
-                        .HasForeignKey(dhp => dhp.HealthPlanId),
+                        .HasForeignKey(dhp => dhp.HealthInsuranceId),
                     j => j
                         .HasOne(dhp => dhp.Doctor)
                         .WithMany()
                         .HasForeignKey(dhp => dhp.DoctorId),
                     j =>
                     {
-                        j.HasKey(t => new { t.DoctorId, t.HealthPlanId });
-                        j.ToTable("DoctorHealthPlan");
+                        j.HasKey(t => new { t.DoctorId, t.HealthInsuranceId });
+                        j.ToTable("DoctorHealthInsurance");
                     }
                 );
 

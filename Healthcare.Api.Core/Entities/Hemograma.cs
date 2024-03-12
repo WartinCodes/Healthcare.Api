@@ -2,7 +2,7 @@
 
 namespace Healthcare.Api.Core.Entities
 {
-    public class LaboratoryDetail
+    public class Hemograma
     {
         public int Id { get; set; }
         public string Metodo { get; set; }

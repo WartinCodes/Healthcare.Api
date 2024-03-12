@@ -63,10 +63,10 @@ namespace Healthcare.Api.Controllers
         }
 
         // PAGE 1 READY
-        private LaboratoryDetail ParsePdfText(string text)
+        private Hemograma ParsePdfText(string text)
         {
-            var laboratoryDetails = new LaboratoryDetail();
-            var properties = typeof(LaboratoryDetail).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            var laboratoryDetails = new Hemograma();
+            var properties = typeof(Hemograma).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             foreach (string line in text.Split('\n'))
             {
                 string cleanLine = line.Trim().ToLowerInvariant().Replace(".", "");

@@ -17,12 +17,12 @@ namespace Healthcare.Api.Repository.Context
         public DbSet<PatientHealthPlan> PatientHealthPlan { get; set; }
         public DbSet<Doctor> Doctor { get; set; }
         public DbSet<DoctorSpeciality> DoctorSpeciality { get; set; }
-        public DbSet<DoctorHealthPlan> DoctorHealthPlan { get; set; }
+        public DbSet<DoctorHealthInsurance> DoctorHealthInsurance { get; set; }
         public DbSet<HealthInsurance> HealthInsurance { get; set; }
         public DbSet<HealthPlan> HealthPlan { get ; set; }
         public DbSet<State> State { get; set; }
         public DbSet<Country> Country { get; set; }
-        public DbSet<LaboratoryDetail> LaboratoryDetail { get; set; }
+        public DbSet<Hemograma> LaboratoryDetail { get; set; }
         public DbSet<Speciality> Speciality { get; set; }
 
         public HealthcareDbContext(IConfiguration configuration) : base()

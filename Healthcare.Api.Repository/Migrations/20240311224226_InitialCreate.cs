@@ -98,6 +98,34 @@ namespace Healthcare.Api.Repository.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Hemograma",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Metodo = table.Column<string>(type: "longtext", nullable: false),
+                    GlobulosRojos = table.Column<string>(type: "longtext", nullable: false),
+                    GlobulosBlancos = table.Column<string>(type: "longtext", nullable: false),
+                    Hemoglobina = table.Column<string>(type: "longtext", nullable: false),
+                    Hematocrito = table.Column<string>(type: "longtext", nullable: false),
+                    VCM = table.Column<string>(type: "longtext", nullable: false),
+                    HCM = table.Column<string>(type: "longtext", nullable: false),
+                    CHCM = table.Column<string>(type: "longtext", nullable: false),
+                    NeutrofilosCayados = table.Column<string>(type: "longtext", nullable: false),
+                    NeutrofilosSegmentados = table.Column<string>(type: "longtext", nullable: false),
+                    Eosinofilos = table.Column<string>(type: "longtext", nullable: false),
+                    Basofilos = table.Column<string>(type: "longtext", nullable: false),
+                    Linfocitos = table.Column<string>(type: "longtext", nullable: false),
+                    Monocitos = table.Column<string>(type: "longtext", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Hemograma", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Speciality",
                 schema: "Healthcare",
                 columns: table => new
@@ -392,30 +420,30 @@ namespace Healthcare.Api.Repository.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "DoctorHealthPlan",
+                name: "DoctorHealthInsurance",
                 schema: "Healthcare",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     DoctorId = table.Column<int>(type: "int", nullable: false),
-                    HealthPlanId = table.Column<int>(type: "int", nullable: false)
+                    HealthInsuranceId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DoctorHealthPlan", x => x.Id);
+                    table.PrimaryKey("PK_DoctorHealthInsurance", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DoctorHealthPlan_Doctor_DoctorId",
+                        name: "FK_DoctorHealthInsurance_Doctor_DoctorId",
                         column: x => x.DoctorId,
                         principalSchema: "Healthcare",
                         principalTable: "Doctor",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DoctorHealthPlan_HealthPlan_HealthPlanId",
-                        column: x => x.HealthPlanId,
+                        name: "FK_DoctorHealthInsurance_HealthInsurance_HealthInsuranceId",
+                        column: x => x.HealthInsuranceId,
                         principalSchema: "Healthcare",
-                        principalTable: "HealthPlan",
+                        principalTable: "HealthInsurance",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -551,17 +579,17 @@ namespace Healthcare.Api.Repository.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DoctorHealthPlan_DoctorId_HealthPlanId",
+                name: "IX_DoctorHealthInsurance_DoctorId_HealthInsuranceId",
                 schema: "Healthcare",
-                table: "DoctorHealthPlan",
-                columns: new[] { "DoctorId", "HealthPlanId" },
+                table: "DoctorHealthInsurance",
+                columns: new[] { "DoctorId", "HealthInsuranceId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DoctorHealthPlan_HealthPlanId",
+                name: "IX_DoctorHealthInsurance_HealthInsuranceId",
                 schema: "Healthcare",
-                table: "DoctorHealthPlan",
-                column: "HealthPlanId");
+                table: "DoctorHealthInsurance",
+                column: "HealthInsuranceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DoctorSpeciality_DoctorId_SpecialityId",
@@ -638,11 +666,15 @@ namespace Healthcare.Api.Repository.Migrations
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(
-                name: "DoctorHealthPlan",
+                name: "DoctorHealthInsurance",
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(
                 name: "DoctorSpeciality",
+                schema: "Healthcare");
+
+            migrationBuilder.DropTable(
+                name: "Hemograma",
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(

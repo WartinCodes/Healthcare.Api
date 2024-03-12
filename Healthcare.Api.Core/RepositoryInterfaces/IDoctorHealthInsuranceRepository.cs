@@ -2,7 +2,7 @@
 
 namespace Healthcare.Api.Core.RepositoryInterfaces
 {
-    public interface IDoctorHealthPlanRepository : IRepository<DoctorHealthPlan>
+    public interface IDoctorHealthInsuranceRepository : IRepository<DoctorHealthInsurance>
     {
     }
 }

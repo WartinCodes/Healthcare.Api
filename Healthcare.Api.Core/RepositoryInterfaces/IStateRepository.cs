@@ -1,4 +1,5 @@
 ﻿using Healthcare.Api.Core.Entities;
+using System.Collections.Generic;
 
 namespace Healthcare.Api.Core.RepositoryInterfaces
 {

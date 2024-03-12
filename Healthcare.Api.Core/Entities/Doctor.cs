@@ -7,11 +7,11 @@
             
         }
 
-        public Doctor(int userId, ICollection<DoctorSpeciality> doctorSpecialities, ICollection<HealthPlan> healthPlans)
+        public Doctor(int userId, ICollection<DoctorSpeciality> doctorSpecialities, ICollection<HealthInsurance> healthInsurances)
         {
             UserId = userId;
             DoctorSpecialities = doctorSpecialities ?? new HashSet<DoctorSpeciality>();
-            HealthPlans = healthPlans ?? new HashSet<HealthPlan>();
+            HealthInsurances = healthInsurances ?? new HashSet<HealthInsurance>();
         }
 
         public int Id { get; set; }
@@ -21,6 +21,6 @@
         public int IdAddress { get; set; }
         public virtual Address Address { get; set; }
         public ICollection<DoctorSpeciality> DoctorSpecialities { get; set; }
-        public ICollection<HealthPlan> HealthPlans { get; set; }
+        public ICollection<HealthInsurance> HealthInsurances { get; set; }
     }
 }
