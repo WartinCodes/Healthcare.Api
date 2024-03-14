@@ -4,18 +4,18 @@ using Healthcare.Api.Repository.Context;
 
 namespace Healthcare.Api.Repository.Repositories
 {
-    public class LaboratoryDetailRepository : BaseRepository<Hemograma>, ILaboratoryDetailRepository
+    public class HemogramaRepository : BaseRepository<Hemograma>, IHemogramaRepository
     {
         private readonly HealthcareDbContext _context;
 
-        public LaboratoryDetailRepository(HealthcareDbContext context) : base(context)
+        public HemogramaRepository(HealthcareDbContext context) : base(context)
         {
             _context = context;
         }
 
         public IQueryable<Hemograma> GetAsQueryable()
         {
-            return _context.LaboratoryDetail.AsQueryable();
+            return _context.Hemograma.AsQueryable();
         }
 
         public async Task<IEnumerable<Hemograma>> GetAsync()
@@ -30,7 +30,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public void Edit(Hemograma entity)
         {
-            _context.LaboratoryDetail.Update(entity);
+            _context.Hemograma.Update(entity);
         }
 
         public async Task<Hemograma> AddAsync(Hemograma entity)

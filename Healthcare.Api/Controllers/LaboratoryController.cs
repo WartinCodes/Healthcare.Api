@@ -1,4 +1,5 @@
 ﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Repository.Repositories;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
@@ -18,6 +19,12 @@ namespace Healthcare.Api.Controllers
     [ApiController]
     public class LaboratoryController : ControllerBase
     {
+        private readonly IHemogramaService _hemogramaService;
+
+        public LaboratoryController()
+        {
+                
+        }
 
         [HttpPost("upload-pdf")]
         public IActionResult UploadPdf([FromForm] IFormFile file)
@@ -43,14 +50,9 @@ namespace Healthcare.Api.Controllers
                                 var page = pdfDocument.GetPage(i);
                                 string text = PdfTextExtractor.GetTextFromPage(page);
 
-                                // Aquí necesitas implementar la lógica para analizar el texto
-                                // extraído del PDF y convertirlo en un objeto LaboratoryDetails
-                                // que puedas guardar en el repositorio.
-
                                 var laboratoryDetails = ParsePdfText(text);
-                                //_repository.Save(laboratoryDetails);
+                                _hemogramaService.Add(laboratoryDetails);
                             }
-
                             return Ok("Laboratory details saved successfully");
                         }
                     }
@@ -65,7 +67,7 @@ namespace Healthcare.Api.Controllers
         // PAGE 1 READY
         private Hemograma ParsePdfText(string text)
         {
-            var laboratoryDetails = new Hemograma();
+            var hemograma = new Hemograma();
             var properties = typeof(Hemograma).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             foreach (string line in text.Split('\n'))
             {
@@ -80,13 +82,14 @@ namespace Healthcare.Api.Controllers
                         MatchCollection matches = Regex.Matches(cleanLine, @"m?\d+([,.]\d+)?");
                         
                         var numericValue = Convert.ChangeType(matches.First().Value, property.PropertyType, CultureInfo.InvariantCulture);
-                        property.SetValue(laboratoryDetails, numericValue);
+                        if (property.GetValue(hemograma) == null)
+                        {
+                            property.SetValue(hemograma, numericValue);
+                        }
                     }
                 }
-
             }
-
-            return laboratoryDetails;
+            return hemograma;
         }
 
         //public static IEnumerable<int> GetNumbersOfLine(string line)

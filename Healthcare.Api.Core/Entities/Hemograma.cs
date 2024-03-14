@@ -4,19 +4,16 @@ namespace Healthcare.Api.Core.Entities
 {
     public class Hemograma
     {
-        public int Id { get; set; }
         public string Metodo { get; set; }
+        public int Id { get; set; }
         [DisplayName("Globulos Rojos")]
         public string GlobulosRojos { get; set; }
         [DisplayName("Globulos Blancos")]
         public string GlobulosBlancos { get; set; }
         public string Hemoglobina { get; set; }
         public string Hematocrito { get; set; }
-        [DisplayName("V.C.M.")]
         public string VCM { get; set; }
-        [DisplayName("C.H.C.M")]
         public string HCM { get; set; }
-        [DisplayName("H.C.M.")]
         public string CHCM { get; set; }
         [DisplayName("Neutrofilos Cayados")]
         public string NeutrofilosCayados { get; set; }

@@ -30,7 +30,7 @@ namespace Healthcare.Api.Repository
             services.AddTransient<IHealthPlanRepository, HealthPlanRepository>();
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientHealthPlanRepository, PatientHealthPlanRepository>();
-            services.AddTransient<ILaboratoryDetailRepository, LaboratoryDetailRepository>();
+            services.AddTransient<IHemogramaRepository, HemogramaRepository>();
             services.AddTransient<ICountryRepository, CountryRepository>();
             services.AddTransient<IStateRepository, StateRepository>();
             services.AddTransient<ISpecialityRepository, SpecialityRepository>();
