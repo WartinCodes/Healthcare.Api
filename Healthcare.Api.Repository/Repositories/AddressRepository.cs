@@ -40,6 +40,9 @@ namespace Healthcare.Api.Repository.Repositories
 
         public void Edit(Address entity)
         {
+            _context.Attach(entity.City);
+            _context.Attach(entity.City.State);
+            _context.Attach(entity.City.State.Country);
             _context.Address.Update(entity);
         }
 

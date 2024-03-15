@@ -29,6 +29,12 @@ namespace Healthcare.Api.Repository.Repositories
             return await _context.PatientHealthPlan.FirstOrDefaultAsync(x => x.Id == id);
         }
 
+        public async Task<IEnumerable<PatientHealthPlan>> GetHealthPlansByPatientIdAsync(int id)
+        {
+            return await _context.PatientHealthPlan.Where(x => x.PatientId == id)
+                .ToListAsync();
+        }
+
         public void Remove(PatientHealthPlan entity)
         {
             base.Delete(entity.Id);

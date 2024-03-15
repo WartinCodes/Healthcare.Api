@@ -3,6 +3,7 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -140,21 +141,57 @@ namespace Healthcare.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] PatientRequest userRequest)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
-            if (user == null)
+            var patient = await _patientService.GetPatientByIdAsync(id);
+            if (patient == null)
             {
-                return NotFound($"No se encontró el paciente con el ID: {id}");
+                return NotFound($"No se encontró el usuario con el ID: {id}");
             }
 
+            var user = await _userManager.FindByIdAsync(patient.UserId.ToString());
+            if (user == null)
+            {
+                return NotFound($"No se encontró el usuario con el ID: {id}");
+            }
+
+            // validacion de si user/document no esten asociadas a otro usuario.
             var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
             var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
-            if (existEmail != null || existDocument != null)
+            if (existEmail != null && existEmail.Id != id)
             {
-                return Conflict("DNI/Email ya existe.");
+                return Conflict("Email ya existe.");
+            }
+            if (existDocument != null && existDocument.Id != id)
+            {
+                return Conflict("DNI ya existe.");
             }
 
             _mapper.Map(userRequest, user);
             var result = await _userManager.UpdateAsync(user);
+
+            // actualizacion de Address
+            var newAddress = _mapper.Map<Address>(userRequest.Address);
+            _addressService.Edit(newAddress);
+
+            // borrado de las obras sociales asociadas al paciente en tabla PatientHealthPlan
+            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(id);
+            foreach (var php in patientHealthPlans)
+            {
+                _patientHealthPlanService.Remove(php);
+            }
+
+            // agregado de las nuevas obras sociales asociadas al paciente en tabla PatientHealthPlan
+            foreach (var healthPlan in userRequest.HealthPlans)
+            {
+                var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
+                if (healthPlanEntity == null)
+                {
+                    return BadRequest($"Plan con ID {healthPlan.Id} no encontrada.");
+                }
+
+                var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
+                await _patientHealthPlanService.Add(patientHealthPlan);
+            } 
+
             if (!result.Succeeded)
             {
                 return BadRequest($"Error al actualizar el paciente: {user.UserName}");
