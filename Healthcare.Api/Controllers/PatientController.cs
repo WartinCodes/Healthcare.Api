@@ -125,6 +125,23 @@ namespace Healthcare.Api.Controllers
                         await _patientHealthPlanService.Add(patientHealthPlan);
                     }
 
+
+                    // photo
+                    //using (var fileStream = System.IO.File.OpenRead(imageOutputPath))
+                    //{
+                    //    var result = await _restClientHelper.InsertAsync(fileStream, Path.GetFileName(imageOutputPath), "image/png");
+                    //    if (result == 200)
+                    //    {
+                    //        var urlImage = _restClientHelper.GetUrl(Path.GetFileName(imageOutputPath));
+                    //        emailHtml = emailHtml.Replace("<%image%>", urlImage);
+                    //    }
+                    //    else
+                    //    {
+                    //        emailHtml = emailHtml.Replace("<%image%>", string.Empty);
+                    //    }
+                    //}
+
+
                     return Ok("Paciente creado exitosamente.");
                 }
                 else

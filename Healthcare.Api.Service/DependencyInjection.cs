@@ -1,4 +1,7 @@
-﻿using Healthcare.Api.Core.RepositoryInterfaces;
+﻿using Amazon;
+using Amazon.S3;
+using Amazon.S3.Transfer;
+using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
 using Microsoft.Extensions.Configuration;
@@ -23,10 +26,31 @@ namespace Healthcare.Api.Service
             services.AddTransient<ICityService, CityService>();
             services.AddTransient<ISpecialityService, SpecialityService>();
             services.AddTransient<IHemogramaService, HemogramaService>();
+            services.AddTransient<IRestClientHelper, RestClientHelper>();
 
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
 
+            services.AddS3Services(configuration);
+
             return services;
         }
+
+        private static IServiceCollection AddS3Services(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<S3Configuration>(configuration.GetSection(nameof(S3Configuration)));
+
+            var s3Configuration = new S3Configuration();
+            configuration.GetSection("S3Configuration").Bind(s3Configuration);
+
+            string awsAccessKey = Environment.GetEnvironmentVariable("S3Configuration.AwsAccessKey") ?? s3Configuration.AwsAccessKey;
+            string awsSecretAccessKey = Environment.GetEnvironmentVariable("S3Configuration.AwsSecretAccessKey") ?? s3Configuration.AwsSecretAccessKey;
+
+            RegionEndpoint region = RegionEndpoint.GetBySystemName(s3Configuration.AwsRegion);
+            services.AddSingleton<IAmazonS3>(new AmazonS3Client(awsAccessKey, awsSecretAccessKey, region));
+            services.AddTransient<ITransferUtility, TransferUtility>();
+
+            return services;
+        }
+
     }
 }
