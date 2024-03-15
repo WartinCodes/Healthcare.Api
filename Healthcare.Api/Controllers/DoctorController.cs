@@ -197,7 +197,7 @@ namespace Healthcare.Api.Controllers
             var newAddress = _mapper.Map<Address>(userRequest.Address);
             _addressService.Edit(newAddress);
 
-            // borrado de las obras sociales asociadas al paciente en tabla DoctorHealthPlanService
+            // borrado de las obras sociales asociadas al doctor en tabla DoctorHealthPlanService
             var doctorHealthInsurances = await _doctorHealthInsuranceService.GetHealthPlansByDoctor(id);
             foreach (var php in doctorHealthInsurances)
             {
@@ -214,6 +214,26 @@ namespace Healthcare.Api.Controllers
 
                 var doctorHealthInsurance = new DoctorHealthInsurance { DoctorId = doctor.Id, HealthInsuranceId = healthInsuranceEntity.Id };
                 await _doctorHealthInsuranceService.Add(doctorHealthInsurance);
+            }
+
+            // borrado de las especialidades asociadas al doctor
+            var doctorSpecialities = await _doctorSpecialityService.GetSpecialitiesByDoctor(id);
+            foreach (var ds in doctorSpecialities)
+            {
+                _doctorSpecialityService.Remove(ds);
+            }
+
+            // asignacion de nuevas especialidades
+            foreach (var speciality in userRequest.Specialities)
+            {
+                var specialityEntity = await _specialityService.GetSpecialityByIdAsync(speciality.Id);
+                if (specialityEntity == null)
+                {
+                    return BadRequest($"Especialidad con ID {specialityEntity} no encontrada.");
+                }
+
+                var doctorSpeciality = new DoctorSpeciality { DoctorId = doctor.Id, SpecialityId = specialityEntity.Id };
+                await _doctorSpecialityService.Add(doctorSpeciality);
             }
 
             if (!result.Succeeded)

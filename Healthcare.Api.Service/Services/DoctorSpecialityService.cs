@@ -7,12 +7,12 @@ namespace Healthcare.Api.Service.Services
 {
     public class DoctorSpecialityService : IDoctorSpecialityService
     {
-        private readonly IDoctorSpecialityRepository _DoctorSpecialityRepository;
+        private readonly IDoctorSpecialityRepository _doctorSpecialityRepository;
         private readonly IUnitOfWork _unitOfWork;
 
         public DoctorSpecialityService(IDoctorSpecialityRepository DoctorSpecialityRepository, IUnitOfWork unitOfWork)
         {
-            _DoctorSpecialityRepository = DoctorSpecialityRepository;
+            _doctorSpecialityRepository = DoctorSpecialityRepository;
             _unitOfWork = unitOfWork;
         }
 
@@ -31,12 +31,17 @@ namespace Healthcare.Api.Service.Services
 
         public IQueryable<DoctorSpeciality> GetAsQueryable()
         {
-            return _DoctorSpecialityRepository.GetAsQueryable();
+            return _doctorSpecialityRepository.GetAsQueryable();
         }
 
         public Task<IEnumerable<DoctorSpeciality>> GetAsync()
         {
-            return _DoctorSpecialityRepository.GetAsync();
+            return _doctorSpecialityRepository.GetAsync();
+        }
+
+        public async Task<IEnumerable<DoctorSpeciality>> GetSpecialitiesByDoctor(int doctorId)
+        {
+            return await _doctorSpecialityRepository.GetSpecialitiesByDoctorIdAsync(doctorId);
         }
 
         public void Remove(DoctorSpeciality entity)
