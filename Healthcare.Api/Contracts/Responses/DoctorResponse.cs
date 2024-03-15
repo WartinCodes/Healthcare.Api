@@ -9,6 +9,7 @@
         public string Matricula { get; set; }
         public string Photo { get; set; }
         public string Email { get; set; }
+        public DateTime BirthDate { get; set; }
         public AddressResponse Address { get; set; }
         public ICollection<HealthInsuranceResponse> HealthInsurances { get; set; }
         public ICollection<DoctorSpecialityResponse> Specialities { get; set; }

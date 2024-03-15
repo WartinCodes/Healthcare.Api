@@ -12,6 +12,6 @@
         public string Matricula { get; set; }
         public AddressRequest Address { get; set; }
         public List<SpecialityRequest> Specialities { get; set; }
-        public List<HealthInsuranceRequest> HealthInsurance { get; set; }
+        public List<HealthInsuranceRequest> HealthInsurances { get; set; }
     }
 }

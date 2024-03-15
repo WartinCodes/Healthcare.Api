@@ -79,6 +79,7 @@ namespace Healthcare.Api.Controllers
                 LastName = doctorEntity.User.LastName,
                 Matricula = doctorEntity.Matricula,
                 DNI = doctorEntity.User.UserName,
+                BirthDate = doctorEntity.User.BirthDate,
                 Address = _mapper.Map<AddressResponse>(doctorEntity.Address),
                 Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(doctorEntity.DoctorSpecialities),
                 HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(doctorEntity.HealthInsurances),
@@ -137,7 +138,7 @@ namespace Healthcare.Api.Controllers
                         await _doctorSpecialityService.Add(doctorSpeciality);
                     }
 
-                    foreach (var healthPlan in userRequest.HealthInsurance)
+                    foreach (var healthPlan in userRequest.HealthInsurances)
                     {
                         var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
                         if (healthPlanEntity == null)
@@ -203,7 +204,7 @@ namespace Healthcare.Api.Controllers
                 _doctorHealthInsuranceService.Remove(php);
             }
 
-            foreach (var healthInsurance in userRequest.HealthInsurance)
+            foreach (var healthInsurance in userRequest.HealthInsurances)
             {
                 var healthInsuranceEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthInsurance.Id);
                 if (healthInsuranceEntity == null)
