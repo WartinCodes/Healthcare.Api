@@ -39,6 +39,11 @@ namespace Healthcare.Api.Service.Services
             return _doctorHealthPlanRepository.GetAsync();
         }
 
+        public async Task<IEnumerable<DoctorHealthInsurance>> GetHealthPlansByDoctor(int doctorId)
+        {
+            return await _doctorHealthPlanRepository.GetHealthPlansByDoctorIdAsync(doctorId);
+        }
+
         public void Remove(DoctorHealthInsurance entity)
         {
             _unitOfWork.DoctorHealthInsuranceRepository.Remove(entity);

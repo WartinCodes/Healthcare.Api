@@ -21,7 +21,7 @@ namespace Healthcare.Api.Controllers
         private readonly ISpecialityService _specialityService;
         private readonly IDoctorSpecialityService _doctorSpecialityService;
         private readonly IHealthPlanService _healthPlanService;
-        private readonly IDoctorHealthInsuranceService _doctorHealthPlanService;
+        private readonly IDoctorHealthInsuranceService _doctorHealthInsuranceService;
 
         private readonly IMapper _mapper;
 
@@ -33,12 +33,12 @@ namespace Healthcare.Api.Controllers
             ISpecialityService specialityService, 
             IHealthPlanService healthPlanService,
             IDoctorSpecialityService doctorSpecialityService,
-            IDoctorHealthInsuranceService doctorHealthPlanService)
+            IDoctorHealthInsuranceService doctorHealthInsuranceService)
         {
             _addressService = addressService;
             _doctorService = doctorService;
             _doctorSpecialityService = doctorSpecialityService;
-            _doctorHealthPlanService = doctorHealthPlanService;
+            _doctorHealthInsuranceService = doctorHealthInsuranceService;
             _healthPlanService = healthPlanService;
             _mapper = mapper;
             _specialityService = specialityService;
@@ -146,7 +146,7 @@ namespace Healthcare.Api.Controllers
                         }
 
                         var doctorHealthPlan = new DoctorHealthInsurance { DoctorId = doctor.Id, HealthInsuranceId = healthPlanEntity.Id };
-                        await _doctorHealthPlanService.Add(doctorHealthPlan);
+                        await _doctorHealthInsuranceService.Add(doctorHealthPlan);
                     }
 
                     return Ok("Médico creado exitosamente.");
@@ -166,10 +166,16 @@ namespace Healthcare.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] DoctorRequest userRequest)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
+            var doctor = await _doctorService.GetDoctorByIdAsync(id);
+            if (doctor == null)
+            {
+                return NotFound($"No se encontró el doctor con el ID: {id}");
+            }
+
+            var user = await _userManager.FindByIdAsync(doctor.UserId.ToString());
             if (user == null)
             {
-                return NotFound($"No se encontró el médico con el ID: {id}");
+                return NotFound($"No se encontró el usuario con el ID: {id}");
             }
 
             var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
@@ -185,6 +191,30 @@ namespace Healthcare.Api.Controllers
 
             _mapper.Map(userRequest, user);
             var result = await _userManager.UpdateAsync(user);
+
+            // actualizacion de Address
+            var newAddress = _mapper.Map<Address>(userRequest.Address);
+            _addressService.Edit(newAddress);
+
+            // borrado de las obras sociales asociadas al paciente en tabla DoctorHealthPlanService
+            var doctorHealthInsurances = await _doctorHealthInsuranceService.GetHealthPlansByDoctor(id);
+            foreach (var php in doctorHealthInsurances)
+            {
+                _doctorHealthInsuranceService.Remove(php);
+            }
+
+            foreach (var healthInsurance in userRequest.HealthInsurance)
+            {
+                var healthInsuranceEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthInsurance.Id);
+                if (healthInsuranceEntity == null)
+                {
+                    return BadRequest($"Obra social con ID {healthInsuranceEntity} no encontrada.");
+                }
+
+                var doctorHealthInsurance = new DoctorHealthInsurance { DoctorId = doctor.Id, HealthInsuranceId = healthInsuranceEntity.Id };
+                await _doctorHealthInsuranceService.Add(doctorHealthInsurance);
+            }
+
             if (!result.Succeeded)
             {
                 return BadRequest($"Error al actualizar el médico: {user.UserName}");
