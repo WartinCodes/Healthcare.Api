@@ -6,6 +6,7 @@ using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
@@ -20,6 +21,7 @@ namespace Healthcare.Api.Controllers
         private readonly IAddressService _addressService;
         private readonly IHealthPlanService _healthPlanService;
         private readonly IPatientHealthPlanService _patientHealthPlanService;
+        private readonly IFileService _fileService;
 
         public PatientController(
             UserManager<User> userManager,
@@ -27,7 +29,8 @@ namespace Healthcare.Api.Controllers
             IPatientService patientService,
             IPatientHealthPlanService patientHealthPlanService,
             IAddressService addressService,
-            IHealthPlanService healthPlanService)
+            IHealthPlanService healthPlanService,
+            IFileService fileService)
         {
             _userManager = userManager;
             _patientService = patientService;
@@ -35,6 +38,7 @@ namespace Healthcare.Api.Controllers
             _addressService = addressService;
             _healthPlanService = healthPlanService;
             _patientHealthPlanService = patientHealthPlanService;
+            _fileService = fileService;
         }
 
         [HttpGet("all")]
@@ -81,7 +85,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Post([FromBody] PatientRequest userRequest)
+        public async Task<IActionResult> Post([FromForm] PatientRequest userRequest)
         {
             try
             {
@@ -92,8 +96,10 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI/Email ya existe.");
                 }
 
+                string fileName = Guid.NewGuid().ToString();
                 var newUser = _mapper.Map<User>(userRequest);
                 newUser.PasswordHash = newUser.UserName;
+                newUser.Photo = fileName;
 
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
@@ -125,22 +131,15 @@ namespace Healthcare.Api.Controllers
                         await _patientHealthPlanService.Add(patientHealthPlan);
                     }
 
-
-                    // photo
-                    //using (var fileStream = System.IO.File.OpenRead(imageOutputPath))
-                    //{
-                    //    var result = await _restClientHelper.InsertAsync(fileStream, Path.GetFileName(imageOutputPath), "image/png");
-                    //    if (result == 200)
-                    //    {
-                    //        var urlImage = _restClientHelper.GetUrl(Path.GetFileName(imageOutputPath));
-                    //        emailHtml = emailHtml.Replace("<%image%>", urlImage);
-                    //    }
-                    //    else
-                    //    {
-                    //        emailHtml = emailHtml.Replace("<%image%>", string.Empty);
-                    //    }
-                    //}
-
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        await userRequest.Photo.CopyToAsync(memoryStream);
+                        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
+                        if (imageResult != HttpStatusCode.OK)
+                        {
+                            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                        }
+                    }
 
                     return Ok("Paciente creado exitosamente.");
                 }
@@ -207,7 +206,7 @@ namespace Healthcare.Api.Controllers
 
                 var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
                 await _patientHealthPlanService.Add(patientHealthPlan);
-            } 
+            }
 
             if (!result.Succeeded)
             {
@@ -220,16 +219,32 @@ namespace Healthcare.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
-            if (user == null)
+            var patient = await _patientService.GetPatientByIdAsync(id);
+            if (patient == null)
             {
                 return NotFound($"No se encontró el paciente con el ID: {id}");
             }
 
-            var result = await _userManager.DeleteAsync(user);
-            if (!result.Succeeded)
+            var user = await _userManager.FindByIdAsync(patient.UserId.ToString());
+            if (user == null)
             {
-                return BadRequest($"Error al eliminar el paciente con el ID: {id}");
+                return NotFound($"No se encontró el usuario con el ID: {id}");
+            }
+            // borrado de obras sociales asociadas al pciente
+            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(id);
+            foreach (var php in patientHealthPlans)
+            {
+                _patientHealthPlanService.Remove(php);
+            }
+            // borrado de paciente
+            _patientService.Remove(patient);
+            // borrado de direccion
+            _addressService.Remove(patient.Address);
+            // borrado de usuario
+            var resultUser = await _userManager.DeleteAsync(user);
+            if (!resultUser.Succeeded)
+            {
+                return BadRequest($"Error al eliminar el usuario con el ID: {id}");
             }
 
             return Ok($"Paciente con el DNI {user.UserName} eliminado exitosamente");

@@ -26,7 +26,7 @@ namespace Healthcare.Api.Service
             services.AddTransient<ICityService, CityService>();
             services.AddTransient<ISpecialityService, SpecialityService>();
             services.AddTransient<IHemogramaService, HemogramaService>();
-            services.AddTransient<IRestClientHelper, RestClientHelper>();
+            services.AddTransient<IFileService, FileService>();
 
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
 

@@ -91,7 +91,6 @@ namespace Healthcare.Api.Controllers
             return Ok(doctor);
         }
 
-        // REVISAR VALIDACIONES, EN EL CASO DE QUE HAYA UN ERROR QUE CANCELE TODO Y NO CREE NADA M{AS
         [HttpPost("create")]
         public async Task<IActionResult> Post([FromBody] DoctorRequest userRequest)
         {
@@ -247,16 +246,38 @@ namespace Healthcare.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
-            if (user == null)
+            var doctor = await _doctorService.GetDoctorByIdAsync(id);
+            if (doctor == null)
             {
-                return NotFound($"No se encontró el médico con el ID: {id}");
+                return NotFound($"No se encontró el doctor con el ID: {id}");
             }
 
+            var user = await _userManager.FindByIdAsync(doctor.UserId.ToString());
+            if (user == null)
+            {
+                return NotFound($"No se encontró el usuario con el ID: {id}");
+            }
+        
+            // borrado de las obras sociales asociadas al doctor en tabla DoctorHealthPlanService
+            var doctorHealthInsurances = await _doctorHealthInsuranceService.GetHealthPlansByDoctor(id);
+            foreach (var php in doctorHealthInsurances)
+            {
+                _doctorHealthInsuranceService.Remove(php);
+            }
+            // borrado de las especialidades asociadas al doctor
+            var doctorSpecialities = await _doctorSpecialityService.GetSpecialitiesByDoctor(id);
+            foreach (var ds in doctorSpecialities)
+            {
+                _doctorSpecialityService.Remove(ds);
+            }
+            // borrado de doctor
+            _doctorService.Remove(doctor);
+            // borrado de direccion
+            _addressService.Remove(doctor.Address);
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
-                return BadRequest($"Error al eliminar el médico con el ID: {id}");
+                return BadRequest($"Error al eliminar el usuario con el ID: {id}");
             }
 
             return Ok($"Médico con el DNI {user.UserName} eliminado exitosamente");
