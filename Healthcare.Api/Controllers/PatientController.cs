@@ -96,7 +96,7 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI/Email ya existe.");
                 }
 
-                string fileName = Guid.NewGuid().ToString();
+                string fileName = userRequest.Photo == null ? String.Empty : Guid.NewGuid().ToString();                
                 var newUser = _mapper.Map<User>(userRequest);
                 newUser.PasswordHash = newUser.UserName;
                 newUser.Photo = fileName;
@@ -131,13 +131,16 @@ namespace Healthcare.Api.Controllers
                         await _patientHealthPlanService.Add(patientHealthPlan);
                     }
 
-                    using (MemoryStream memoryStream = new MemoryStream())
+                    if (!String.IsNullOrEmpty(fileName))
                     {
-                        await userRequest.Photo.CopyToAsync(memoryStream);
-                        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
-                        if (imageResult != HttpStatusCode.OK)
+                        using (MemoryStream memoryStream = new MemoryStream())
                         {
-                            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                            await userRequest.Photo.CopyToAsync(memoryStream);
+                            var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
+                            if (imageResult != HttpStatusCode.OK)
+                            {
+                                return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                            }
                         }
                     }
 
@@ -181,6 +184,10 @@ namespace Healthcare.Api.Controllers
                 return Conflict("DNI ya existe.");
             }
 
+            if (!String.IsNullOrEmpty(user.Photo))
+            {
+                await _fileService.DeletePhotoAsync(user.Photo);
+            }
             _mapper.Map(userRequest, user);
             var result = await _userManager.UpdateAsync(user);
 
@@ -206,6 +213,19 @@ namespace Healthcare.Api.Controllers
 
                 var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
                 await _patientHealthPlanService.Add(patientHealthPlan);
+            }
+
+            if (!String.IsNullOrEmpty(user.Photo))
+            {
+                using (MemoryStream memoryStream = new MemoryStream())
+                {
+                    await userRequest.Photo.CopyToAsync(memoryStream);
+                    var imageResult = await _fileService.InsertPhotoAsync(memoryStream, userRequest.Photo.FileName, "image/jpeg");
+                    if (imageResult != HttpStatusCode.OK)
+                    {
+                        return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                    }
+                }
             }
 
             if (!result.Succeeded)

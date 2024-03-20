@@ -44,5 +44,25 @@ namespace Healthcare.Api.Service.Services
                 throw ex; 
             }
         }
+
+        public async Task<HttpStatusCode> DeletePhotoAsync(string fileName)
+        {
+            try
+            {
+                string key = _photosFolder + "/" + fileName;
+
+                var result = await _awsS3Client.DeleteObjectAsync(new DeleteObjectRequest
+                {
+                    BucketName = _s3Configuration.BucketName,
+                    Key = key
+                });
+
+                return HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

@@ -4,8 +4,8 @@ namespace Healthcare.Api.Core.Entities
 {
     public class Hemograma
     {
-        public string Metodo { get; set; }
         public int Id { get; set; }
+        public string Metodo { get; set; }
         [DisplayName("Globulos Rojos")]
         public string GlobulosRojos { get; set; }
         [DisplayName("Globulos Blancos")]

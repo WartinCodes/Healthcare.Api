@@ -64,7 +64,6 @@ namespace Healthcare.Api.Controllers
             }
         }
 
-        // PAGE 1 READY
         private Hemograma ParsePdfText(string text)
         {
             var hemograma = new Hemograma();
