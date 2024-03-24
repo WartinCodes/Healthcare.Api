@@ -12,7 +12,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
         IHealthInsuranceRepository HealthInsuranceRepository { get; }
         IHealthPlanRepository HealthPlanRepository { get; }
         IAddressRepository AddressRepository { get; }
-        IHemogramaRepository HemogramaRepository { get; }
+        ILaboratoryDetailsRepository LaboratoryDetailsRepository { get; }
         ICityRepository CityRepository { get; }
         ICountryRepository CountryRepository { get; }
         IStateRepository StateRepository { get; }

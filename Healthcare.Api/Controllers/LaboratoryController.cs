@@ -3,6 +3,7 @@ using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Repository.Repositories;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
+using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -10,8 +11,6 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using static iText.IO.Codec.TiffWriter;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Healthcare.Api.Controllers
 {
@@ -19,7 +18,7 @@ namespace Healthcare.Api.Controllers
     [ApiController]
     public class LaboratoryController : ControllerBase
     {
-        private readonly IHemogramaService _hemogramaService;
+        private readonly ILaboratoryDetailService _laboratoryDetailService;
 
         public LaboratoryController()
         {
@@ -36,6 +35,7 @@ namespace Healthcare.Api.Controllers
 
             try
             {
+                var mergedLaboratoryDetails = new LaboratoryDetail();
                 using (var memoryStream = new MemoryStream())
                 {
                     file.CopyTo(memoryStream);
@@ -50,13 +50,14 @@ namespace Healthcare.Api.Controllers
                                 var page = pdfDocument.GetPage(i);
                                 string text = PdfTextExtractor.GetTextFromPage(page);
 
-                                var laboratoryDetails = ParsePdfText(text);
-                                _hemogramaService.Add(laboratoryDetails);
+                                var pageLaboratoryDetails = ParsePdfText(text);
+                                MergeLaboratoryDetails(mergedLaboratoryDetails, pageLaboratoryDetails);
                             }
-                            return Ok("Laboratory details saved successfully");
                         }
                     }
                 }
+                _laboratoryDetailService.Add(mergedLaboratoryDetails);
+                return Ok("Laboratory details saved successfully");
             }
             catch (Exception ex)
             {
@@ -64,13 +65,70 @@ namespace Healthcare.Api.Controllers
             }
         }
 
-        private Hemograma ParsePdfText(string text)
+        void MergeLaboratoryDetails(LaboratoryDetail mergedDetails, LaboratoryDetail pageDetails)
         {
-            var hemograma = new Hemograma();
-            var properties = typeof(Hemograma).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-            foreach (string line in text.Split('\n'))
+            mergedDetails.GlobulosRojos = MergeProperty(mergedDetails.GlobulosRojos, pageDetails.GlobulosRojos);
+            mergedDetails.GlobulosBlancos = MergeProperty(mergedDetails.GlobulosBlancos, pageDetails.GlobulosBlancos);
+            mergedDetails.Hemoglobina = MergeProperty(mergedDetails.Hemoglobina, pageDetails.Hemoglobina);
+            mergedDetails.Hematocrito = MergeProperty(mergedDetails.Hematocrito, pageDetails.Hematocrito);
+            mergedDetails.VCM = MergeProperty(mergedDetails.VCM, pageDetails.VCM);
+            mergedDetails.HCM = MergeProperty(mergedDetails.HCM, pageDetails.HCM);
+            mergedDetails.CHCM = MergeProperty(mergedDetails.CHCM, pageDetails.CHCM);
+            mergedDetails.NeutrofilosCayados = MergeProperty(mergedDetails.NeutrofilosCayados, pageDetails.NeutrofilosCayados);
+            mergedDetails.NeutrofilosSegmentados = MergeProperty(mergedDetails.NeutrofilosSegmentados, pageDetails.NeutrofilosSegmentados);
+            mergedDetails.Eosinofilos = MergeProperty(mergedDetails.Eosinofilos, pageDetails.Eosinofilos);
+            mergedDetails.Basofilos = MergeProperty(mergedDetails.Basofilos, pageDetails.Basofilos);
+            mergedDetails.Linfocitos = MergeProperty(mergedDetails.Linfocitos, pageDetails.Linfocitos);
+            mergedDetails.Monocitos = MergeProperty(mergedDetails.Monocitos, pageDetails.Monocitos);
+            mergedDetails.Eritrosedimentacion1 = MergeProperty(mergedDetails.Eritrosedimentacion1, pageDetails.Eritrosedimentacion1);
+            mergedDetails.Eritrosedimentacion2 = MergeProperty(mergedDetails.Eritrosedimentacion2, pageDetails.Eritrosedimentacion2);
+            mergedDetails.Plaquetas = MergeProperty(mergedDetails.Plaquetas, pageDetails.Plaquetas);
+            mergedDetails.Glucemia = MergeProperty(mergedDetails.Glucemia, pageDetails.Glucemia);
+            mergedDetails.Uremia = MergeProperty(mergedDetails.Uremia, pageDetails.Uremia);
+            mergedDetails.Creatininemia = MergeProperty(mergedDetails.Creatininemia, pageDetails.Creatininemia);
+            mergedDetails.ColesterolTotal = MergeProperty(mergedDetails.ColesterolTotal, pageDetails.ColesterolTotal);
+            mergedDetails.ColesterolHdl = MergeProperty(mergedDetails.ColesterolHdl, pageDetails.ColesterolHdl);
+            mergedDetails.Trigliceridos = MergeProperty(mergedDetails.Trigliceridos, pageDetails.Trigliceridos);
+            mergedDetails.Uricemia = MergeProperty(mergedDetails.Uricemia, pageDetails.Uricemia);
+            mergedDetails.BilirrubinaDirecta = MergeProperty(mergedDetails.BilirrubinaDirecta, pageDetails.BilirrubinaDirecta);
+            mergedDetails.BilirrubinaIndirecta = MergeProperty(mergedDetails.BilirrubinaIndirecta, pageDetails.BilirrubinaIndirecta);
+            mergedDetails.BilirrubinaTotal = MergeProperty(mergedDetails.BilirrubinaTotal, pageDetails.BilirrubinaTotal);
+            mergedDetails.TransaminasaGlutamicoOxalac = MergeProperty(mergedDetails.TransaminasaGlutamicoOxalac, pageDetails.TransaminasaGlutamicoOxalac);
+            mergedDetails.TransaminasaGlutamicoPiruvic = MergeProperty(mergedDetails.TransaminasaGlutamicoPiruvic, pageDetails.TransaminasaGlutamicoPiruvic);
+            mergedDetails.FosfatasaAlcalina = MergeProperty(mergedDetails.FosfatasaAlcalina, pageDetails.FosfatasaAlcalina);
+            mergedDetails.TirotrofinaPlamatica = MergeProperty(mergedDetails.TirotrofinaPlamatica, pageDetails.TirotrofinaPlamatica);
+        }
+
+        string MergeProperty(string existingValue, string newValue)
+        {
+            if (existingValue == null)
+                return newValue;
+
+            if (newValue == null)
+                return existingValue;
+
+            return existingValue + newValue;
+        }
+
+        private static LaboratoryDetail ParsePdfText(string text)
+        {
+            var laboratoryDetail = new LaboratoryDetail();
+            var properties = typeof(LaboratoryDetail).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            string[] lines = text.Split('\n');
+            List<string> targetProperties = new List<string> {
+                "plaquetas",
+                "glucemia",
+                "uremia",
+                "creatininemia",
+                "colesterol total",
+                "colesterol hdl",
+                "trigliceridos",
+                "uricemia"
+            };
+
+            for (int i = 0; i < lines.Length; i++)
             {
-                string cleanLine = line.Trim().ToLowerInvariant().Replace(".", "");
+                string cleanLine = lines[i].Trim().ToLowerInvariant().Replace(".", "");
                 foreach (var property in properties)
                 {
                     var displayNameAttribute = (DisplayNameAttribute)property.GetCustomAttribute(typeof(DisplayNameAttribute));
@@ -79,20 +137,37 @@ namespace Healthcare.Api.Controllers
                     if (cleanLine.Contains(propertyNameToShow.ToLowerInvariant()))
                     {
                         MatchCollection matches = Regex.Matches(cleanLine, @"m?\d+([,.]\d+)?");
-                        
-                        var numericValue = Convert.ChangeType(matches.First().Value, property.PropertyType, CultureInfo.InvariantCulture);
-                        if (property.GetValue(hemograma) == null)
+                        if (matches.Count > 0)
                         {
-                            property.SetValue(hemograma, numericValue);
+                            var numericValue = Convert.ChangeType(
+                                cleanLine.Contains("eritrosedimentacion") ? matches.Last().Value : matches.First().Value,
+                                property.PropertyType, CultureInfo.InvariantCulture);
+
+                            if (property.GetValue(laboratoryDetail) == null)
+                            {
+                                property.SetValue(laboratoryDetail, numericValue);
+                            }
+
+                            break;
+                        }
+                        else if (i + 2 < lines.Length)
+                        {
+                            cleanLine = lines[i + 2].Trim().ToLowerInvariant().Replace(".", "");
+                            matches = Regex.Matches(cleanLine, @"m?\d+([,.]\d+)?");
+                            if (matches.Count > 0)
+                            {
+                                var numericValue = Convert.ChangeType(matches.First().Value, property.PropertyType, CultureInfo.InvariantCulture);
+                                if (property.GetValue(laboratoryDetail) == null)
+                                {
+                                    property.SetValue(laboratoryDetail, numericValue);
+                                }
+                            }
+                            break;
                         }
                     }
                 }
             }
-            return hemograma;
+            return laboratoryDetail;
         }
-
-        //public static IEnumerable<int> GetNumbersOfLine(string line)
-        //{
-        //}
     }
 }

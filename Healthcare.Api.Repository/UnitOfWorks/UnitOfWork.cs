@@ -17,7 +17,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             IHealthPlanRepository healthPlanRepository,
             IDoctorSpecialityRepository doctorSpecialityRepository,
             IAddressRepository addressRepository,
-            IHemogramaRepository laboratoryDetailRepository,
+            ILaboratoryDetailsRepository laboratoryDetailRepository,
             ICountryRepository countryRepository,
             IStateRepository stateRepository,
             ICityRepository cityRepository,
@@ -32,7 +32,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             HealthPlanRepository = healthPlanRepository;
             DoctorSpecialityRepository = doctorSpecialityRepository;
             AddressRepository = addressRepository;
-            HemogramaRepository = laboratoryDetailRepository;
+            LaboratoryDetailsRepository = laboratoryDetailRepository;
             CountryRepository = countryRepository;
             StateRepository = stateRepository;
             CityRepository = cityRepository;
@@ -47,7 +47,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         public IHealthPlanRepository HealthPlanRepository { get; }
         public IDoctorSpecialityRepository DoctorSpecialityRepository { get; }
         public IAddressRepository AddressRepository { get; }
-        public IHemogramaRepository HemogramaRepository { get; }
+        public ILaboratoryDetailsRepository LaboratoryDetailsRepository { get; }
         public ICityRepository CityRepository { get; }
         public ICountryRepository CountryRepository { get; }
         public IStateRepository StateRepository { get; }
