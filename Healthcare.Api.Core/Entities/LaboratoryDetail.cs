@@ -10,8 +10,8 @@ namespace Healthcare.Api.Core.Entities
         public string Hemoglobina { get; set; }
         public string Hematocrito { get; set; }
         public string VCM { get; set; }
-        public string CHCM { get; set; }
         public string HCM { get; set; }
+        public string CHCM { get; set; }
         public string NeutrofilosCayados { get; set; }
         public string NeutrofilosSegmentados { get; set; }
         public string Eosinofilos { get; set; }
