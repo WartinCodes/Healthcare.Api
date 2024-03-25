@@ -158,7 +158,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromForm] PatientRequest userRequest)
+        public async Task<IActionResult> Put([FromForm] PatientRequest userRequest, int id)
         {
             var patient = await _patientService.GetPatientByIdAsync(id);
             if (patient == null)
