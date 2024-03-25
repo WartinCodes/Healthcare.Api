@@ -1,4 +1,6 @@
-﻿using Healthcare.Api.Core.Entities;
+﻿using AutoMapper;
+using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Repository.Repositories;
 using iText.Kernel.Pdf;
@@ -19,10 +21,12 @@ namespace Healthcare.Api.Controllers
     public class LaboratoryController : ControllerBase
     {
         private readonly ILaboratoryDetailService _laboratoryDetailService;
+        private readonly IMapper _mapper;
 
-        public LaboratoryController()
+        public LaboratoryController(IMapper mapper, ILaboratoryDetailService laboratoryDetailService)
         {
-                
+            _mapper = mapper;
+            _laboratoryDetailService = laboratoryDetailService;
         }
 
         [HttpPost("upload-pdf")]
@@ -30,12 +34,12 @@ namespace Healthcare.Api.Controllers
         {
             if (file == null || file.Length <= 0)
             {
-                return BadRequest("File is required");
+                return BadRequest("Es necesario el archivo.");
             }
 
             try
             {
-                var mergedLaboratoryDetails = new LaboratoryDetail();
+                var mergedLaboratoryDetails = new LaboratoryDetailRequest();
                 using (var memoryStream = new MemoryStream())
                 {
                     file.CopyTo(memoryStream);
@@ -56,16 +60,17 @@ namespace Healthcare.Api.Controllers
                         }
                     }
                 }
-                _laboratoryDetailService.Add(mergedLaboratoryDetails);
-                return Ok("Laboratory details saved successfully");
+                
+                _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
+                return Ok("Se ha guardado correctamente los datos del laboratorio.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred: {ex.Message}");
+                return StatusCode(500, $"Ocurrió un error: {ex.Message}");
             }
         }
 
-        void MergeLaboratoryDetails(LaboratoryDetail mergedDetails, LaboratoryDetail pageDetails)
+        void MergeLaboratoryDetails(LaboratoryDetailRequest mergedDetails, LaboratoryDetailRequest pageDetails)
         {
             mergedDetails.GlobulosRojos = MergeProperty(mergedDetails.GlobulosRojos, pageDetails.GlobulosRojos);
             mergedDetails.GlobulosBlancos = MergeProperty(mergedDetails.GlobulosBlancos, pageDetails.GlobulosBlancos);
@@ -110,21 +115,11 @@ namespace Healthcare.Api.Controllers
             return existingValue + newValue;
         }
 
-        private static LaboratoryDetail ParsePdfText(string text)
+        private static LaboratoryDetailRequest ParsePdfText(string text)
         {
-            var laboratoryDetail = new LaboratoryDetail();
-            var properties = typeof(LaboratoryDetail).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            var laboratoryDetail = new LaboratoryDetailRequest();
+            var properties = typeof(LaboratoryDetailRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
             string[] lines = text.Split('\n');
-            List<string> targetProperties = new List<string> {
-                "plaquetas",
-                "glucemia",
-                "uremia",
-                "creatininemia",
-                "colesterol total",
-                "colesterol hdl",
-                "trigliceridos",
-                "uricemia"
-            };
 
             for (int i = 0; i < lines.Length; i++)
             {
