@@ -7,28 +7,28 @@ namespace Healthcare.Api.Service.Services
 {
     public class StateService : IStateService
     {
-        private readonly IStateRepository _StateRepository;
+        private readonly IStateRepository _stateRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public StateService(IStateRepository StateRepository, IUnitOfWork unitOfWork)
+        public StateService(IStateRepository stateRepository, IUnitOfWork unitOfWork)
         {
-            _StateRepository = StateRepository;
+            _stateRepository = stateRepository;
             _unitOfWork = unitOfWork;
         }
 
         public IQueryable<State> GetAsQueryable()
         {
-            return _StateRepository.GetAsQueryable();
+            return _stateRepository.GetAsQueryable();
         }
 
         public Task<IEnumerable<State>> GetAsync()
         {
-            return _StateRepository.GetAllStateAsync();
+            return _stateRepository.GetAllStateAsync();
         }
 
         public Task<IEnumerable<State>> GetStatesByCountryId(int countryId)
         {
-            return _StateRepository.GetStatesByCountryId(countryId);
+            return _stateRepository.GetStatesByCountryId(countryId);
         }
     }
 }

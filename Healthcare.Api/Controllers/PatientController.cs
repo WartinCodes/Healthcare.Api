@@ -175,11 +175,11 @@ namespace Healthcare.Api.Controllers
             // validacion de si user/document no esten asociadas a otro usuario.
             var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
             var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
-            if (existEmail != null && existEmail.Id != id)
+            if (existEmail != null && patient.UserId != existEmail.Id)
             {
                 return Conflict("Email ya existe.");
             }
-            if (existDocument != null && existDocument.Id != id)
+            if (existDocument != null && patient.UserId != existDocument.Id)
             {
                 return Conflict("DNI ya existe.");
             }

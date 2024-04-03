@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -36,21 +37,21 @@ namespace Healthcare.Api.Controllers
 
         [Authorize(Roles = "Administrador")]
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<User>>> Get()
+        public async Task<ActionResult<IEnumerable<UserResponse>>> Get()
         {
-            return await _userManager.Users.Select(x => x).ToListAsync();
+            var users = await _userManager.Users.Select(x => x).ToListAsync();
+            return Ok(_mapper.Map<IEnumerable<UserResponse>>(users));
         }
 
         [HttpGet("user")]
-        public async Task<ActionResult<User>> GetUserById([FromQuery] string id)
+        public async Task<ActionResult<UserResponse>> GetUserById([FromQuery] string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound($"Usuario con ID {id} no encontrado.");
             }
-
-            return Ok(user);
+            return Ok(_mapper.Map<UserResponse>(user));
         }
 
         [AllowAnonymous]

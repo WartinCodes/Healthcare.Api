@@ -29,8 +29,8 @@ namespace Healthcare.Api.Controllers
             _laboratoryDetailService = laboratoryDetailService;
         }
 
-        [HttpPost("upload-pdf")]
-        public IActionResult UploadPdf([FromForm] IFormFile file)
+        [HttpPost("upload-laboratory")]
+        public IActionResult UploadLaboratory([FromForm] IFormFile file)
         {
             if (file == null || file.Length <= 0)
             {

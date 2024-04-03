@@ -18,5 +18,7 @@ namespace Healthcare.Api.Repository.Context
         DbSet<LaboratoryDetail> Hemograma { get; set; }
         DbSet<DoctorHealthInsurance> DoctorHealthInsurance { get; set; }
         DbSet<PatientHealthPlan> PatientHealthPlan { get; set; }
+        DbSet<Study> Study { get; set; }
+        DbSet<StudyType> StudyType { get; set; }
     }
 }

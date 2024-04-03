@@ -13,6 +13,7 @@ namespace Healthcare.Api.Service.Services
         private readonly S3Configuration _s3Configuration;
         private readonly ITransferUtility _awsS3TransferUtility;
         private readonly string _photosFolder = "photos";
+        private readonly string _studiesFolder = "studies";
 
         public FileService(IAmazonS3 client, IOptions<S3Configuration> s3Configuration, ITransferUtility transferUtility)
         {
@@ -50,6 +51,50 @@ namespace Healthcare.Api.Service.Services
             try
             {
                 string key = _photosFolder + "/" + fileName;
+
+                var result = await _awsS3Client.DeleteObjectAsync(new DeleteObjectRequest
+                {
+                    BucketName = _s3Configuration.BucketName,
+                    Key = key
+                });
+
+                return HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<HttpStatusCode> InsertStudyAsync(Stream file, string fileName, string contentType)
+        {
+            try
+            {
+                string key = _studiesFolder + "/" + fileName;
+
+                TransferUtilityUploadRequest transferUtilityUploadRequest = new TransferUtilityUploadRequest()
+                {
+                    CannedACL = S3CannedACL.PublicRead,
+                    BucketName = _s3Configuration.BucketName,
+                    Key = key,
+                    InputStream = file
+                };
+
+                await _awsS3TransferUtility.UploadAsync(transferUtilityUploadRequest);
+
+                return HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                throw ex; 
+            }
+        }
+
+        public async Task<HttpStatusCode> DeleteStudyAsync(string fileName)
+        {
+            try
+            {
+                string key = _studiesFolder + "/" + fileName;
 
                 var result = await _awsS3Client.DeleteObjectAsync(new DeleteObjectRequest
                 {

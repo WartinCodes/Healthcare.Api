@@ -15,14 +15,9 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.Property(s => s.LocationS3).IsRequired();
             builder.Property(s=> s.Note).IsRequired(false);
 
-            builder.HasOne(s => s.StudyType)
-               .WithOne()
-               .HasForeignKey<Study>(s => s.StudyTypeId)
-               .IsRequired();
-
-            builder.HasOne(e => e.StudyType)
-               .WithMany()
-               .HasForeignKey(e => e.StudyTypeId);
+            builder.HasOne(s =>s.StudyType)
+                .WithMany(st => st.Studies)
+                .HasForeignKey(s => s.StudyTypeId);
 
             builder.HasOne(s => s.Patient)
                 .WithMany(s => s.Studies)

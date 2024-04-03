@@ -11,6 +11,11 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.ToTable("LaboratoryDetail").HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
+            builder.HasOne(x => x.Study)
+               .WithMany()
+               .HasForeignKey(x => x.IdStudy)
+               .IsRequired(false);
+
             builder.Property(x => x.GlobulosRojos);
             builder.Property(x => x.GlobulosBlancos);
             builder.Property(x => x.Hemoglobina);

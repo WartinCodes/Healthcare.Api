@@ -20,7 +20,12 @@ namespace Helthcare.Api.Mappers
             CreateMap<Country, CountryResponse>();
             CreateMap<State, StateResponse>();
             CreateMap<City, CityResponse>();
+            CreateMap<Study, StudyResponse>().ReverseMap();
+            CreateMap<StudyType, StudyTypeResponse>().ReverseMap();
             CreateMap<HealthInsurance, HealthInsuranceByHealthPlanResponse>().ReverseMap();
+            CreateMap<User, UserResponse>()
+                .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.UserName))
+                .ReverseMap();
             #endregion
 
             #region Requests
@@ -33,6 +38,7 @@ namespace Helthcare.Api.Mappers
             CreateMap<City, CityRequest>().ReverseMap();
             CreateMap<State, StateRequest>().ReverseMap();
             CreateMap<Country, CountryRequest>().ReverseMap();
+            CreateMap<StudyType, StudyTypeRequest>().ReverseMap();
             CreateMap<LaboratoryDetail, LaboratoryDetailRequest>().ReverseMap();
 
             //CreateMap<HealthPlanRequest, HealthPlan>()

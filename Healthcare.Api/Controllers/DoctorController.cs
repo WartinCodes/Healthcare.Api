@@ -198,11 +198,11 @@ namespace Healthcare.Api.Controllers
 
             var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
             var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
-            if (existEmail != null && existEmail.Id != id)
+            if (existEmail != null && doctor.UserId != existEmail.Id)
             {
                 return Conflict("Email ya existe.");
             }
-            if (existDocument != null && existDocument.Id != id)
+            if (existDocument != null && doctor.UserId != existDocument.Id)
             {
                 return Conflict("DNI ya existe.");
             }
