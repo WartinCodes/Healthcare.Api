@@ -54,9 +54,10 @@ namespace Healthcare.Api.Controllers
                     return NotFound($"Tipo de estudio no encontrado.");
                 }
 
-                string fileName = Guid.NewGuid().ToString();
+                string fileName = Guid.NewGuid().ToString() + ".pdf"; 
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
+                    study.StudyFile.CopyTo(memoryStream);
                     var pdfResult = await _fileService.InsertStudyAsync(memoryStream, fileName, "application/pdf");
                     if (pdfResult != HttpStatusCode.OK)
                     {

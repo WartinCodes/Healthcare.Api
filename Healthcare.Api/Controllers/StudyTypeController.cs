@@ -3,6 +3,7 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
@@ -25,6 +26,13 @@ namespace Healthcare.Api.Controllers
         {
             var studyTypes = await _studyTypeService.GetAsync();
             return Ok(_mapper.Map<IEnumerable<StudyTypeResponse>>(studyTypes));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<StudyTypeResponse>> Get([FromRoute] int id)
+        {
+            var studyTypeEntity = await _studyTypeService.GetStudyTypeByIdAsync(id);
+            return Ok(_mapper.Map<StudyTypeResponse>(studyTypeEntity));
         }
 
         [HttpPost("create")]
@@ -57,7 +65,7 @@ namespace Healthcare.Api.Controllers
                 studyType.Name = studyTypeRequest.Name;
                 _studyTypeService.Edit(studyType);
 
-                return Ok("Obra social actualizada exitosamente.");
+                return Ok("Tipo de estudio actualizado exitosamente.");
             }
             catch (Exception ex)
             {
