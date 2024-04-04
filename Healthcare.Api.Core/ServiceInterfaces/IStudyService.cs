@@ -7,6 +7,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         IQueryable<Study> GetAsQueryable();
         Task<IEnumerable<Study>> GetAsync();
         Task<Study> GetStudyByIdAsync(int id);
+        Task<IEnumerable<Study>> GetStudiesByPatientId(int id);
         Task<Study> Add(Study entity);
         void Remove(Study entity);
         void Edit(Study entity);

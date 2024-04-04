@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
@@ -30,6 +31,14 @@ namespace Healthcare.Api.Controllers
             _studyService = studyService;
             _studyTypeService = studyTypeService;
             _mapper = mapper;
+        }
+
+        [HttpGet("byPatient/{id}")]
+        public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesByPatient([FromRoute] int id)
+        {
+            var studies = await _studyService.GetStudiesByPatientId(id);
+
+            return Ok(_mapper.Map<IEnumerable<StudyResponse>>(studies));
         }
 
         [HttpPost("upload-study")]

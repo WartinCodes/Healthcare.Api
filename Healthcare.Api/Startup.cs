@@ -111,9 +111,9 @@ namespace Helthcare.Api
 
             app.UseHttpsRedirection();
 
-            app.UseRouting();
-
             app.UseCors(MyPolicy);
+
+            app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();

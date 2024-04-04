@@ -5,15 +5,17 @@ using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
+    [ApiController]
     [Route("api/[controller]")]
     //[Authorize(Roles = "Administrador")]
-    [ApiController]
+    [EnableCors("MyPolicy")]
     public class DoctorController : ControllerBase
     {
         private readonly UserManager<User> _userManager;

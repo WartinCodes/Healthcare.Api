@@ -34,6 +34,14 @@ namespace Healthcare.Api.Repository.Repositories
             return await base.GetAsync().ConfigureAwait(false);
         }
 
+        public async Task<IEnumerable<Study>> GetStudiesByPatientId(int id)
+        {
+            return await _context.Study
+                .Include(x => x.StudyType)
+                .Where(x => x.PatientId == id)
+                .ToListAsync();
+        }
+
         public async Task<Study> GetStudyByIdAsync(int id)
         {
             return await _context.Study.FirstOrDefaultAsync(x => x.Id == id);
