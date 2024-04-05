@@ -63,6 +63,7 @@ namespace Helthcare.Api
                 if (Configuration.GetValue<bool>("isAllowAllCrossOrigins"))
                 {
                     builder
+                        .WithOrigins("http://localhost:3000")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowAnyOrigin();
@@ -72,6 +73,7 @@ namespace Helthcare.Api
                     builder.WithOrigins(Configuration.GetSection("AllowedOriginsList").GetChildren().ToArray().Select(c => c.Value).ToArray());
                 }
             }));
+
 
             var jwtIssuer = Configuration.GetSection("JWT:Issuer").Get<string>();
             var jwtKey = Configuration.GetSection("JWT:SecretKey").Get<string>();
