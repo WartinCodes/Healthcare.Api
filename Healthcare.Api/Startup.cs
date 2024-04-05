@@ -59,10 +59,10 @@ namespace Helthcare.Api
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigin",
+                options.AddPolicy("AllowAny",
                     builder =>
                     {
-                        builder.WithOrigins("https://mi-portal-incor-rosdata.vercel.app", "http://localhost:3000")
+                        builder.AllowAnyOrigin()
                                .AllowAnyHeader()
                                .AllowAnyMethod();
                     });
@@ -107,7 +107,7 @@ namespace Helthcare.Api
 
             app.UseHttpsRedirection();
 
-            app.UseCors("AllowSpecificOrigin");
+            app.UseCors("AllowAny");
 
             app.UseRouting();
 
