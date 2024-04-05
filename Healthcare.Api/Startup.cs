@@ -19,7 +19,6 @@ namespace Helthcare.Api
 {
     public class Startup
     {
-        readonly string MyPolicy = "MyPolicy";
         public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
@@ -58,20 +57,16 @@ namespace Helthcare.Api
             services.AddMappers();
             services.AddMvc();
 
-            services.AddCors(o => o.AddPolicy(string.Empty, builder =>
+            services.AddCors(options =>
             {
-                if (Configuration.GetValue<bool>("isAllowAllCrossOrigins"))
-                {
-                    builder
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .WithOrigins("http://localhost:3000");
-                }
-                else
-                {
-                    builder.WithOrigins(Configuration.GetSection("AllowedOriginsList").GetChildren().Select(c => c.Value).ToArray());
-                }
-            }));
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder =>
+                    {
+                        builder.WithOrigins("https://mi-portal-incor-rosdata.vercel.app", "http://localhost:3000")
+                               .AllowAnyHeader()
+                               .AllowAnyMethod();
+                    });
+            });
 
 
             var jwtIssuer = Configuration.GetSection("JWT:Issuer").Get<string>();
@@ -112,7 +107,7 @@ namespace Helthcare.Api
 
             app.UseHttpsRedirection();
 
-            app.UseCors();
+            app.UseCors("AllowSpecificOrigin");
 
             app.UseRouting();
 
