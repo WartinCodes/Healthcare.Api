@@ -14,7 +14,6 @@ namespace Healthcare.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     //[Authorize(Roles = "Administrador")]
-    [EnableCors("MyPolicy")]
     public class PatientController : ControllerBase
     {
         private readonly UserManager<User> _userManager;

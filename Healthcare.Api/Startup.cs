@@ -58,19 +58,18 @@ namespace Helthcare.Api
             services.AddMappers();
             services.AddMvc();
 
-            services.AddCors(o => o.AddPolicy(MyPolicy, builder =>
+            services.AddCors(o => o.AddPolicy(string.Empty, builder =>
             {
                 if (Configuration.GetValue<bool>("isAllowAllCrossOrigins"))
                 {
                     builder
-                        .WithOrigins("http://localhost:3000")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
-                        .AllowAnyOrigin();
+                        .WithOrigins("http://localhost:3000");
                 }
                 else
                 {
-                    builder.WithOrigins(Configuration.GetSection("AllowedOriginsList").GetChildren().ToArray().Select(c => c.Value).ToArray());
+                    builder.WithOrigins(Configuration.GetSection("AllowedOriginsList").GetChildren().Select(c => c.Value).ToArray());
                 }
             }));
 
@@ -113,7 +112,7 @@ namespace Helthcare.Api
 
             app.UseHttpsRedirection();
 
-            app.UseCors(MyPolicy);
+            app.UseCors();
 
             app.UseRouting();
 
