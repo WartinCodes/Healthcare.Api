@@ -1,4 +1,5 @@
-﻿using Healthcare.Api.Core.Entities;
+﻿using Amazon.Auth.AccessControlPolicy;
+using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Repository;
 using Healthcare.Api.Repository.Context;
 using Healthcare.Api.Service;
@@ -20,6 +21,7 @@ namespace Helthcare.Api
     public class Startup
     {
         public IConfiguration Configuration { get; }
+        readonly string MyPolicy = "MyPolicy";
 
         public Startup(IConfiguration configuration)
         {
@@ -57,16 +59,12 @@ namespace Helthcare.Api
             services.AddMappers();
             services.AddMvc();
 
-            services.AddCors(options =>
+            services.AddCors(o => o.AddPolicy(MyPolicy, builder =>
             {
-                options.AddPolicy("AllowAny",
-                    builder =>
-                    {
-                        builder.AllowAnyOrigin()
-                               .AllowAnyHeader()
-                               .AllowAnyMethod();
-                    });
-            });
+                builder.WithOrigins(Configuration.GetSection("AllowedOriginsList").GetChildren().ToArray().Select(c => c.Value).ToArray());
+                builder.AllowAnyHeader();
+                builder.AllowAnyMethod();
+            }));
 
 
             var jwtIssuer = Configuration.GetSection("JWT:Issuer").Get<string>();
@@ -107,9 +105,9 @@ namespace Helthcare.Api
 
             app.UseHttpsRedirection();
 
-            app.UseCors("AllowAny");
-
             app.UseRouting();
+
+            app.UseCors(MyPolicy);
 
             app.UseAuthentication();
             app.UseAuthorization();

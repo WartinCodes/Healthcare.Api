@@ -5,6 +5,7 @@ using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Repository.Repositories;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,7 @@ namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyPolicy")]
     public class LaboratoryController : ControllerBase
     {
         private readonly ILaboratoryDetailService _laboratoryDetailService;
