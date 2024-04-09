@@ -73,10 +73,10 @@ namespace Healthcare.Api.Controllers
             return Ok(doctors);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<DoctorResponse>> Get([FromRoute] int id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<DoctorResponse>> Get([FromRoute] int userId)
         {
-            var doctorEntity = await _doctorService.GetDoctorByIdAsync(id);
+            var doctorEntity = await _doctorService.GetDoctorByUserIdAsync(userId);
 
             var doctor = new DoctorResponse()
             {

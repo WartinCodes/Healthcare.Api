@@ -160,18 +160,18 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromForm] PatientRequest userRequest, int id)
+        public async Task<IActionResult> Put([FromForm] PatientRequest userRequest, int userId)
         {
-            var patient = await _patientService.GetPatientByIdAsync(id);
+            var patient = await _patientService.GetPatientByUserIdAsync(userId);
             if (patient == null)
             {
-                return NotFound($"No se encontró el usuario con el ID: {id}");
+                return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
             }
 
             var user = await _userManager.FindByIdAsync(patient.UserId.ToString());
             if (user == null)
             {
-                return NotFound($"No se encontró el usuario con el ID: {id}");
+                return NotFound($"No se encontró el usuario con el ID: {userId}");
             }
 
             // validacion de si user/document no esten asociadas a otro usuario.
@@ -198,7 +198,7 @@ namespace Healthcare.Api.Controllers
             _addressService.Edit(newAddress);
 
             // borrado de las obras sociales asociadas al paciente en tabla PatientHealthPlan
-            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(id);
+            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(userId);
             foreach (var php in patientHealthPlans)
             {
                 _patientHealthPlanService.Remove(php);
@@ -235,7 +235,7 @@ namespace Healthcare.Api.Controllers
                 return BadRequest($"Error al actualizar el paciente: {user.UserName}");
             }
 
-            return Ok($"Paciente con el ID {id} actualizado exitosamente");
+            return Ok($"Paciente con el ID {userId} actualizado exitosamente");
         }
 
         [HttpDelete("{id}")]

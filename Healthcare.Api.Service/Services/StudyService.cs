@@ -41,7 +41,7 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<IEnumerable<Study>> GetStudiesByPatientId(int id)
         {
-            return await _studyRepository.GetStudiesByPatientId(id);
+            return await _studyRepository.GetStudiesByUserId(id);
         }
 
         public async Task<Study> GetStudyByIdAsync(int id)
