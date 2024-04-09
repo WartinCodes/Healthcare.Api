@@ -33,6 +33,19 @@ namespace Healthcare.Api.Repository.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Patient> GetPatientByUserIdAsync(int userId)
+        {
+            return await _context.Patient.Where(x => x.UserId == userId)
+                .Include(x => x.User)
+                .Include(x => x.HealthPlans)
+                .ThenInclude(x => x.HealthInsurance)
+                .Include(x => x.Address)
+                .ThenInclude(x => x.City)
+                .ThenInclude(x => x.State)
+                .ThenInclude(x => x.Country)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<Patient> GetPatientByIdAsync(int id)
         {
             return await _context.Patient.Where(x => x.Id == id)
