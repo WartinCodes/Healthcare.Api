@@ -49,7 +49,7 @@ namespace Healthcare.Api.Controllers
             var patients = (await _patientService.GetAsync())
                 .Select(x => new PatientResponse()
                 {
-                    Id = x.UserId,
+                    UserId = x.UserId,
                     FirstName = x.User.FirstName,
                     LastName = x.User.LastName,
                     DNI = x.User.UserName,
@@ -71,7 +71,7 @@ namespace Healthcare.Api.Controllers
 
             var patient = new PatientResponse()
             {
-                Id = patientEntity.Id,
+                UserId = patientEntity.UserId,
                 FirstName = patientEntity.User.FirstName,
                 LastName = patientEntity.User.LastName,
                 DNI = patientEntity.User.UserName,
