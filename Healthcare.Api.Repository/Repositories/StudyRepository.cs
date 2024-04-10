@@ -34,12 +34,12 @@ namespace Healthcare.Api.Repository.Repositories
             return await base.GetAsync().ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<Study>> GetStudiesByUserId(int id)
+        public async Task<IEnumerable<Study>> GetStudiesByUserId(int userId)
         {
             return await _context.Study
                 .Include(x => x.StudyType)
                 .Include(x => x.Patient)
-                .Where(x => x.Patient.UserId == id)
+                .Where(x => x.Patient.UserId == userId)
                 .ToListAsync();
         }
 

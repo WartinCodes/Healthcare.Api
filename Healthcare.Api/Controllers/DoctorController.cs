@@ -184,7 +184,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromForm] DoctorRequest userRequest, int id)
+        public async Task<IActionResult> Put(int id, [FromBody] DoctorRequest userRequest)
         {
             var doctor = await _doctorService.GetDoctorByIdAsync(id);
             if (doctor == null)
@@ -262,43 +262,25 @@ namespace Healthcare.Api.Controllers
             return Ok($"Usuario con el ID {id} actualizado exitosamente");
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> Delete(int userId)
         {
-            var doctor = await _doctorService.GetDoctorByIdAsync(id);
+            var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
             if (doctor == null)
             {
-                return NotFound($"No se encontró el doctor con el ID: {id}");
+                return NotFound($"No se encontró el doctor con el usuario ID: {userId}");
             }
 
             var user = await _userManager.FindByIdAsync(doctor.UserId.ToString());
             if (user == null)
             {
-                return NotFound($"No se encontró el usuario con el ID: {id}");
+                return NotFound($"No se encontró el usuario con el ID: {userId}");
             }
-        
-            // borrado de las obras sociales asociadas al doctor en tabla DoctorHealthPlanService
-            var doctorHealthInsurances = await _doctorHealthInsuranceService.GetHealthPlansByDoctor(id);
-            foreach (var php in doctorHealthInsurances)
-            {
-                _doctorHealthInsuranceService.Remove(php);
-            }
-            // borrado de las especialidades asociadas al doctor
-            var doctorSpecialities = await _doctorSpecialityService.GetSpecialitiesByDoctor(id);
-            foreach (var ds in doctorSpecialities)
-            {
-                _doctorSpecialityService.Remove(ds);
-            }
-            // borrado de doctor
-            _doctorService.Remove(doctor);
-            // borrado de direccion
-            _addressService.Remove(doctor.Address);
-            // borro foto
-            await _fileService.DeletePhotoAsync(user.Photo);
+
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
-                return BadRequest($"Error al eliminar el usuario con el ID: {id}");
+                return BadRequest($"Error al eliminar el usuario con el ID: {userId}");
             }
 
             return Ok($"Médico con el DNI {user.UserName} eliminado exitosamente");

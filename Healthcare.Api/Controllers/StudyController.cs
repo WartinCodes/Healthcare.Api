@@ -36,10 +36,10 @@ namespace Healthcare.Api.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("byPatient/{id}")]
-        public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesByPatient([FromRoute] int id)
+        [HttpGet("byPatient/{userId}")]
+        public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesByPatient([FromRoute] int userId)
         {
-            var studies = await _studyService.GetStudiesByPatientId(id);
+            var studies = await _studyService.GetStudiesByUserId(userId);
 
             return Ok(_mapper.Map<IEnumerable<StudyResponse>>(studies));
         }
@@ -54,7 +54,7 @@ namespace Healthcare.Api.Controllers
 
             try
             {
-                var patient = await _patientService.GetPatientByIdAsync(study.PatientId);
+                var patient = await _patientService.GetPatientByUserIdAsync(study.UserId);
                 if (patient == null)
                 {
                     return NotFound($"Paciente no encontrado.");

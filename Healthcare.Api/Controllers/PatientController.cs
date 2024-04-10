@@ -248,36 +248,25 @@ namespace Healthcare.Api.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> Delete(int userId)
         {
-            var patient = await _patientService.GetPatientByUserIdAsync(id);
+            var patient = await _patientService.GetPatientByUserIdAsync(userId);
             if (patient == null)
             {
-                return NotFound($"No se encontró el paciente con el usuario ID: {id}");
+                return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
             }
 
-            var user = await _userManager.FindByIdAsync(id.ToString());
+            var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                return NotFound($"No se encontró el usuario con el ID: {id}");
+                return NotFound($"No se encontró el usuario con el ID: {userId}");
             }
 
-            // borrado de obras sociales asociadas al pciente
-            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(patient.Id);
-            foreach (var php in patientHealthPlans)
-            {
-                _patientHealthPlanService.Remove(php);
-            }
-            // borrado de paciente
-            _patientService.Remove(patient);
-            // borrado de direccion
-            _addressService.Remove(patient.Address);
-            // borrado de usuario
             var resultUser = await _userManager.DeleteAsync(user);
             if (!resultUser.Succeeded)
             {
-                return BadRequest($"Error al eliminar el usuario con el ID: {id}");
+                return BadRequest($"Error al eliminar el usuario con el ID: {userId}");
             }
 
             return Ok($"Paciente con el DNI {user.UserName} eliminado exitosamente");
