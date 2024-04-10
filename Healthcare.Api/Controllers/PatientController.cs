@@ -2,6 +2,7 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Cors;
@@ -102,6 +103,8 @@ namespace Healthcare.Api.Controllers
                 var newUser = _mapper.Map<User>(userRequest);
                 newUser.PasswordHash = newUser.UserName;
                 newUser.Photo = fileName;
+                DateTime birthDate = userRequest.BirthDate.ToArgentinaTime();
+                newUser.BirthDate = birthDate;
 
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)

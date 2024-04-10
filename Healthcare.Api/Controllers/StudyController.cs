@@ -2,6 +2,7 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Cors;
@@ -76,10 +77,11 @@ namespace Healthcare.Api.Controllers
                     }
                 }
 
+                DateTime date = study.Date.ToArgentinaTime();
                 Study newStudy = new Study() 
                 {
                     LocationS3 = fileName,
-                    Date = DateTime.Now,
+                    Date = date,
                     Note = study.Note,
                     Patient = patient,
                     StudyType = studyType

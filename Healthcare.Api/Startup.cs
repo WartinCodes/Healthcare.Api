@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Configuration;
+using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -120,6 +121,12 @@ namespace Helthcare.Api
             {
                 endpoints.MapControllers();
             });
+
+            var cultureInfo = new CultureInfo("es-AR");
+            cultureInfo.NumberFormat.CurrencySymbol = "$";
+
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
         }
     }
 }
