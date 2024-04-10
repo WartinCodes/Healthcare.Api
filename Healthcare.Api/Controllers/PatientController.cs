@@ -98,7 +98,7 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI/Email ya existe.");
                 }
 
-                string fileName = userRequest.Photo == null ? String.Empty : Guid.NewGuid().ToString();                
+                string fileName = userRequest.Photo == null ? String.Empty : Guid.NewGuid().ToString();
                 var newUser = _mapper.Map<User>(userRequest);
                 newUser.PasswordHash = newUser.UserName;
                 newUser.Photo = fileName;
@@ -145,7 +145,7 @@ namespace Healthcare.Api.Controllers
                             }
                         }
                     }
-
+                    
                     return Ok("Paciente creado exitosamente.");
                 }
                 else
@@ -160,7 +160,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
-        public async Task<IActionResult> Put([FromForm] PatientRequest userRequest, int userId)
+        public async Task<IActionResult> Put([FromBody] PatientRequestEdit userRequest, int userId)
         {
             var patient = await _patientService.GetPatientByUserIdAsync(userId);
             if (patient == null)
@@ -186,10 +186,10 @@ namespace Healthcare.Api.Controllers
                 return Conflict("DNI ya existe.");
             }
 
-            if (!String.IsNullOrEmpty(user.Photo))
-            {
-                await _fileService.DeletePhotoAsync(user.Photo);
-            }
+            //if (!String.IsNullOrEmpty(user.Photo))
+            //{
+            //    await _fileService.DeletePhotoAsync(user.Photo);
+            //}
             _mapper.Map(userRequest, user);
             var result = await _userManager.UpdateAsync(user);
 
@@ -217,18 +217,18 @@ namespace Healthcare.Api.Controllers
                 await _patientHealthPlanService.Add(patientHealthPlan);
             }
 
-            if (!String.IsNullOrEmpty(user.Photo))
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    await userRequest.Photo.CopyToAsync(memoryStream);
-                    var imageResult = await _fileService.InsertPhotoAsync(memoryStream, userRequest.Photo.FileName, "image/jpeg");
-                    if (imageResult != HttpStatusCode.OK)
-                    {
-                        return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
-                    }
-                }
-            }
+            //if (!String.IsNullOrEmpty(user.Photo))
+            //{
+            //    using (MemoryStream memoryStream = new MemoryStream())
+            //    {
+            //        await userRequest.Photo.CopyToAsync(memoryStream);
+            //        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, userRequest.Photo.FileName, "image/jpeg");
+            //        if (imageResult != HttpStatusCode.OK)
+            //        {
+            //            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+            //        }
+            //    }
+            //}
 
             if (!result.Succeeded)
             {
@@ -241,19 +241,20 @@ namespace Healthcare.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var patient = await _patientService.GetPatientByIdAsync(id);
+            var patient = await _patientService.GetPatientByUserIdAsync(id);
             if (patient == null)
             {
-                return NotFound($"No se encontró el paciente con el ID: {id}");
+                return NotFound($"No se encontró el paciente con el usuario ID: {id}");
             }
 
-            var user = await _userManager.FindByIdAsync(patient.UserId.ToString());
+            var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
             {
                 return NotFound($"No se encontró el usuario con el ID: {id}");
             }
+
             // borrado de obras sociales asociadas al pciente
-            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(id);
+            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(patient.Id);
             foreach (var php in patientHealthPlans)
             {
                 _patientHealthPlanService.Remove(php);
