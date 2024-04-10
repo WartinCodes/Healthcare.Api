@@ -29,7 +29,8 @@ namespace Helthcare.Api.Mappers
             #endregion
 
             #region Requests
-            CreateMap<User, PatientRequest>().ReverseMap();     
+            CreateMap<User, PatientRequest>().ReverseMap();
+            CreateMap<User, PatientRequestEdit>().ReverseMap();
             CreateMap<User, DoctorRequest>().ReverseMap();
             CreateMap<Speciality, SpecialityRequest>().ReverseMap();
             CreateMap<HealthInsurance, HealthInsuranceRequest>().ReverseMap();
