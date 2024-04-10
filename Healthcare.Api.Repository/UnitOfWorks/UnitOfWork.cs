@@ -17,12 +17,14 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             IHealthPlanRepository healthPlanRepository,
             IDoctorSpecialityRepository doctorSpecialityRepository,
             IAddressRepository addressRepository,
-            IHemogramaRepository laboratoryDetailRepository,
+            ILaboratoryDetailsRepository laboratoryDetailRepository,
             ICountryRepository countryRepository,
             IStateRepository stateRepository,
             ICityRepository cityRepository,
             IDoctorHealthInsuranceRepository doctorHealthPlanRepository,
-            IPatientHealthPlanRepository patientHealthPlanRepository)
+            IPatientHealthPlanRepository patientHealthPlanRepository,
+            IStudyTypeRepository studyTypeRepository,
+            IStudyRepository studyRepository)
         {
             _context = context;
             PatientRepository = patientRepository;
@@ -32,12 +34,14 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             HealthPlanRepository = healthPlanRepository;
             DoctorSpecialityRepository = doctorSpecialityRepository;
             AddressRepository = addressRepository;
-            HemogramaRepository = laboratoryDetailRepository;
+            LaboratoryDetailsRepository = laboratoryDetailRepository;
             CountryRepository = countryRepository;
             StateRepository = stateRepository;
             CityRepository = cityRepository;
             DoctorHealthInsuranceRepository = doctorHealthPlanRepository;
             PatientHealthPlanRepository = patientHealthPlanRepository;
+            StudyTypeRepository = studyTypeRepository;
+            StudyRepository = studyRepository;
         }
 
         public ISpecialityRepository SpecialityRepository { get; }
@@ -47,12 +51,14 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         public IHealthPlanRepository HealthPlanRepository { get; }
         public IDoctorSpecialityRepository DoctorSpecialityRepository { get; }
         public IAddressRepository AddressRepository { get; }
-        public IHemogramaRepository HemogramaRepository { get; }
+        public ILaboratoryDetailsRepository LaboratoryDetailsRepository { get; }
         public ICityRepository CityRepository { get; }
         public ICountryRepository CountryRepository { get; }
         public IStateRepository StateRepository { get; }
         public IDoctorHealthInsuranceRepository DoctorHealthInsuranceRepository { get; }
         public IPatientHealthPlanRepository PatientHealthPlanRepository { get; }
+        public IStudyRepository StudyRepository { get; }
+        public IStudyTypeRepository StudyTypeRepository { get; }
 
         public void Dispose()
         {

@@ -1,5 +1,4 @@
 ﻿using Healthcare.Api.Core.RepositoryInterfaces;
-using Healthcare.Api.Core.ServiceInterfaces;
 
 namespace Healthcare.Api.Core.UnitOfWorks
 {
@@ -12,12 +11,14 @@ namespace Healthcare.Api.Core.UnitOfWorks
         IHealthInsuranceRepository HealthInsuranceRepository { get; }
         IHealthPlanRepository HealthPlanRepository { get; }
         IAddressRepository AddressRepository { get; }
-        IHemogramaRepository HemogramaRepository { get; }
+        ILaboratoryDetailsRepository LaboratoryDetailsRepository { get; }
         ICityRepository CityRepository { get; }
         ICountryRepository CountryRepository { get; }
         IStateRepository StateRepository { get; }
         IPatientRepository PatientRepository { get; }
         IPatientHealthPlanRepository PatientHealthPlanRepository { get; }
+        IStudyRepository StudyRepository { get; }
+        IStudyTypeRepository StudyTypeRepository { get; }
 
         void Save();
         Task SaveAsync();

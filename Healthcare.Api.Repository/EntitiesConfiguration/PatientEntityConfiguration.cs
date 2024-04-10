@@ -16,7 +16,8 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.HasOne(p => p.User)
                .WithOne()
                .HasForeignKey<Patient>(p => p.UserId)
-               .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(p => p.HealthPlans)
                 .WithMany(hp => hp.Patients)

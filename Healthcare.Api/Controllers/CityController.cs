@@ -2,12 +2,14 @@
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyPolicy")]
     public class CityController : ControllerBase
     {
         private readonly ICityService _cityService;

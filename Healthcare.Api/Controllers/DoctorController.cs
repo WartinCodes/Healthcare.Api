@@ -5,14 +5,17 @@ using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
-    [Route("api/[controller]")]
-    //[Authorize(Roles = "Administrador")]
     [ApiController]
+    [Route("api/[controller]")]
+    [EnableCors("MyPolicy")]
+    //[Authorize(Roles = "Administrador")]
     public class DoctorController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
@@ -22,6 +25,7 @@ namespace Healthcare.Api.Controllers
         private readonly IDoctorSpecialityService _doctorSpecialityService;
         private readonly IHealthPlanService _healthPlanService;
         private readonly IDoctorHealthInsuranceService _doctorHealthInsuranceService;
+        private readonly IFileService _fileService;
 
         private readonly IMapper _mapper;
 
@@ -33,7 +37,8 @@ namespace Healthcare.Api.Controllers
             ISpecialityService specialityService, 
             IHealthPlanService healthPlanService,
             IDoctorSpecialityService doctorSpecialityService,
-            IDoctorHealthInsuranceService doctorHealthInsuranceService)
+            IDoctorHealthInsuranceService doctorHealthInsuranceService,
+            IFileService fileService)
         {
             _addressService = addressService;
             _doctorService = doctorService;
@@ -43,6 +48,7 @@ namespace Healthcare.Api.Controllers
             _mapper = mapper;
             _specialityService = specialityService;
             _userManager = userManager;
+            _fileService = fileService;
         }
 
         [HttpGet("all")]
@@ -67,10 +73,10 @@ namespace Healthcare.Api.Controllers
             return Ok(doctors);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<DoctorResponse>> Get([FromRoute] int id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<DoctorResponse>> Get([FromRoute] int userId)
         {
-            var doctorEntity = await _doctorService.GetDoctorByIdAsync(id);
+            var doctorEntity = await _doctorService.GetDoctorByUserIdAsync(userId);
 
             var doctor = new DoctorResponse()
             {
@@ -91,9 +97,8 @@ namespace Healthcare.Api.Controllers
             return Ok(doctor);
         }
 
-        // REVISAR VALIDACIONES, EN EL CASO DE QUE HAYA UN ERROR QUE CANCELE TODO Y NO CREE NADA M{AS
         [HttpPost("create")]
-        public async Task<IActionResult> Post([FromBody] DoctorRequest userRequest)
+        public async Task<IActionResult> Post([FromForm] DoctorRequest userRequest)
         {
             try
             {
@@ -104,8 +109,10 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI/Email ya existe.");
                 }
 
+                string fileName = userRequest.Photo == null ? String.Empty : Guid.NewGuid().ToString();
                 var newUser = _mapper.Map<User>(userRequest);
                 newUser.PasswordHash = newUser.UserName;
+                newUser.Photo = fileName;
 
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
@@ -150,6 +157,19 @@ namespace Healthcare.Api.Controllers
                         await _doctorHealthInsuranceService.Add(doctorHealthPlan);
                     }
 
+                    if (!String.IsNullOrEmpty(fileName))
+                    {
+                        using (MemoryStream memoryStream = new MemoryStream())
+                        {
+                            await userRequest.Photo.CopyToAsync(memoryStream);
+                            var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
+                            if (imageResult != HttpStatusCode.OK)
+                            {
+                                return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                            }
+                        }
+                    }
+
                     return Ok("Médico creado exitosamente.");
                 }
                 else
@@ -162,7 +182,6 @@ namespace Healthcare.Api.Controllers
                 return StatusCode(500, $"An error occurred while processing your request: {ex}");
             }
         }
-
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] DoctorRequest userRequest)
@@ -181,11 +200,11 @@ namespace Healthcare.Api.Controllers
 
             var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
             var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
-            if (existEmail != null && existEmail.Id != id)
+            if (existEmail != null && doctor.UserId != existEmail.Id)
             {
                 return Conflict("Email ya existe.");
             }
-            if (existDocument != null && existDocument.Id != id)
+            if (existDocument != null && doctor.UserId != existDocument.Id)
             {
                 return Conflict("DNI ya existe.");
             }
@@ -193,7 +212,6 @@ namespace Healthcare.Api.Controllers
             _mapper.Map(userRequest, user);
             var result = await _userManager.UpdateAsync(user);
 
-            // actualizacion de Address
             var newAddress = _mapper.Map<Address>(userRequest.Address);
             _addressService.Edit(newAddress);
 
@@ -244,19 +262,25 @@ namespace Healthcare.Api.Controllers
             return Ok($"Usuario con el ID {id} actualizado exitosamente");
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> Delete(int userId)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
+            var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
+            if (doctor == null)
+            {
+                return NotFound($"No se encontró el doctor con el usuario ID: {userId}");
+            }
+
+            var user = await _userManager.FindByIdAsync(doctor.UserId.ToString());
             if (user == null)
             {
-                return NotFound($"No se encontró el médico con el ID: {id}");
+                return NotFound($"No se encontró el usuario con el ID: {userId}");
             }
 
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
-                return BadRequest($"Error al eliminar el médico con el ID: {id}");
+                return BadRequest($"Error al eliminar el usuario con el ID: {userId}");
             }
 
             return Ok($"Médico con el DNI {user.UserName} eliminado exitosamente");

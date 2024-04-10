@@ -210,7 +210,7 @@ namespace Healthcare.Api.Repository.Migrations
                     b.ToTable("HealthPlan", "Healthcare");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.Hemograma", b =>
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.LaboratoryDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -218,77 +218,132 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.Property<string>("Basofilos")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("Basofilos");
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BilirrubinaDirecta")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BilirrubinaIndirecta")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BilirrubinaTotal")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("CHCM")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("CHCM");
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ColesterolHdl")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ColesterolTotal")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Creatininemia")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Eosinofilos")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("Eosinofilos");
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Eritrosedimentacion1")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Eritrosedimentacion2")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FosfatasaAlcalina")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("GlobulosBlancos")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("GlobulosBlancos");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("GlobulosRojos")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("GlobulosRojos");
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Glucemia")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("HCM")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("HCM");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Hematocrito")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("Hematocrito");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Hemoglobina")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("Hemoglobina");
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("IdStudy")
+                        .HasColumnType("int");
 
                     b.Property<string>("Linfocitos")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("Linfocitos");
-
-                    b.Property<string>("Metodo")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("Metodo");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Monocitos")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("Monocitos");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("NeutrofilosCayados")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("NeutrofilosCayados");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("NeutrofilosSegmentados")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("NeutrofilosSegmentados");
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Plaquetas")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TirotrofinaPlamatica")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TransaminasaGlutamicoOxalac")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TransaminasaGlutamicoPiruvic")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Trigliceridos")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Uremia")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Uricemia")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("VCM")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("VCM");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Hemograma", "Healthcare");
+                    b.HasIndex("IdStudy");
+
+                    b.ToTable("LaboratoryDetail", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
@@ -401,6 +456,52 @@ namespace Healthcare.Api.Repository.Migrations
                     b.HasIndex("IdCountry");
 
                     b.ToTable("State", "Healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Study", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("LocationS3")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudyTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("StudyTypeId");
+
+                    b.ToTable("Study", "Healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.StudyType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StudyType", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
@@ -678,6 +779,15 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("HealthInsurance");
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.LaboratoryDetail", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.Study", "Study")
+                        .WithMany()
+                        .HasForeignKey("IdStudy");
+
+                    b.Navigation("Study");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
                 {
                     b.HasOne("Healthcare.Api.Core.Entities.Address", "Address")
@@ -725,6 +835,25 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Study", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.Patient", "Patient")
+                        .WithMany("Studies")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Healthcare.Api.Core.Entities.StudyType", "StudyType")
+                        .WithMany("Studies")
+                        .HasForeignKey("StudyTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("StudyType");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -798,6 +927,11 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("HealthPlans");
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
+                {
+                    b.Navigation("Studies");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Speciality", b =>
                 {
                     b.Navigation("DoctorSpecialities");
@@ -806,6 +940,11 @@ namespace Healthcare.Api.Repository.Migrations
             modelBuilder.Entity("Healthcare.Api.Core.Entities.State", b =>
                 {
                     b.Navigation("Cities");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.StudyType", b =>
+                {
+                    b.Navigation("Studies");
                 });
 #pragma warning restore 612, 618
         }

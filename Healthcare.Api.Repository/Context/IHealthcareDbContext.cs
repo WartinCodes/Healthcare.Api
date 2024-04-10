@@ -15,8 +15,10 @@ namespace Healthcare.Api.Repository.Context
         DbSet<City> City { get; set; }
         DbSet<State> State { get; set; }
         DbSet<Country> Country { get; set; }
-        DbSet<Hemograma> Hemograma { get; set; }
+        DbSet<LaboratoryDetail> Hemograma { get; set; }
         DbSet<DoctorHealthInsurance> DoctorHealthInsurance { get; set; }
         DbSet<PatientHealthPlan> PatientHealthPlan { get; set; }
+        DbSet<Study> Study { get; set; }
+        DbSet<StudyType> StudyType { get; set; }
     }
 }

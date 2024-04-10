@@ -22,8 +22,10 @@ namespace Healthcare.Api.Repository.Context
         public DbSet<HealthPlan> HealthPlan { get ; set; }
         public DbSet<State> State { get; set; }
         public DbSet<Country> Country { get; set; }
-        public DbSet<Hemograma> Hemograma { get; set; }
+        public DbSet<LaboratoryDetail> Hemograma { get; set; }
         public DbSet<Speciality> Speciality { get; set; }
+        public DbSet<Study> Study { get; set; }
+        public DbSet<StudyType> StudyType { get; set; }
 
         public HealthcareDbContext(IConfiguration configuration) : base()
         {

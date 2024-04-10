@@ -1,12 +1,14 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("MyPolicy")]
     public class StateController : ControllerBase
     {
         private readonly IStateService _StateService;

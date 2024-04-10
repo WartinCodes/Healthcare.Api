@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
@@ -8,6 +9,7 @@ namespace Healthcare.Api.Controllers
     [ApiController]
     [Produces("application/json")]
     [Route("api/[controller]")]
+    [EnableCors("MyPolicy")]
     public class CountryController : ControllerBase
     {
         private readonly ICountryService _CountryService;

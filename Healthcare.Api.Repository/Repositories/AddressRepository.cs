@@ -35,14 +35,18 @@ namespace Healthcare.Api.Repository.Repositories
 
         public void Remove(Address entity)
         {
+            _context.Attach(entity.City);
+            _context.Attach(entity.City.State);
+            _context.Attach(entity.City.State.Country);
             base.Delete(entity.Id);
         }
 
         public void Edit(Address entity)
         {
-            _context.Attach(entity.City);
-            _context.Attach(entity.City.State);
-            _context.Attach(entity.City.State.Country);
+            _context.Entry(entity.City).State = EntityState.Detached;
+            _context.Entry(entity.City.State).State = EntityState.Detached;
+            _context.Entry(entity.City.State.Country).State = EntityState.Detached;
+
             _context.Address.Update(entity);
         }
 

@@ -2,16 +2,20 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
-    [Route("api/[controller]")]
-    //[Authorize(Roles = "Administrador")]
     [ApiController]
+    [Route("api/[controller]")]
+    [EnableCors("MyPolicy")]
+    //[Authorize(Roles = "Administrador")]
     public class PatientController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
@@ -20,6 +24,7 @@ namespace Healthcare.Api.Controllers
         private readonly IAddressService _addressService;
         private readonly IHealthPlanService _healthPlanService;
         private readonly IPatientHealthPlanService _patientHealthPlanService;
+        private readonly IFileService _fileService;
 
         public PatientController(
             UserManager<User> userManager,
@@ -27,7 +32,8 @@ namespace Healthcare.Api.Controllers
             IPatientService patientService,
             IPatientHealthPlanService patientHealthPlanService,
             IAddressService addressService,
-            IHealthPlanService healthPlanService)
+            IHealthPlanService healthPlanService,
+            IFileService fileService)
         {
             _userManager = userManager;
             _patientService = patientService;
@@ -35,6 +41,7 @@ namespace Healthcare.Api.Controllers
             _addressService = addressService;
             _healthPlanService = healthPlanService;
             _patientHealthPlanService = patientHealthPlanService;
+            _fileService = fileService;
         }
 
         [HttpGet("all")]
@@ -43,7 +50,7 @@ namespace Healthcare.Api.Controllers
             var patients = (await _patientService.GetAsync())
                 .Select(x => new PatientResponse()
                 {
-                    Id = x.Id,
+                    UserId = x.UserId,
                     FirstName = x.User.FirstName,
                     LastName = x.User.LastName,
                     DNI = x.User.UserName,
@@ -58,14 +65,14 @@ namespace Healthcare.Api.Controllers
             return Ok(patients);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PatientResponse>> Get([FromRoute] int id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<PatientResponse>> Get([FromRoute] int userId)
         {
-            var patientEntity = await _patientService.GetPatientByIdAsync(id);
+            var patientEntity = await _patientService.GetPatientByUserIdAsync(userId);
 
             var patient = new PatientResponse()
             {
-                Id = patientEntity.Id,
+                UserId = patientEntity.UserId,
                 FirstName = patientEntity.User.FirstName,
                 LastName = patientEntity.User.LastName,
                 DNI = patientEntity.User.UserName,
@@ -81,7 +88,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Post([FromBody] PatientRequest userRequest)
+        public async Task<IActionResult> Post([FromForm] PatientRequest userRequest)
         {
             try
             {
@@ -92,8 +99,12 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI/Email ya existe.");
                 }
 
+                string fileName = userRequest.Photo == null ? String.Empty : Guid.NewGuid().ToString();
                 var newUser = _mapper.Map<User>(userRequest);
                 newUser.PasswordHash = newUser.UserName;
+                newUser.Photo = fileName;
+                DateTime birthDate = userRequest.BirthDate.ToArgentinaTime();
+                newUser.BirthDate = birthDate;
 
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
@@ -125,23 +136,19 @@ namespace Healthcare.Api.Controllers
                         await _patientHealthPlanService.Add(patientHealthPlan);
                     }
 
-
-                    // photo
-                    //using (var fileStream = System.IO.File.OpenRead(imageOutputPath))
-                    //{
-                    //    var result = await _restClientHelper.InsertAsync(fileStream, Path.GetFileName(imageOutputPath), "image/png");
-                    //    if (result == 200)
-                    //    {
-                    //        var urlImage = _restClientHelper.GetUrl(Path.GetFileName(imageOutputPath));
-                    //        emailHtml = emailHtml.Replace("<%image%>", urlImage);
-                    //    }
-                    //    else
-                    //    {
-                    //        emailHtml = emailHtml.Replace("<%image%>", string.Empty);
-                    //    }
-                    //}
-
-
+                    if (!String.IsNullOrEmpty(fileName))
+                    {
+                        using (MemoryStream memoryStream = new MemoryStream())
+                        {
+                            await userRequest.Photo.CopyToAsync(memoryStream);
+                            var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
+                            if (imageResult != HttpStatusCode.OK)
+                            {
+                                return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                            }
+                        }
+                    }
+                    
                     return Ok("Paciente creado exitosamente.");
                 }
                 else
@@ -155,81 +162,111 @@ namespace Healthcare.Api.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] PatientRequest userRequest)
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> Put(int userId, [FromBody] PatientRequestEdit userRequest)
         {
-            var patient = await _patientService.GetPatientByIdAsync(id);
-            if (patient == null)
+            try
             {
-                return NotFound($"No se encontró el usuario con el ID: {id}");
-            }
-
-            var user = await _userManager.FindByIdAsync(patient.UserId.ToString());
-            if (user == null)
-            {
-                return NotFound($"No se encontró el usuario con el ID: {id}");
-            }
-
-            // validacion de si user/document no esten asociadas a otro usuario.
-            var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
-            var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
-            if (existEmail != null && existEmail.Id != id)
-            {
-                return Conflict("Email ya existe.");
-            }
-            if (existDocument != null && existDocument.Id != id)
-            {
-                return Conflict("DNI ya existe.");
-            }
-
-            _mapper.Map(userRequest, user);
-            var result = await _userManager.UpdateAsync(user);
-
-            // actualizacion de Address
-            var newAddress = _mapper.Map<Address>(userRequest.Address);
-            _addressService.Edit(newAddress);
-
-            // borrado de las obras sociales asociadas al paciente en tabla PatientHealthPlan
-            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(id);
-            foreach (var php in patientHealthPlans)
-            {
-                _patientHealthPlanService.Remove(php);
-            }
-
-            // agregado de las nuevas obras sociales asociadas al paciente en tabla PatientHealthPlan
-            foreach (var healthPlan in userRequest.HealthPlans)
-            {
-                var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
-                if (healthPlanEntity == null)
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
                 {
-                    return BadRequest($"Plan con ID {healthPlan.Id} no encontrada.");
+                    return NotFound($"No se encontró el usuario con el ID: {userId}");
                 }
 
-                var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
-                await _patientHealthPlanService.Add(patientHealthPlan);
-            } 
+                var patient = await _patientService.GetPatientByUserIdAsync(userId);
+                if (patient == null)
+                {
+                    return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
+                }
 
-            if (!result.Succeeded)
-            {
-                return BadRequest($"Error al actualizar el paciente: {user.UserName}");
+                // validacion de si user/document no esten asociadas a otro usuario.
+                var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
+                var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
+                if (existEmail != null && patient.UserId != existEmail.Id)
+                {
+                    return Conflict("Email ya existe.");
+                }
+                if (existDocument != null && patient.UserId != existDocument.Id)
+                {
+                    return Conflict("DNI ya existe.");
+                }
+
+                //if (!String.IsNullOrEmpty(user.Photo))
+                //{
+                //    await _fileService.DeletePhotoAsync(user.Photo);
+                //}
+                _mapper.Map(userRequest, user);
+                var result = await _userManager.UpdateAsync(user);
+
+                // actualizacion de Address
+                var newAddress = _mapper.Map<Address>(userRequest.Address);
+                _addressService.Edit(newAddress);
+
+                // borrado de las obras sociales asociadas al paciente en tabla PatientHealthPlan
+                var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(patient.Id);
+                foreach (var php in patientHealthPlans)
+                {
+                    _patientHealthPlanService.Remove(php);
+                }
+
+                // agregado de las nuevas obras sociales asociadas al paciente en tabla PatientHealthPlan
+                foreach (var healthPlan in userRequest.HealthPlans)
+                {
+                    var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
+                    if (healthPlanEntity == null)
+                    {
+                        return BadRequest($"Plan con ID {healthPlan.Id} no encontrada.");
+                    }
+
+                    var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
+                    await _patientHealthPlanService.Add(patientHealthPlan);
+                }
+
+                //if (!String.IsNullOrEmpty(user.Photo))
+                //{
+                //    using (MemoryStream memoryStream = new MemoryStream())
+                //    {
+                //        await userRequest.Photo.CopyToAsync(memoryStream);
+                //        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, userRequest.Photo.FileName, "image/jpeg");
+                //        if (imageResult != HttpStatusCode.OK)
+                //        {
+                //            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                //        }
+                //    }
+                //}
+
+                if (!result.Succeeded)
+                {
+                    return BadRequest($"Error al actualizar el paciente: {user.UserName}");
+                }
+
+                return Ok($"Paciente con el ID {userId} actualizado exitosamente");
             }
-
-            return Ok($"Paciente con el ID {id} actualizado exitosamente");
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while processing your request: {ex}");
+            }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> Delete(int userId)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
-            if (user == null)
+            var patient = await _patientService.GetPatientByUserIdAsync(userId);
+            if (patient == null)
             {
-                return NotFound($"No se encontró el paciente con el ID: {id}");
+                return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
             }
 
-            var result = await _userManager.DeleteAsync(user);
-            if (!result.Succeeded)
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
             {
-                return BadRequest($"Error al eliminar el paciente con el ID: {id}");
+                return NotFound($"No se encontró el usuario con el ID: {userId}");
+            }
+
+            var resultUser = await _userManager.DeleteAsync(user);
+            if (!resultUser.Succeeded)
+            {
+                return BadRequest($"Error al eliminar el usuario con el ID: {userId}");
             }
 
             return Ok($"Paciente con el DNI {user.UserName} eliminado exitosamente");
