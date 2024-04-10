@@ -43,6 +43,7 @@ namespace Healthcare.Api.Repository.Repositories
                 .ThenInclude(x => x.City)
                 .ThenInclude(x => x.State)
                 .ThenInclude(x => x.Country)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
 

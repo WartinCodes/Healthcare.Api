@@ -212,7 +212,6 @@ namespace Healthcare.Api.Controllers
             _mapper.Map(userRequest, user);
             var result = await _userManager.UpdateAsync(user);
 
-            // actualizacion de Address
             var newAddress = _mapper.Map<Address>(userRequest.Address);
             _addressService.Edit(newAddress);
 

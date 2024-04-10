@@ -164,16 +164,16 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return NotFound($"No se encontró el usuario con el ID: {userId}");
+                }
+
                 var patient = await _patientService.GetPatientByUserIdAsync(userId);
                 if (patient == null)
                 {
                     return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
-                }
-
-                var user = await _userManager.FindByIdAsync(patient.UserId.ToString());
-                if (user == null)
-                {
-                    return NotFound($"No se encontró el usuario con el ID: {userId}");
                 }
 
                 // validacion de si user/document no esten asociadas a otro usuario.
@@ -200,7 +200,7 @@ namespace Healthcare.Api.Controllers
                 _addressService.Edit(newAddress);
 
                 // borrado de las obras sociales asociadas al paciente en tabla PatientHealthPlan
-                var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(userId);
+                var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(patient.Id);
                 foreach (var php in patientHealthPlans)
                 {
                     _patientHealthPlanService.Remove(php);
