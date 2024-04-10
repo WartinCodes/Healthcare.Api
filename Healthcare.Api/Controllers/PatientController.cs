@@ -160,82 +160,89 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
-        public async Task<IActionResult> Put([FromBody] PatientRequestEdit userRequest, int userId)
+        public async Task<IActionResult> Put(int userId, [FromBody] PatientRequestEdit userRequest)
         {
-            var patient = await _patientService.GetPatientByUserIdAsync(userId);
-            if (patient == null)
+            try
             {
-                return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
-            }
-
-            var user = await _userManager.FindByIdAsync(patient.UserId.ToString());
-            if (user == null)
-            {
-                return NotFound($"No se encontró el usuario con el ID: {userId}");
-            }
-
-            // validacion de si user/document no esten asociadas a otro usuario.
-            var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
-            var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
-            if (existEmail != null && patient.UserId != existEmail.Id)
-            {
-                return Conflict("Email ya existe.");
-            }
-            if (existDocument != null && patient.UserId != existDocument.Id)
-            {
-                return Conflict("DNI ya existe.");
-            }
-
-            //if (!String.IsNullOrEmpty(user.Photo))
-            //{
-            //    await _fileService.DeletePhotoAsync(user.Photo);
-            //}
-            _mapper.Map(userRequest, user);
-            var result = await _userManager.UpdateAsync(user);
-
-            // actualizacion de Address
-            var newAddress = _mapper.Map<Address>(userRequest.Address);
-            _addressService.Edit(newAddress);
-
-            // borrado de las obras sociales asociadas al paciente en tabla PatientHealthPlan
-            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(userId);
-            foreach (var php in patientHealthPlans)
-            {
-                _patientHealthPlanService.Remove(php);
-            }
-
-            // agregado de las nuevas obras sociales asociadas al paciente en tabla PatientHealthPlan
-            foreach (var healthPlan in userRequest.HealthPlans)
-            {
-                var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
-                if (healthPlanEntity == null)
+                var patient = await _patientService.GetPatientByUserIdAsync(userId);
+                if (patient == null)
                 {
-                    return BadRequest($"Plan con ID {healthPlan.Id} no encontrada.");
+                    return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
                 }
 
-                var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
-                await _patientHealthPlanService.Add(patientHealthPlan);
+                var user = await _userManager.FindByIdAsync(patient.UserId.ToString());
+                if (user == null)
+                {
+                    return NotFound($"No se encontró el usuario con el ID: {userId}");
+                }
+
+                // validacion de si user/document no esten asociadas a otro usuario.
+                var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
+                var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
+                if (existEmail != null && patient.UserId != existEmail.Id)
+                {
+                    return Conflict("Email ya existe.");
+                }
+                if (existDocument != null && patient.UserId != existDocument.Id)
+                {
+                    return Conflict("DNI ya existe.");
+                }
+
+                //if (!String.IsNullOrEmpty(user.Photo))
+                //{
+                //    await _fileService.DeletePhotoAsync(user.Photo);
+                //}
+                _mapper.Map(userRequest, user);
+                var result = await _userManager.UpdateAsync(user);
+
+                // actualizacion de Address
+                var newAddress = _mapper.Map<Address>(userRequest.Address);
+                _addressService.Edit(newAddress);
+
+                // borrado de las obras sociales asociadas al paciente en tabla PatientHealthPlan
+                var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(userId);
+                foreach (var php in patientHealthPlans)
+                {
+                    _patientHealthPlanService.Remove(php);
+                }
+
+                // agregado de las nuevas obras sociales asociadas al paciente en tabla PatientHealthPlan
+                foreach (var healthPlan in userRequest.HealthPlans)
+                {
+                    var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
+                    if (healthPlanEntity == null)
+                    {
+                        return BadRequest($"Plan con ID {healthPlan.Id} no encontrada.");
+                    }
+
+                    var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
+                    await _patientHealthPlanService.Add(patientHealthPlan);
+                }
+
+                //if (!String.IsNullOrEmpty(user.Photo))
+                //{
+                //    using (MemoryStream memoryStream = new MemoryStream())
+                //    {
+                //        await userRequest.Photo.CopyToAsync(memoryStream);
+                //        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, userRequest.Photo.FileName, "image/jpeg");
+                //        if (imageResult != HttpStatusCode.OK)
+                //        {
+                //            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                //        }
+                //    }
+                //}
+
+                if (!result.Succeeded)
+                {
+                    return BadRequest($"Error al actualizar el paciente: {user.UserName}");
+                }
+
+                return Ok($"Paciente con el ID {userId} actualizado exitosamente");
             }
-
-            //if (!String.IsNullOrEmpty(user.Photo))
-            //{
-            //    using (MemoryStream memoryStream = new MemoryStream())
-            //    {
-            //        await userRequest.Photo.CopyToAsync(memoryStream);
-            //        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, userRequest.Photo.FileName, "image/jpeg");
-            //        if (imageResult != HttpStatusCode.OK)
-            //        {
-            //            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
-            //        }
-            //    }
-            //}
-
-            if (!result.Succeeded)
+            catch (Exception ex)
             {
-                return BadRequest($"Error al actualizar el paciente: {user.UserName}");
+                return StatusCode(500, $"An error occurred while processing your request: {ex}");
             }
-
-            return Ok($"Paciente con el ID {userId} actualizado exitosamente");
         }
 
         [HttpDelete("{id}")]
