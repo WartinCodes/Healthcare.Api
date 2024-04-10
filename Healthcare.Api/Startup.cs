@@ -93,8 +93,6 @@ namespace Helthcare.Api
                 };
             });
 
-            services.Configure<SmtpSettings>(Configuration.GetSection(nameof(SmtpSettings)));
-            services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         }

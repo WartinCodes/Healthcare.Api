@@ -4,6 +4,7 @@ using Amazon.S3.Transfer;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,6 +30,9 @@ namespace Healthcare.Api.Service
             services.AddTransient<IRestClientHelper, RestClientHelper>();
 
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
+
+            services.Configure<SmtpSettings>(configuration.GetSection(nameof(SmtpSettings)));
+            services.AddTransient<IEmailService, EmailService>();
 
             services.AddS3Services(configuration);
 

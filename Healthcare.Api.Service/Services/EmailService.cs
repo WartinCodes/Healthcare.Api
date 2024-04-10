@@ -1,17 +1,28 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Healthcare.Api.Core.ServiceInterfaces;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 
 namespace Healthcare.Api.Service.Services
 {
-    public class EmailSender : IEmailSender
+    public class EmailService : IEmailService
     {
         private readonly SmtpSettings _smtpSettings;
+        private readonly IConfiguration _configuration;
 
-        public EmailSender(IOptions<SmtpSettings> smtpSettings)
+        public EmailService(IOptions<SmtpSettings> smtpSettings, IConfiguration configuration)
         {
             _smtpSettings = smtpSettings?.Value ?? throw new ArgumentNullException(nameof(SmtpSettings));
+            _configuration = configuration;
+        }
+
+        public string GenerateResetPasswordLink(string email, string token)
+        {
+            var baseUrl = _configuration.GetValue<string>("BaseUrl");
+
+            return $"{baseUrl}/reset-password?token={Uri.EscapeDataString(token)}";
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
@@ -23,7 +34,7 @@ namespace Healthcare.Api.Service.Services
                     From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
                     Subject = subject,
                     Body = htmlMessage,
-                    IsBodyHtml = true
+                    IsBodyHtml = true,
                 };
                 mailMessage.To.Add(email);
 
@@ -31,12 +42,13 @@ namespace Healthcare.Api.Service.Services
                 {
                     client.EnableSsl = _smtpSettings.UseSsl;
                     client.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
-                    await client.SendMailAsync(mailMessage);
+
+                    await client.SendMailAsync(mailMessage, cancellationToken: default);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error sending email: {ex}");
+                Console.WriteLine($"Error al enviar el mail: {ex}");
                 throw;
             }
         }

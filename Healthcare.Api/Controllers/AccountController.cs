@@ -4,7 +4,6 @@ using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,21 +16,21 @@ namespace Healthcare.Api.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IJwtService _jwtService;
-        private readonly IEmailSender _emailSender;
+        private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
 
         public AccountController(
             IJwtService jwtService,
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            IEmailSender emailSender,
+            IEmailService emailService,
             IMapper mapper)
         {
             _jwtService = jwtService;
             _mapper = mapper;
             _userManager = userManager;
             _signInManager = signInManager;
-            _emailSender = emailSender;
+            _emailService = emailService;
         }
 
         [Authorize(Roles = "Administrador")]
@@ -80,19 +79,25 @@ namespace Healthcare.Api.Controllers
         [HttpPost("forgot/password")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
-            // configurar SMTP
-            // PENDINGGGGGGG
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            try
             {
-                return NotFound($"Usuario con correo electrónico {email} no encontrado.");
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    return NotFound($"Usuario con correo electrónico {email} no encontrado.");
+                }
+
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetLink = _emailService.GenerateResetPasswordLink(email, code);
+
+                await _emailService.SendEmailAsync(email, "Restablecer contraseña", $"Para restablecer tu contraseña, haz clic en el siguiente enlace: {resetLink}");
+
+                return Ok("Correo electrónico de restablecimiento de contraseña enviado exitosamente.");
             }
-
-            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            await _emailSender.SendEmailAsync(email, "Restablecer contraseña", $"Para restablecer tu contraseña, haz clic en el siguiente enlace: {code}");
-
-            return Ok("Correo electrónico de restablecimiento de contraseña enviado exitosamente.");
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
