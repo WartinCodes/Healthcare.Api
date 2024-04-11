@@ -15,7 +15,6 @@ namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("MyPolicy")]
     public class SpecialityController : ControllerBase
     {
         private readonly ISpecialityService _specialityService;

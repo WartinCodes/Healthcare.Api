@@ -10,7 +10,6 @@ namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("MyPolicy")]
     public class HealthInsuranceController : ControllerBase
     {
         private readonly IHealthInsuranceService _healthInsuranceService;

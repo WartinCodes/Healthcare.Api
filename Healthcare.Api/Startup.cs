@@ -6,6 +6,7 @@ using Healthcare.Api.Service;
 using Healthcare.Api.Service.Services;
 using Helthcare.Api.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,6 @@ namespace Helthcare.Api
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        readonly string MyPolicy = "MyPolicy";
 
         public Startup(IConfiguration configuration)
         {
@@ -60,14 +60,10 @@ namespace Helthcare.Api
             services.AddMappers();
             services.AddMvc();
 
-            services.AddCors(o => o.AddPolicy(MyPolicy, builder =>
-            {
-                builder.WithOrigins(Configuration.GetSection("AllowedOriginsList").GetChildren().ToArray().Select(c => c.Value).ToArray());
-                builder.AllowAnyHeader();
-                builder.AllowAnyMethod();
-            }));
+            services.AddCors();
 
-
+            //var corsPolicy = new EnableCorsAttribute("AllowOrigin");
+            
             var jwtIssuer = Configuration.GetSection("JWT:Issuer").Get<string>();
             var jwtKey = Configuration.GetSection("JWT:SecretKey").Get<string>();
 
@@ -106,7 +102,11 @@ namespace Helthcare.Api
 
             app.UseRouting();
 
-            app.UseCors(MyPolicy);
+            app.UseCors(builder =>
+                builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+            );
 
             app.UseAuthentication();
             app.UseAuthorization();

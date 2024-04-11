@@ -8,7 +8,6 @@ namespace Healthcare.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("MyPolicy")]
     public class StateController : ControllerBase
     {
         private readonly IStateService _StateService;
