@@ -23,7 +23,7 @@ namespace Healthcare.Api.Service.Services
         {
             var baseUrl = _configuration.GetValue<string>("BaseUrl");
 
-            return $"{baseUrl}/reset-password?token={Uri.EscapeDataString(token)}";
+            return $"{baseUrl}/restablecer-contraseña?token={Uri.EscapeDataString(token)}";
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)

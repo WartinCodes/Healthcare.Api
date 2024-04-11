@@ -38,27 +38,27 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<HealthPlanResponse>>(healthPlans));
         }
 
-        //[HttpPost("create")]
-        //public async Task<IActionResult> Post([FromBody] HealthPlanRequest healthPlanRequest)
-        //{
-        //    try
-        //    {
-        //        var healthInsurance = await _healthInsuranceService.GetHealthInsuranceByIdAsync(healthPlanRequest.HealthInsurance.Id);
-        //        if (healthInsurance == null)
-        //        {
-        //            return BadRequest("La obra social especificado no existe.");
-        //        }
+        [HttpPost("create")]
+        public async Task<IActionResult> Post([FromBody] HealthPlanRequest healthPlanRequest)
+        {
+            try
+            {
+                var healthInsurance = await _healthInsuranceService.GetHealthInsuranceByIdAsync(healthPlanRequest.HealthInsurance.Id);
+                if (healthInsurance == null)
+                {
+                    return BadRequest("La obra social especificado no existe.");
+                }
 
-        //        var newHealthPlan = _mapper.Map<HealthPlan>(healthPlanRequest);
-        //        await _healthPlanService.Add(newHealthPlan);
+                var newHealthPlan = _mapper.Map<HealthPlan>(healthPlanRequest);
+                await _healthPlanService.Add(newHealthPlan);
 
-        //        return Ok("Plan de obra social creada exitosamente.");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"An error occurred while processing your request: {ex}");
-        //    }
-        //}
+                return Ok("Plan de obra social creada exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while processing your request: {ex}");
+            }
+        }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] HealthPlanRequest healthPlanRequest)

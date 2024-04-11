@@ -55,7 +55,7 @@ namespace Healthcare.Api.Controllers
 
             try
             {
-                var patient = await _patientService.GetPatientByUserIdAsync(study.UserId);
+                var patient = await _patientService.GetPatientByUserIdAsync(Convert.ToInt32(study.UserId));
                 if (patient == null)
                 {
                     return NotFound($"Paciente no encontrado.");

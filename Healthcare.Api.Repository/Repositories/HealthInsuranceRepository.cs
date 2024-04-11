@@ -23,6 +23,7 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.HealthInsurance
                 .Include(x => x.HealthPlans)
+                .OrderBy(x => x.Name)
                 .ToListAsync();
         }
 

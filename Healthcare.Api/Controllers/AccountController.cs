@@ -104,6 +104,32 @@ namespace Healthcare.Api.Controllers
             }
         }
 
+        [HttpPost("reset/password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest reset)
+        {
+            try
+            {
+                if (reset.Password != reset.ConfirmPassword)
+                {
+                    return Conflict("Las contraseñas no coinciden");
+                }
+
+                var user = await _userManager.FindByEmailAsync(reset.Email);
+                if (user == null)
+                {
+                    return NotFound($"Usuario con email {reset.Email} no encontrado.");
+                }
+
+                var result = await _userManager.ResetPasswordAsync(user, reset.Code, reset.Password);
+
+                return Ok("Nueva contraseña establecida con éxito.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         [HttpPost("support")]
         public async Task<IActionResult> Support(SupportRequest supportRequest)
         {
@@ -114,11 +140,13 @@ namespace Healthcare.Api.Controllers
                 {
                     return NotFound($"Usuario con ID {supportRequest.UserId} no encontrado.");
                 }
+
                 var support = _mapper.Map<Support>(supportRequest);
                 support.ReportDate = DateTime.UtcNow.ToArgentinaTime();
                 support.ResolutionDate = null;
                 support.Status = StatusEnum.Pendiente;
                 string userName = $"{user.FirstName} {user.LastName}";
+
                 await _emailService.SendEmailSupportAsync(userName, support);
 
                 return Ok("Correo electrónico enviado a soporte exitosamente.");
