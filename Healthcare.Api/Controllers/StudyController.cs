@@ -4,7 +4,6 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -20,6 +19,7 @@ namespace Healthcare.Api.Controllers
         private readonly IStudyTypeService _studyTypeService;
         private readonly IPatientService _patientService;
         private readonly IFileService _fileService;
+        private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
 
         public StudyController(
@@ -27,12 +27,14 @@ namespace Healthcare.Api.Controllers
             IPatientService patientService,
             IStudyService studyService,
             IStudyTypeService studyTypeService,
+            IEmailService emailService,
             IMapper mapper)
         {
             _fileService = fileService;
             _patientService = patientService;
             _studyService = studyService;
             _studyTypeService = studyTypeService;
+            _emailService = emailService;
             _mapper = mapper;
         }
 
@@ -88,6 +90,7 @@ namespace Healthcare.Api.Controllers
                 };
 
                 await _studyService.Add(newStudy);
+                await _emailService.SendEmailForNewStudyAsync(patient.User.Email, $"{patient.User.FirstName} {patient.User.LastName}");
 
                 return Ok("Se ha guardado correctamente el estudio.");
             }

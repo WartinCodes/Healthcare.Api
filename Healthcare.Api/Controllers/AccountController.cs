@@ -2,12 +2,14 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Healthcare.Api.Controllers
 {
@@ -96,6 +98,31 @@ namespace Healthcare.Api.Controllers
                 await _emailService.SendEmailAsync(email, "Restablecer contraseña", $"Para restablecer tu contraseña, haz clic en el siguiente enlace: {resetLink}");
 
                 return Ok("Correo electrónico de restablecimiento de contraseña enviado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [HttpPost("support")]
+        public async Task<IActionResult> Support(SupportRequest supportRequest)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(supportRequest.UserId);
+                if (user == null)
+                {
+                    return NotFound($"Usuario con ID {supportRequest.UserId} no encontrado.");
+                }
+                var support = _mapper.Map<Support>(supportRequest);
+                support.ReportDate = DateTime.UtcNow.ToArgentinaTime();
+                support.ResolutionDate = null;
+                support.Status = StatusEnum.Pendiente;
+                string userName = $"{user.FirstName} {user.LastName}";
+                await _emailService.SendEmailSupportAsync(userName, support);
+
+                return Ok("Correo electrónico enviado a soporte exitosamente.");
             }
             catch (Exception ex)
             {

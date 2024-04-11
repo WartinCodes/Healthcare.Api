@@ -41,6 +41,7 @@ namespace Helthcare.Api.Mappers
             CreateMap<Country, CountryRequest>().ReverseMap();
             CreateMap<StudyType, StudyTypeRequest>().ReverseMap();
             CreateMap<LaboratoryDetail, LaboratoryDetailRequest>().ReverseMap();
+            CreateMap<Support, SupportRequest>().ReverseMap();
 
             //CreateMap<HealthPlanRequest, HealthPlan>()
             //    .ForMember(dest => dest.HealthInsurance, opt => opt.MapFrom(src => src.HealthInsurance));
