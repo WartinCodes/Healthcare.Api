@@ -94,7 +94,10 @@ namespace Healthcare.Api.Controllers
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var resetLink = _emailService.GenerateResetPasswordLink(email, code);
 
-                await _emailService.SendEmailAsync(email, "Restablecer contraseña", $"Para restablecer tu contraseña, haz clic en el siguiente enlace: {resetLink}");
+                user.ResetPasswordToken = code;
+                await _userManager.UpdateAsync(user);
+                string userName = $"{user.FirstName} {user.LastName}";
+                await _emailService.SendForgotPasswordEmailAsync(email, userName, resetLink);
 
                 return Ok("Correo electrónico de restablecimiento de contraseña enviado exitosamente.");
             }
@@ -114,10 +117,10 @@ namespace Healthcare.Api.Controllers
                     return Conflict("Las contraseñas no coinciden");
                 }
 
-                var user = await _userManager.FindByEmailAsync(reset.Email);
+                var user = await UserManagerExtensions.FindByResetTokenAsync(_userManager, reset.Code);
                 if (user == null)
                 {
-                    return NotFound($"Usuario con email {reset.Email} no encontrado.");
+                    return NotFound($"Usuario no encontrado.");
                 }
 
                 var result = await _userManager.ResetPasswordAsync(user, reset.Code, reset.Password);

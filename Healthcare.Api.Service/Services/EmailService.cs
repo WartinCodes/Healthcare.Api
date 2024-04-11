@@ -1,6 +1,5 @@
 ﻿using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Net;
@@ -23,18 +22,64 @@ namespace Healthcare.Api.Service.Services
         {
             var baseUrl = _configuration.GetValue<string>("BaseUrl");
 
-            return $"{baseUrl}/restablecer-contraseña?token={Uri.EscapeDataString(token)}";
+            return $"{baseUrl}/restablecer-contraseña?token={token}";
         }
 
-        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+        public async Task SendForgotPasswordEmailAsync(string email, string fullName, string resetLink)
         {
             try
             {
+                var messageBody = $@"
+                    <html>
+                    <head>
+                        <style>
+                            body {{
+                                font-family: Arial, sans-serif;
+                                background-color: #f4f4f4;
+                                margin: 0;
+                                padding: 20px;
+                            }}
+                            .container {{
+                                max-width: 600px;
+                                margin: auto;
+                                background-color: #ffffff;
+                                padding: 20px;
+                                border-radius: 5px;
+                                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                            }}
+                            h1 {{
+                                color: #333333;
+                            }}
+                            p {{
+                                color: #666666;
+                            }}
+                            a {{
+                                color: #007bff;
+                                text-decoration: none;
+                            }}
+                        </style>
+                    </head>
+                    <body>
+                        <div class='container'>
+                            <h1>Recuperación de Contraseña</h1>
+                            <p>Estimado {fullName},</p>
+                            <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Si no has solicitado este cambio, puedes ignorar este mensaje.</p>
+                            <p>Para restablecer tu contraseña, haz clic en el siguiente enlace:</p>
+                            <p><a href='{resetLink}'>{resetLink}</a></p>
+                            <p>Este enlace expirará en 24 horas. Si necesitas ayuda adicional, por favor contáctanos.</p>
+                            <p>¡Gracias por confiar en nosotros!</p>
+                            <p>Atentamente,</p>
+                            <p>Incor - Centro Médico</p>
+                        </div>
+                    </body>
+                    </html>
+                ";
+
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
-                    Subject = subject,
-                    Body = htmlMessage,
+                    Subject = "Restablecer contraseña",
+                    Body = messageBody,
                     IsBodyHtml = true,
                 };
                 mailMessage.To.Add(email);

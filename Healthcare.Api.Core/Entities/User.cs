@@ -10,5 +10,6 @@ namespace Healthcare.Api.Core.Entities
         public string Photo { get; set; }
         public DateTime? LastActivityDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
+        public string ResetPasswordToken { get; set; }
     }
 }
