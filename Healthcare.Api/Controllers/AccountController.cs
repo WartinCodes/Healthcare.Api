@@ -5,11 +5,9 @@ using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Healthcare.Api.Controllers
 {
@@ -100,6 +98,39 @@ namespace Healthcare.Api.Controllers
                 await _emailService.SendForgotPasswordEmailAsync(email, userName, resetLink);
 
                 return Ok("Correo electrónico de restablecimiento de contraseña enviado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [HttpPost("change/password")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordRequest change)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(change.UserId);
+                if (user == null)
+                {
+                    return NotFound($"Usuario no encontrado.");
+                }
+
+                var validateActualPassword = await _userManager.CheckPasswordAsync(user, change.ActualPassword);
+                if (validateActualPassword == false)
+                {
+                    return BadRequest("Contraseña actual incorrecta");
+                }
+
+                if (change.NewPassword != change.ConfirmPassword)
+                {
+                    return Conflict("Las contraseñas no coinciden");
+                }
+
+                user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, change.NewPassword);
+                await _userManager.UpdateAsync(user);
+
+                return Ok("Nueva contraseña establecida con éxito.");
             }
             catch (Exception ex)
             {
