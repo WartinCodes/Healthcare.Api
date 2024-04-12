@@ -116,8 +116,8 @@ namespace Healthcare.Api.Controllers
                     return NotFound($"Usuario no encontrado.");
                 }
 
-                var validateActualPassword = await _userManager.CheckPasswordAsync(user, change.ActualPassword);
-                if (validateActualPassword == false)
+                var validateCurrentPassword = await _userManager.CheckPasswordAsync(user, change.CurrentPassword);
+                if (validateCurrentPassword == false)
                 {
                     return BadRequest("Contraseña actual incorrecta");
                 }
