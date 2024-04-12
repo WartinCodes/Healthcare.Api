@@ -1,5 +1,6 @@
 ﻿using Amazon.Auth.AccessControlPolicy;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Repository;
 using Healthcare.Api.Repository.Context;
 using Healthcare.Api.Service;
@@ -35,6 +36,8 @@ namespace Helthcare.Api
 
             services.AddDbContext<HealthcareDbContext>(options => 
                 options.UseMySQL(Configuration.GetConnectionString(nameof(HealthcareDbContext))));
+
+            services.AddTransient<IPasswordHasher<User>, BcryptHash>();
 
             services.AddIdentity<User, Role>()
                 .AddRoleManager<RoleManager<Role>>()
