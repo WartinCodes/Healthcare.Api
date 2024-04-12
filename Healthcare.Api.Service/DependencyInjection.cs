@@ -30,6 +30,7 @@ namespace Healthcare.Api.Service
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IStudyTypeService, StudyTypeService>();
             services.AddTransient<IStudyService, StudyService>();
+            services.AddTransient<ISupportService, SupportService>();
 
             services.AddTransient<IJwtService>(provider => new JwtService(configuration));
 

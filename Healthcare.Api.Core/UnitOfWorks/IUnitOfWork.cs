@@ -19,6 +19,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
         IPatientHealthPlanRepository PatientHealthPlanRepository { get; }
         IStudyRepository StudyRepository { get; }
         IStudyTypeRepository StudyTypeRepository { get; }
+        ISupportRepository SupportRepository { get; }
 
         void Save();
         Task SaveAsync();

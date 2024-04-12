@@ -20,5 +20,6 @@ namespace Healthcare.Api.Repository.Context
         DbSet<PatientHealthPlan> PatientHealthPlan { get; set; }
         DbSet<Study> Study { get; set; }
         DbSet<StudyType> StudyType { get; set; }
+        DbSet<Support> Support { get; set; }
     }
 }

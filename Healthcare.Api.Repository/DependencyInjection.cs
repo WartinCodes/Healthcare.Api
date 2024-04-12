@@ -36,6 +36,7 @@ namespace Healthcare.Api.Repository
             services.AddTransient<ISpecialityRepository, SpecialityRepository>();
             services.AddTransient<IStudyTypeRepository, StudyTypeRepository>();
             services.AddTransient<IStudyRepository, StudyRepository>();
+            services.AddTransient<ISupportRepository, SupportRepository>();
 
             return services;
         }
