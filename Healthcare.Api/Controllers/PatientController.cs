@@ -53,7 +53,7 @@ namespace Healthcare.Api.Controllers
                     FirstName = x.User.FirstName,
                     LastName = x.User.LastName,
                     DNI = x.User.UserName,
-                    Address = _mapper.Map<AddressResponse>(x.Address),
+                    Address = _mapper.Map<AddressResponse>(x.User.Address),
                     HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(x.HealthPlans),
                     BirthDate = x.User.BirthDate,
                     Email = x.User.Email,
@@ -75,7 +75,7 @@ namespace Healthcare.Api.Controllers
                 FirstName = patientEntity.User.FirstName,
                 LastName = patientEntity.User.LastName,
                 DNI = patientEntity.User.UserName,
-                Address = _mapper.Map<AddressResponse>(patientEntity.Address),
+                Address = _mapper.Map<AddressResponse>(patientEntity.User.Address),
                 HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(patientEntity.HealthPlans),
                 BirthDate = patientEntity.User.BirthDate,
                 Email = patientEntity.User.Email,
@@ -105,20 +105,20 @@ namespace Healthcare.Api.Controllers
                 DateTime birthDate = userRequest.BirthDate.ToArgentinaTime();
                 newUser.BirthDate = birthDate;
 
+                var address = _mapper.Map<Address>(userRequest.Address);
+                await _addressService.Add(address);
+                newUser.Address = address;
+
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(newUser, RoleEnum.Paciente);
-
-                    var address = _mapper.Map<Address>(userRequest.Address);
-                    await _addressService.Add(address);
 
                     var patient = new Patient
                     {
                         UserId = newUser.Id,
                         CUIL = String.Empty,
                         HealthPlans = null,
-                        Address = address
                     };
 
                     await _patientService.Add(patient);

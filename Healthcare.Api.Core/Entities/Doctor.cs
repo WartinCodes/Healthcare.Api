@@ -18,8 +18,6 @@
         public int UserId { get; set; }
         public virtual User User { get; set; }
         public string Matricula { get; set; }
-        public int IdAddress { get; set; }
-        public virtual Address Address { get; set; }
         public ICollection<DoctorSpeciality> DoctorSpecialities { get; set; }
         public ICollection<HealthInsurance> HealthInsurances { get; set; }
     }

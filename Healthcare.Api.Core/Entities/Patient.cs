@@ -18,8 +18,6 @@
         public int UserId { get; set; }
         public virtual User User { get; set; }
         public string CUIL { get; set; }
-        public int IdAddress { get; set; }
-        public virtual Address Address { get; set; }
         public ICollection<HealthPlan> HealthPlans { get; set; }
         public ICollection<Study> Studies { get; set; }
     }

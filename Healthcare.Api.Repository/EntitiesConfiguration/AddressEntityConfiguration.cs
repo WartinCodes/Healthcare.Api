@@ -1,6 +1,8 @@
 ﻿using Healthcare.Api.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using static Mysqlx.Crud.Order.Types;
+using System.Reflection.Emit;
 
 namespace Healthcare.Api.Repository.EntitiesConfiguration
 {
@@ -37,7 +39,6 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                 .WithMany(c => c.Addresses)
                 .HasForeignKey(a => a.CityId)
                 .IsRequired();
-
         }
     }
 }

@@ -34,40 +34,6 @@ namespace Healthcare.Api.Repository.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                schema: "Healthcare",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    FirstName = table.Column<string>(type: "longtext", nullable: false),
-                    LastName = table.Column<string>(type: "longtext", nullable: false),
-                    BirthDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Photo = table.Column<string>(type: "longtext", nullable: false),
-                    LastActivityDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    LastLoginDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    PasswordHash = table.Column<string>(type: "longtext", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "longtext", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Country",
                 schema: "Healthcare",
                 columns: table => new
@@ -98,34 +64,6 @@ namespace Healthcare.Api.Repository.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Hemograma",
-                schema: "Healthcare",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Metodo = table.Column<string>(type: "longtext", nullable: false),
-                    GlobulosRojos = table.Column<string>(type: "longtext", nullable: false),
-                    GlobulosBlancos = table.Column<string>(type: "longtext", nullable: false),
-                    Hemoglobina = table.Column<string>(type: "longtext", nullable: false),
-                    Hematocrito = table.Column<string>(type: "longtext", nullable: false),
-                    VCM = table.Column<string>(type: "longtext", nullable: false),
-                    HCM = table.Column<string>(type: "longtext", nullable: false),
-                    CHCM = table.Column<string>(type: "longtext", nullable: false),
-                    NeutrofilosCayados = table.Column<string>(type: "longtext", nullable: false),
-                    NeutrofilosSegmentados = table.Column<string>(type: "longtext", nullable: false),
-                    Eosinofilos = table.Column<string>(type: "longtext", nullable: false),
-                    Basofilos = table.Column<string>(type: "longtext", nullable: false),
-                    Linfocitos = table.Column<string>(type: "longtext", nullable: false),
-                    Monocitos = table.Column<string>(type: "longtext", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Hemograma", x => x.Id);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Speciality",
                 schema: "Healthcare",
                 columns: table => new
@@ -137,6 +75,42 @@ namespace Healthcare.Api.Repository.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Speciality", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "StudyType",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudyType", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Support",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<string>(type: "longtext", nullable: false),
+                    Priority = table.Column<string>(type: "longtext", nullable: false),
+                    Module = table.Column<string>(type: "longtext", nullable: false),
+                    Description = table.Column<string>(type: "longtext", nullable: false),
+                    ReportDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ResolutionDate = table.Column<DateTime>(type: "datetime(6)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Support", x => x.Id);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -159,6 +133,145 @@ namespace Healthcare.Api.Repository.Migrations
                         column: x => x.RoleId,
                         principalSchema: "Healthcare",
                         principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "State",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(45)", unicode: false, maxLength: 45, nullable: false),
+                    IdCountry = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_State", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_State_Country_IdCountry",
+                        column: x => x.IdCountry,
+                        principalSchema: "Healthcare",
+                        principalTable: "Country",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "HealthPlan",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false),
+                    HealthInsuranceId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HealthPlan", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_HealthPlan_HealthInsurance_HealthInsuranceId",
+                        column: x => x.HealthInsuranceId,
+                        principalSchema: "Healthcare",
+                        principalTable: "HealthInsurance",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "City",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "varchar(45)", unicode: false, maxLength: 45, nullable: false),
+                    IdState = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_City", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_City_State_IdState",
+                        column: x => x.IdState,
+                        principalSchema: "Healthcare",
+                        principalTable: "State",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Address",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    Street = table.Column<string>(type: "varchar(100)", unicode: false, maxLength: 100, nullable: false),
+                    Number = table.Column<string>(type: "varchar(10)", unicode: false, maxLength: 10, nullable: false),
+                    Description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
+                    CityId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Address", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Address_City_CityId",
+                        column: x => x.CityId,
+                        principalSchema: "Healthcare",
+                        principalTable: "City",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    FirstName = table.Column<string>(type: "longtext", nullable: false),
+                    LastName = table.Column<string>(type: "longtext", nullable: false),
+                    BirthDate = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Photo = table.Column<string>(type: "longtext", nullable: false),
+                    LastActivityDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    LastLoginDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    ResetPasswordToken = table.Column<string>(type: "longtext", nullable: true),
+                    IdAddress = table.Column<int>(type: "int", nullable: false),
+                    UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "longtext", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "longtext", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "longtext", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "longtext", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUsers_Address_IdAddress",
+                        column: x => x.IdAddress,
+                        principalSchema: "Healthcare",
+                        principalTable: "Address",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -263,101 +376,6 @@ namespace Healthcare.Api.Repository.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "State",
-                schema: "Healthcare",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "varchar(45)", unicode: false, maxLength: 45, nullable: false),
-                    IdCountry = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_State", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_State_Country_IdCountry",
-                        column: x => x.IdCountry,
-                        principalSchema: "Healthcare",
-                        principalTable: "Country",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "HealthPlan",
-                schema: "Healthcare",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "longtext", nullable: false),
-                    HealthInsuranceId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_HealthPlan", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_HealthPlan_HealthInsurance_HealthInsuranceId",
-                        column: x => x.HealthInsuranceId,
-                        principalSchema: "Healthcare",
-                        principalTable: "HealthInsurance",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "City",
-                schema: "Healthcare",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "varchar(45)", unicode: false, maxLength: 45, nullable: false),
-                    IdState = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_City", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_City_State_IdState",
-                        column: x => x.IdState,
-                        principalSchema: "Healthcare",
-                        principalTable: "State",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Address",
-                schema: "Healthcare",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Street = table.Column<string>(type: "varchar(100)", unicode: false, maxLength: 100, nullable: false),
-                    Number = table.Column<string>(type: "varchar(10)", unicode: false, maxLength: 10, nullable: false),
-                    Description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
-                    CityId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Address", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Address_City_CityId",
-                        column: x => x.CityId,
-                        principalSchema: "Healthcare",
-                        principalTable: "City",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Doctor",
                 schema: "Healthcare",
                 columns: table => new
@@ -365,19 +383,11 @@ namespace Healthcare.Api.Repository.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    Matricula = table.Column<string>(type: "longtext", nullable: false),
-                    IdAddress = table.Column<int>(type: "int", nullable: false)
+                    Matricula = table.Column<string>(type: "longtext", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Doctor", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Doctor_Address_IdAddress",
-                        column: x => x.IdAddress,
-                        principalSchema: "Healthcare",
-                        principalTable: "Address",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Doctor_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -396,19 +406,11 @@ namespace Healthcare.Api.Repository.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    CUIL = table.Column<string>(type: "longtext", nullable: true),
-                    IdAddress = table.Column<int>(type: "int", nullable: false)
+                    CUIL = table.Column<string>(type: "longtext", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Patient", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Patient_Address_IdAddress",
-                        column: x => x.IdAddress,
-                        principalSchema: "Healthcare",
-                        principalTable: "Address",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Patient_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -509,6 +511,90 @@ namespace Healthcare.Api.Repository.Migrations
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "Study",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    LocationS3 = table.Column<string>(type: "longtext", nullable: false),
+                    PatientId = table.Column<int>(type: "int", nullable: false),
+                    StudyTypeId = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Note = table.Column<string>(type: "longtext", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Study", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Study_Patient_PatientId",
+                        column: x => x.PatientId,
+                        principalSchema: "Healthcare",
+                        principalTable: "Patient",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Study_StudyType_StudyTypeId",
+                        column: x => x.StudyTypeId,
+                        principalSchema: "Healthcare",
+                        principalTable: "StudyType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "LaboratoryDetail",
+                schema: "Healthcare",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    IdStudy = table.Column<int>(type: "int", nullable: false),
+                    GlobulosRojos = table.Column<string>(type: "longtext", nullable: false),
+                    GlobulosBlancos = table.Column<string>(type: "longtext", nullable: false),
+                    Hemoglobina = table.Column<string>(type: "longtext", nullable: false),
+                    Hematocrito = table.Column<string>(type: "longtext", nullable: false),
+                    VCM = table.Column<string>(type: "longtext", nullable: false),
+                    HCM = table.Column<string>(type: "longtext", nullable: false),
+                    CHCM = table.Column<string>(type: "longtext", nullable: false),
+                    NeutrofilosCayados = table.Column<string>(type: "longtext", nullable: false),
+                    NeutrofilosSegmentados = table.Column<string>(type: "longtext", nullable: false),
+                    Eosinofilos = table.Column<string>(type: "longtext", nullable: false),
+                    Basofilos = table.Column<string>(type: "longtext", nullable: false),
+                    Linfocitos = table.Column<string>(type: "longtext", nullable: false),
+                    Monocitos = table.Column<string>(type: "longtext", nullable: false),
+                    Eritrosedimentacion1 = table.Column<string>(type: "longtext", nullable: false),
+                    Eritrosedimentacion2 = table.Column<string>(type: "longtext", nullable: false),
+                    Plaquetas = table.Column<string>(type: "longtext", nullable: false),
+                    Glucemia = table.Column<string>(type: "longtext", nullable: false),
+                    Uremia = table.Column<string>(type: "longtext", nullable: false),
+                    Creatininemia = table.Column<string>(type: "longtext", nullable: false),
+                    ColesterolTotal = table.Column<string>(type: "longtext", nullable: false),
+                    ColesterolHdl = table.Column<string>(type: "longtext", nullable: false),
+                    Trigliceridos = table.Column<string>(type: "longtext", nullable: false),
+                    Uricemia = table.Column<string>(type: "longtext", nullable: false),
+                    BilirrubinaDirecta = table.Column<string>(type: "longtext", nullable: false),
+                    BilirrubinaIndirecta = table.Column<string>(type: "longtext", nullable: false),
+                    BilirrubinaTotal = table.Column<string>(type: "longtext", nullable: false),
+                    TransaminasaGlutamicoOxalac = table.Column<string>(type: "longtext", nullable: false),
+                    TransaminasaGlutamicoPiruvic = table.Column<string>(type: "longtext", nullable: false),
+                    FosfatasaAlcalina = table.Column<string>(type: "longtext", nullable: false),
+                    TirotrofinaPlamatica = table.Column<string>(type: "longtext", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LaboratoryDetail", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LaboratoryDetail_Study_IdStudy",
+                        column: x => x.IdStudy,
+                        principalSchema: "Healthcare",
+                        principalTable: "Study",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Address_CityId",
                 schema: "Healthcare",
@@ -553,6 +639,13 @@ namespace Healthcare.Api.Repository.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_IdAddress",
+                schema: "Healthcare",
+                table: "AspNetUsers",
+                column: "IdAddress",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 schema: "Healthcare",
                 table: "AspNetUsers",
@@ -564,12 +657,6 @@ namespace Healthcare.Api.Repository.Migrations
                 schema: "Healthcare",
                 table: "City",
                 column: "IdState");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Doctor_IdAddress",
-                schema: "Healthcare",
-                table: "Doctor",
-                column: "IdAddress");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Doctor_UserId",
@@ -611,10 +698,10 @@ namespace Healthcare.Api.Repository.Migrations
                 column: "HealthInsuranceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Patient_IdAddress",
+                name: "IX_LaboratoryDetail_IdStudy",
                 schema: "Healthcare",
-                table: "Patient",
-                column: "IdAddress");
+                table: "LaboratoryDetail",
+                column: "IdStudy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Patient_UserId",
@@ -641,6 +728,18 @@ namespace Healthcare.Api.Repository.Migrations
                 schema: "Healthcare",
                 table: "State",
                 column: "IdCountry");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Study_PatientId",
+                schema: "Healthcare",
+                table: "Study",
+                column: "PatientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Study_StudyTypeId",
+                schema: "Healthcare",
+                table: "Study",
+                column: "StudyTypeId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -674,11 +773,15 @@ namespace Healthcare.Api.Repository.Migrations
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(
-                name: "Hemograma",
+                name: "LaboratoryDetail",
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(
                 name: "PatientHealthPlan",
+                schema: "Healthcare");
+
+            migrationBuilder.DropTable(
+                name: "Support",
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(
@@ -694,6 +797,10 @@ namespace Healthcare.Api.Repository.Migrations
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(
+                name: "Study",
+                schema: "Healthcare");
+
+            migrationBuilder.DropTable(
                 name: "HealthPlan",
                 schema: "Healthcare");
 
@@ -702,15 +809,19 @@ namespace Healthcare.Api.Repository.Migrations
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(
+                name: "StudyType",
+                schema: "Healthcare");
+
+            migrationBuilder.DropTable(
                 name: "HealthInsurance",
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(
-                name: "Address",
+                name: "AspNetUsers",
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers",
+                name: "Address",
                 schema: "Healthcare");
 
             migrationBuilder.DropTable(

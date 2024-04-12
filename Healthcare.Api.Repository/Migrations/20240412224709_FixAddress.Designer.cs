@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Healthcare.Api.Repository.Migrations
 {
     [DbContext(typeof(HealthcareDbContext))]
-    [Migration("20240325231836_LaboratoryAndStudyTables")]
-    partial class LaboratoryAndStudyTables
+    [Migration("20240412224709_FixAddress")]
+    partial class FixAddress
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -113,9 +113,6 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("IdAddress")
-                        .HasColumnType("int");
-
                     b.Property<string>("Matricula")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -124,8 +121,6 @@ namespace Healthcare.Api.Repository.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdAddress");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -290,6 +285,9 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("IdStudy")
+                        .HasColumnType("int");
+
                     b.Property<string>("Linfocitos")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -340,6 +338,8 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IdStudy");
+
                     b.ToTable("LaboratoryDetail", "Healthcare");
                 });
 
@@ -352,15 +352,10 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<string>("CUIL")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("IdAddress")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IdAddress");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -477,16 +472,11 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<int>("StudyTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StudyTypeId1")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PatientId");
 
                     b.HasIndex("StudyTypeId");
-
-                    b.HasIndex("StudyTypeId1");
 
                     b.ToTable("Study", "Healthcare");
                 });
@@ -506,6 +496,42 @@ namespace Healthcare.Api.Repository.Migrations
                     b.ToTable("StudyType", "Healthcare");
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Support", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("ReportDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ResolutionDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Support", "Healthcare");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -513,6 +539,9 @@ namespace Healthcare.Api.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("BirthDate")
@@ -532,6 +561,9 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("IdAddress")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("LastActivityDate")
                         .HasColumnType("datetime(6)");
@@ -570,6 +602,9 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("ResetPasswordToken")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("longtext");
 
@@ -581,6 +616,8 @@ namespace Healthcare.Api.Repository.Migrations
                         .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -715,19 +752,11 @@ namespace Healthcare.Api.Repository.Migrations
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Doctor", b =>
                 {
-                    b.HasOne("Healthcare.Api.Core.Entities.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("IdAddress")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Healthcare.Api.Core.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("Healthcare.Api.Core.Entities.Doctor", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Address");
 
                     b.Navigation("User");
                 });
@@ -781,21 +810,22 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("HealthInsurance");
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.LaboratoryDetail", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.Study", "Study")
+                        .WithMany()
+                        .HasForeignKey("IdStudy");
+
+                    b.Navigation("Study");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
                 {
-                    b.HasOne("Healthcare.Api.Core.Entities.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("IdAddress")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Healthcare.Api.Core.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("Healthcare.Api.Core.Entities.Patient", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Address");
 
                     b.Navigation("User");
                 });
@@ -839,18 +869,25 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired();
 
                     b.HasOne("Healthcare.Api.Core.Entities.StudyType", "StudyType")
-                        .WithMany()
+                        .WithMany("Studies")
                         .HasForeignKey("StudyTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Healthcare.Api.Core.Entities.StudyType", null)
-                        .WithMany("Studies")
-                        .HasForeignKey("StudyTypeId1");
-
                     b.Navigation("Patient");
 
                     b.Navigation("StudyType");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

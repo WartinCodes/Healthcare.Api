@@ -23,12 +23,12 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.Patient
                 .Include(x => x.User)
-                .Include(x => x.HealthPlans)
-                .ThenInclude(x => x.HealthInsurance)
-                .Include(x => x.Address)
+                .ThenInclude(x => x.Address)
                 .ThenInclude(x => x.City)
                 .ThenInclude(x => x.State)
                 .ThenInclude(x => x.Country)
+                .Include(x => x.HealthPlans)
+                .ThenInclude(x => x.HealthInsurance)
                 .AsNoTracking()
                 .ToListAsync();
         }
@@ -37,12 +37,12 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.Patient.Where(x => x.UserId == userId)
                 .Include(x => x.User)
-                .Include(x => x.HealthPlans)
-                .ThenInclude(x => x.HealthInsurance)
-                .Include(x => x.Address)
+                .ThenInclude(x => x.Address)
                 .ThenInclude(x => x.City)
                 .ThenInclude(x => x.State)
                 .ThenInclude(x => x.Country)
+                .Include(x => x.HealthPlans)
+                .ThenInclude(x => x.HealthInsurance)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
@@ -51,19 +51,19 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.Patient.Where(x => x.Id == id)
                 .Include(x => x.User)
-                .Include(x => x.HealthPlans)
-                .ThenInclude(x => x.HealthInsurance)
-                .Include(x => x.Address)
+                .ThenInclude(x => x.Address)
                 .ThenInclude(x => x.City)
                 .ThenInclude(x => x.State)
                 .ThenInclude(x => x.Country)
+                .Include(x => x.HealthPlans)
+                .ThenInclude(x => x.HealthInsurance)
                 .FirstOrDefaultAsync();
         }
 
         public void Remove(Patient entity)
         {
             _context.Entry(entity.User).State = EntityState.Detached;
-            _context.Entry(entity.Address).State = EntityState.Detached;
+            _context.Entry(entity.User.Address).State = EntityState.Detached;
             _context.Remove(entity);
         }
 

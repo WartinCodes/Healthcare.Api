@@ -4,10 +4,12 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
@@ -19,6 +21,7 @@ namespace Healthcare.Api.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
+        private readonly IAddressService _addressService;
         private readonly IMapper _mapper;
 
         public AccountController(
@@ -26,6 +29,7 @@ namespace Healthcare.Api.Controllers
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IEmailService emailService,
+            IAddressService addressService,
             IMapper mapper)
         {
             _jwtService = jwtService;
@@ -33,6 +37,7 @@ namespace Healthcare.Api.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
             _emailService = emailService;
+            _addressService = addressService;
         }
 
         [Authorize(Roles = "Administrador")]
@@ -76,6 +81,49 @@ namespace Healthcare.Api.Controllers
         {
             await _signInManager.SignOutAsync();
             return Ok();
+        }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> Post([FromBody] UserRequest userRequest)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(userRequest.Email);
+                var userDocument = await _userManager.FindByNameAsync(userRequest.UserName);
+                if (user != null || userDocument != null)
+                {
+                    return Conflict("DNI/Email ya existe.");
+                }
+
+                string fileName = userRequest.Photo == null ? String.Empty : Guid.NewGuid().ToString();
+                var newUser = _mapper.Map<User>(userRequest);
+                newUser.PasswordHash = newUser.UserName;
+                newUser.Photo = fileName;
+                DateTime birthDate = userRequest.BirthDate.ToArgentinaTime();
+                newUser.BirthDate = birthDate;
+
+                var address = _mapper.Map<Address>(userRequest.Address);
+                await _addressService.Add(address);
+                newUser.Address = address;
+
+                var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(newUser, RoleEnum.Secretaria);
+
+
+
+                    return Ok("Administrador creado exitosamente.");
+                }
+                else
+                {
+                    return BadRequest(result.Errors);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while processing your request: {ex}");
+            }
         }
 
         [HttpPost("forgot/password")]

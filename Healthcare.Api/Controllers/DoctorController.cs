@@ -61,7 +61,7 @@ namespace Healthcare.Api.Controllers
                     LastName = x.User.LastName,
                     Matricula = x.Matricula,
                     DNI = x.User.UserName,
-                    Address = _mapper.Map<AddressResponse>(x.Address),
+                    Address = _mapper.Map<AddressResponse>(x.User.Address),
                     Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(x.DoctorSpecialities),
                     HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(x.HealthInsurances),
                     Email = x.User.Email,
@@ -85,7 +85,7 @@ namespace Healthcare.Api.Controllers
                 Matricula = doctorEntity.Matricula,
                 DNI = doctorEntity.User.UserName,
                 BirthDate = doctorEntity.User.BirthDate,
-                Address = _mapper.Map<AddressResponse>(doctorEntity.Address),
+                Address = _mapper.Map<AddressResponse>(doctorEntity.User.Address),
                 Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(doctorEntity.DoctorSpecialities),
                 HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(doctorEntity.HealthInsurances),
                 Email = doctorEntity.User.Email,
@@ -113,13 +113,15 @@ namespace Healthcare.Api.Controllers
                 newUser.PasswordHash = newUser.UserName;
                 newUser.Photo = fileName;
 
+                var address = _mapper.Map<Address>(userRequest.Address);
+                await _addressService.Add(address);
+                newUser.Address = address;
+
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(newUser, RoleEnum.Medico);
 
-                    var address = _mapper.Map<Address>(userRequest.Address);
-                    await _addressService.Add(address);
 
                     var doctor = new Doctor
                     {
@@ -127,7 +129,6 @@ namespace Healthcare.Api.Controllers
                         Matricula = userRequest.Matricula,
                         DoctorSpecialities = null,
                         HealthInsurances = null,
-                        Address = address
                     };
 
                     await _doctorService.Add(doctor);

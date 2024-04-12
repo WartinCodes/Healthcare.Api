@@ -36,10 +36,6 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                         j.ToTable("PatientHealthPlan");
                     }
                 );
-
-            builder.HasOne(p => p.Address)
-                .WithMany()
-                .HasForeignKey(p => p.IdAddress);
         }
     }
 }
