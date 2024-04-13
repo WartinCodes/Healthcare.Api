@@ -57,6 +57,7 @@ namespace Healthcare.Api.Controllers
                 .Select(x => new DoctorResponse()
                 {
                     Id = x.Id,
+                    UserId = x.UserId,
                     FirstName = x.User.FirstName,
                     LastName = x.User.LastName,
                     Matricula = x.Matricula,
@@ -84,6 +85,7 @@ namespace Healthcare.Api.Controllers
             var doctor = new DoctorResponse()
             {
                 Id = doctorEntity.Id,
+                UserId = doctorEntity.UserId,
                 FirstName = doctorEntity.User.FirstName,
                 LastName = doctorEntity.User.LastName,
                 Matricula = doctorEntity.Matricula,
@@ -213,11 +215,11 @@ namespace Healthcare.Api.Controllers
                 return Conflict("DNI ya existe.");
             }
 
-            _mapper.Map(userRequest, user);
-            var result = await _userManager.UpdateAsync(user);
-
             var newAddress = _mapper.Map<Address>(userRequest.Address);
             _addressService.Edit(newAddress);
+
+            _mapper.Map(userRequest, user);
+            var result = await _userManager.UpdateAsync(user);
 
             // borrado de las obras sociales asociadas al doctor en tabla DoctorHealthPlanService
             var doctorHealthInsurances = await _doctorHealthInsuranceService.GetHealthPlansByDoctor(id);

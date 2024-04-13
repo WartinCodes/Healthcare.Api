@@ -43,6 +43,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public void Edit(Address entity)
         {
+            _context.Entry(entity).State = EntityState.Detached;
             _context.Entry(entity.City).State = EntityState.Detached;
             _context.Entry(entity.City.State).State = EntityState.Detached;
             _context.Entry(entity.City.State.Country).State = EntityState.Detached;

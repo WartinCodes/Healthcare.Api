@@ -49,6 +49,7 @@ namespace Healthcare.Api.Controllers
             var patients = (await _patientService.GetAsync())
                 .Select(x => new PatientResponse()
                 {
+                    Id = x.Id,
                     UserId = x.UserId,
                     FirstName = x.User.FirstName,
                     LastName = x.User.LastName,
@@ -76,6 +77,7 @@ namespace Healthcare.Api.Controllers
 
             var patient = new PatientResponse()
             {
+                Id = patientEntity.Id,
                 UserId = patientEntity.UserId,
                 FirstName = patientEntity.User.FirstName,
                 LastName = patientEntity.User.LastName,
@@ -199,12 +201,12 @@ namespace Healthcare.Api.Controllers
                 //{
                 //    await _fileService.DeletePhotoAsync(user.Photo);
                 //}
-                _mapper.Map(userRequest, user);
-                var result = await _userManager.UpdateAsync(user);
-
                 // actualizacion de Address
                 var newAddress = _mapper.Map<Address>(userRequest.Address);
                 _addressService.Edit(newAddress);
+
+                _mapper.Map(userRequest, user);
+                var result = await _userManager.UpdateAsync(user);
 
                 // borrado de las obras sociales asociadas al paciente en tabla PatientHealthPlan
                 var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(patient.Id);
