@@ -4,12 +4,10 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
@@ -51,7 +49,7 @@ namespace Healthcare.Api.Controllers
         [HttpGet("user")]
         public async Task<ActionResult<UserResponse>> GetUserById([FromQuery] string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var user = await UserManagerExtensions.GetUserById(_userManager, Convert.ToInt32(id));
             if (user == null)
             {
                 return NotFound($"Usuario con ID {id} no encontrado.");
@@ -124,6 +122,40 @@ namespace Healthcare.Api.Controllers
             {
                 return StatusCode(500, $"An error occurred while processing your request: {ex}");
             }
+        }
+
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> Put(int userId, [FromBody] UserRequest userEdit)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return NotFound($"No se encontró el usuario con el ID: {userId}");
+                }
+
+                var existEmail = await _userManager.FindByEmailAsync(userEdit.Email);
+                var existDocument = await _userManager.FindByNameAsync(userEdit.UserName);
+                if (existEmail != null && user.Id != existEmail.Id)
+                {
+                    return Conflict("Email ya existe.");
+                }
+                if (existDocument != null && user.Id != existDocument.Id)
+                {
+                    return Conflict("DNI ya existe.");
+                }
+
+                var newAddress = _mapper.Map<Address>(userEdit.Address);
+                _addressService.Edit(newAddress);
+
+                return Ok($"Usuario con el ID {userId} actualizado exitosamente");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while processing your request: {ex}");
+            }
+
         }
 
         [HttpPost("forgot/password")]

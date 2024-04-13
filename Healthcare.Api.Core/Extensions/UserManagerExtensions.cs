@@ -10,5 +10,15 @@ namespace Healthcare.Api.Core.Extensions
         {
             return await um?.Users?.SingleOrDefaultAsync(x => x.ResetPasswordToken == resetToken);
         }
+
+        public static async Task<User> GetUserById(this UserManager<User> um, int userId)
+        {
+            return await um?.Users?
+                .Include(x => x.Address)
+                .ThenInclude(x => x.City)
+                .ThenInclude(x => x.State)
+                .ThenInclude(x => x.Country)
+                .SingleOrDefaultAsync(x => x.Id == userId);
+        }
     }
 }
