@@ -97,7 +97,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Post([FromForm] DoctorRequest userRequest)
+        public async Task<IActionResult> Post([FromBody] DoctorRequest userRequest)
         {
             try
             {
@@ -157,18 +157,18 @@ namespace Healthcare.Api.Controllers
                         await _doctorHealthInsuranceService.Add(doctorHealthPlan);
                     }
 
-                    if (!String.IsNullOrEmpty(fileName))
-                    {
-                        using (MemoryStream memoryStream = new MemoryStream())
-                        {
-                            await userRequest.Photo.CopyToAsync(memoryStream);
-                            var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
-                            if (imageResult != HttpStatusCode.OK)
-                            {
-                                return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
-                            }
-                        }
-                    }
+                    //if (!String.IsNullOrEmpty(fileName))
+                    //{
+                    //    using (MemoryStream memoryStream = new MemoryStream())
+                    //    {
+                    //        await userRequest.Photo.CopyToAsync(memoryStream);
+                    //        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
+                    //        if (imageResult != HttpStatusCode.OK)
+                    //        {
+                    //            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                    //        }
+                    //    }
+                    //}
 
                     return Ok("Médico creado exitosamente.");
                 }
