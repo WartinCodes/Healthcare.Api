@@ -76,6 +76,10 @@ namespace Healthcare.Api.Controllers
         public async Task<ActionResult<DoctorResponse>> Get([FromRoute] int userId)
         {
             var doctorEntity = await _doctorService.GetDoctorByUserIdAsync(userId);
+            if (doctorEntity == null)
+            {
+                return NotFound($"El doctor con el ID usuario {userId} no existe.");
+            }
 
             var doctor = new DoctorResponse()
             {

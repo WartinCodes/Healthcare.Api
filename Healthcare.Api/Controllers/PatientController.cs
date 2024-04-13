@@ -69,6 +69,11 @@ namespace Healthcare.Api.Controllers
         {
             var patientEntity = await _patientService.GetPatientByUserIdAsync(userId);
 
+            if (patientEntity == null)
+            {
+                return NotFound($"El paciente con el ID usuario {userId} no existe.");
+            }
+
             var patient = new PatientResponse()
             {
                 UserId = patientEntity.UserId,
