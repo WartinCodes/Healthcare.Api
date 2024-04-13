@@ -87,7 +87,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Post([FromForm] PatientRequest userRequest)
+        public async Task<IActionResult> Post([FromBody] PatientRequest userRequest)
         {
             try
             {
@@ -98,11 +98,11 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI/Email ya existe.");
                 }
 
-                string fileName = userRequest.Photo == null ? String.Empty : Guid.NewGuid().ToString();
+                string fileName = String.Empty;
                 var newUser = _mapper.Map<User>(userRequest);
                 newUser.PasswordHash = newUser.UserName;
                 newUser.Photo = fileName;
-                DateTime birthDate = userRequest.BirthDate.ToArgentinaTime();
+                DateTime birthDate = DateTime.SpecifyKind(userRequest.BirthDate, DateTimeKind.Utc).ToArgentinaTime();
                 newUser.BirthDate = birthDate;
 
                 var address = _mapper.Map<Address>(userRequest.Address);
@@ -135,18 +135,18 @@ namespace Healthcare.Api.Controllers
                         await _patientHealthPlanService.Add(patientHealthPlan);
                     }
 
-                    if (!String.IsNullOrEmpty(fileName))
-                    {
-                        using (MemoryStream memoryStream = new MemoryStream())
-                        {
-                            await userRequest.Photo.CopyToAsync(memoryStream);
-                            var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
-                            if (imageResult != HttpStatusCode.OK)
-                            {
-                                return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
-                            }
-                        }
-                    }
+                    //if (!String.IsNullOrEmpty(fileName))
+                    //{
+                    //    using (MemoryStream memoryStream = new MemoryStream())
+                    //    {
+                    //        await userRequest.Photo.CopyToAsync(memoryStream);
+                    //        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
+                    //        if (imageResult != HttpStatusCode.OK)
+                    //        {
+                    //            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
+                    //        }
+                    //    }
+                    //}
                     
                     return Ok("Paciente creado exitosamente.");
                 }
