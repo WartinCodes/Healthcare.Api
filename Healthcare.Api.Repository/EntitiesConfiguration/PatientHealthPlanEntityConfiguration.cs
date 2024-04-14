@@ -1,7 +1,6 @@
 ﻿using Healthcare.Api.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Runtime.Intrinsics.Arm;
 
 namespace Healthcare.Api.Repository.EntitiesConfiguration
 {

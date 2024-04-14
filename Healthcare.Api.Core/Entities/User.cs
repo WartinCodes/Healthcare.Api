@@ -11,7 +11,7 @@ namespace Healthcare.Api.Core.Entities
         public DateTime? LastActivityDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
         public string? ResetPasswordToken { get; set; }
-        public int IdAddress { get; set; }
+        public int AddressId { get; set; }
         public virtual Address Address { get; set; }
     }
 }

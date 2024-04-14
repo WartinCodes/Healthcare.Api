@@ -30,28 +30,24 @@ namespace Healthcare.Api.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .IsUnicode(true)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("Description");
 
                     b.Property<string>("Number")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .IsUnicode(false)
                         .HasColumnType("varchar(10)")
                         .HasColumnName("Number");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
                         .HasColumnType("varchar(20)")
                         .HasColumnName("PhoneNumber");
 
                     b.Property<string>("Street")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)")
@@ -112,7 +108,6 @@ namespace Healthcare.Api.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Matricula")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
@@ -560,9 +555,6 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("IdAddress")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("LastActivityDate")
                         .HasColumnType("datetime(6)");
 
@@ -781,13 +773,13 @@ namespace Healthcare.Api.Repository.Migrations
             modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorSpeciality", b =>
                 {
                     b.HasOne("Healthcare.Api.Core.Entities.Doctor", "Doctor")
-                        .WithMany("DoctorSpecialities")
+                        .WithMany()
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Healthcare.Api.Core.Entities.Speciality", "Speciality")
-                        .WithMany("DoctorSpecialities")
+                        .WithMany()
                         .HasForeignKey("SpecialityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -949,11 +941,6 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("States");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.Doctor", b =>
-                {
-                    b.Navigation("DoctorSpecialities");
-                });
-
             modelBuilder.Entity("Healthcare.Api.Core.Entities.HealthInsurance", b =>
                 {
                     b.Navigation("HealthPlans");
@@ -962,11 +949,6 @@ namespace Healthcare.Api.Repository.Migrations
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
                 {
                     b.Navigation("Studies");
-                });
-
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.Speciality", b =>
-                {
-                    b.Navigation("DoctorSpecialities");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.State", b =>

@@ -214,12 +214,11 @@ namespace Healthcare.Api.Repository.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    Street = table.Column<string>(type: "varchar(100)", unicode: false, maxLength: 100, nullable: false),
-                    Number = table.Column<string>(type: "varchar(10)", unicode: false, maxLength: 10, nullable: false),
-                    Description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
-                    CityId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    Street = table.Column<string>(type: "varchar(100)", unicode: false, maxLength: 100, nullable: true),
+                    Number = table.Column<string>(type: "varchar(10)", unicode: false, maxLength: 10, nullable: true),
+                    Description = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: true),
+                    CityId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -248,7 +247,7 @@ namespace Healthcare.Api.Repository.Migrations
                     LastActivityDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     LastLoginDate = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     ResetPasswordToken = table.Column<string>(type: "longtext", nullable: true),
-                    IdAddress = table.Column<int>(type: "int", nullable: false),
+                    AddressId = table.Column<int>(type: "int", nullable: false),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true),
@@ -268,8 +267,8 @@ namespace Healthcare.Api.Repository.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUsers_Address_IdAddress",
-                        column: x => x.IdAddress,
+                        name: "FK_AspNetUsers_Address_AddressId",
+                        column: x => x.AddressId,
                         principalSchema: "Healthcare",
                         principalTable: "Address",
                         principalColumn: "Id",
@@ -383,7 +382,7 @@ namespace Healthcare.Api.Repository.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    Matricula = table.Column<string>(type: "longtext", nullable: false)
+                    Matricula = table.Column<string>(type: "longtext", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -639,11 +638,10 @@ namespace Healthcare.Api.Repository.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_IdAddress",
+                name: "IX_AspNetUsers_AddressId",
                 schema: "Healthcare",
                 table: "AspNetUsers",
-                column: "IdAddress",
-                unique: true);
+                column: "AddressId");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",

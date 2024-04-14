@@ -27,8 +27,7 @@ namespace Healthcare.Api.Repository.Repositories
                 .ThenInclude(x => x.City)
                 .ThenInclude(x => x.State)
                 .ThenInclude(x => x.Country)
-                .Include(x => x.DoctorSpecialities)
-                .ThenInclude(x => x.Speciality)
+                .Include(x => x.Specialities)
                 .Include(x => x.HealthInsurances)
                 .AsNoTracking()
                 .ToListAsync();
@@ -42,8 +41,7 @@ namespace Healthcare.Api.Repository.Repositories
                 .ThenInclude(x => x.City)
                 .ThenInclude(x => x.State)
                 .ThenInclude(x => x.Country)
-                .Include(x => x.DoctorSpecialities)
-                .ThenInclude(x => x.Speciality)
+                .Include(x => x.Specialities)
                 .Include(x => x.HealthInsurances)
                 .FirstOrDefaultAsync();
         }
@@ -77,8 +75,7 @@ namespace Healthcare.Api.Repository.Repositories
                 .ThenInclude(x => x.City)
                 .ThenInclude(x => x.State)
                 .ThenInclude(x => x.Country)
-                .Include(x => x.DoctorSpecialities)
-                .ThenInclude(x => x.Speciality)
+                .Include(x => x.Specialities)
                 .Include(x => x.HealthInsurances)
                 .FirstOrDefaultAsync();
         }

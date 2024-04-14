@@ -11,6 +11,8 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.ToTable("Doctor").HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
+            builder.Property(x => x.Matricula).IsRequired(false);
+
             builder.HasOne(p => p.User)
                .WithOne()
                .HasForeignKey<Doctor>(p => p.UserId)
@@ -35,9 +37,23 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                     }
                 );
 
-            builder.HasMany(d => d.DoctorSpecialities)
-                .WithOne(ds => ds.Doctor)
-                .HasForeignKey(ds => ds.DoctorId);
+            builder.HasMany(d => d.Specialities)
+                .WithMany(s => s.Doctors)
+                .UsingEntity<DoctorSpeciality>(
+                    j => j
+                        .HasOne(ds => ds.Speciality)
+                        .WithMany()
+                        .HasForeignKey(ds => ds.SpecialityId),
+                    j => j
+                        .HasOne(ds => ds.Doctor)
+                        .WithMany()
+                        .HasForeignKey(ds => ds.DoctorId),
+                    j =>
+                    {
+                        j.HasKey(t => new { t.DoctorId, t.SpecialityId });
+                        j.ToTable("DoctorSpeciality");
+                    }
+                );
         }
     }
 }

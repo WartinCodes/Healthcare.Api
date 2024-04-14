@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<DoctorSpeciality> DoctorSpecialities { get; set; }
+        public ICollection<Doctor> Doctors { get; set; }
     }
 }

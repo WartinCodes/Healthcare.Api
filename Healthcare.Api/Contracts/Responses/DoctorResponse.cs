@@ -13,7 +13,7 @@
         public DateTime BirthDate { get; set; }
         public AddressResponse Address { get; set; }
         public ICollection<HealthInsuranceResponse> HealthInsurances { get; set; }
-        public ICollection<DoctorSpecialityResponse> Specialities { get; set; }
+        public ICollection<SpecialityResponse> Specialities { get; set; }
         public string PhoneNumber { get; set; }
     }
 }

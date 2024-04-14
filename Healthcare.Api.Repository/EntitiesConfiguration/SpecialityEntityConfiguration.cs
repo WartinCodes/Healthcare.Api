@@ -12,10 +12,6 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.Property(x => x.Name).IsRequired();
-
-            builder.HasMany(s => s.DoctorSpecialities)
-                .WithOne(ds => ds.Speciality)
-                .HasForeignKey(ds => ds.SpecialityId);
         }
     }
 }

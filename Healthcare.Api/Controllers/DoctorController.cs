@@ -63,7 +63,7 @@ namespace Healthcare.Api.Controllers
                     Matricula = x.Matricula,
                     DNI = x.User.UserName,
                     Address = _mapper.Map<AddressResponse>(x.User.Address),
-                    Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(x.DoctorSpecialities),
+                    Specialities = _mapper.Map<ICollection<SpecialityResponse>>(x.Specialities),
                     HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(x.HealthInsurances),
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,
@@ -92,7 +92,7 @@ namespace Healthcare.Api.Controllers
                 DNI = doctorEntity.User.UserName,
                 BirthDate = doctorEntity.User.BirthDate,
                 Address = _mapper.Map<AddressResponse>(doctorEntity.User.Address),
-                Specialities = _mapper.Map<ICollection<DoctorSpecialityResponse>>(doctorEntity.DoctorSpecialities),
+                Specialities = _mapper.Map<ICollection<SpecialityResponse>>(doctorEntity.Specialities),
                 HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(doctorEntity.HealthInsurances),
                 Email = doctorEntity.User.Email,
                 PhoneNumber = doctorEntity.User.PhoneNumber,
@@ -133,7 +133,7 @@ namespace Healthcare.Api.Controllers
                     {
                         UserId = newUser.Id,
                         Matricula = userRequest.Matricula,
-                        DoctorSpecialities = null,
+                        Specialities = null,
                         HealthInsurances = null,
                     };
 
