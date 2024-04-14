@@ -6,6 +6,7 @@ using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Mysqlx.Cursor;
 using System.Net;
 
 namespace Healthcare.Api.Controllers
@@ -66,8 +67,8 @@ namespace Healthcare.Api.Controllers
                 {
                     return NotFound($"Tipo de estudio no encontrado.");
                 }
-
-                string fileName = Guid.NewGuid().ToString() + ".pdf"; 
+                var fileDate = study.Date.ToArgentinaTime().ToString();
+                string fileName = patient.User.LastName + patient.User.FirstName + studyType.Name + '-' + fileDate + ".pdf";
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     study.StudyFile.CopyTo(memoryStream);
@@ -84,8 +85,8 @@ namespace Healthcare.Api.Controllers
                     LocationS3 = fileName,
                     Date = date,
                     Note = study.Note,
-                    Patient = patient,
-                    StudyType = studyType
+                    PatientId = patient.Id,
+                    StudyTypeId = study.StudyTypeId,
                 };
 
                 await _studyService.Add(newStudy);

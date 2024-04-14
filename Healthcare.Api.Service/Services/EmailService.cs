@@ -21,8 +21,7 @@ namespace Healthcare.Api.Service.Services
         public string GenerateResetPasswordLink(string email, string token)
         {
             var baseUrl = _configuration.GetValue<string>("BaseUrl");
-
-            return $"{baseUrl}/restablecer-contraseña?token={token}";
+            return $"{baseUrl}/nueva-contraseña?token={token}";
         }
 
         public async Task SendForgotPasswordEmailAsync(string email, string fullName, string resetLink)

@@ -169,7 +169,7 @@ namespace Healthcare.Api.Controllers
                     return NotFound($"Usuario con correo electrónico {email} no encontrado.");
                 }
 
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var code = Guid.NewGuid().ToString();
                 var resetLink = _emailService.GenerateResetPasswordLink(email, code);
 
                 user.ResetPasswordToken = code;
@@ -223,15 +223,15 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
-                if (reset.Password != reset.ConfirmPassword)
-                {
-                    return Conflict("Las contraseñas no coinciden");
-                }
-
                 var user = await UserManagerExtensions.FindByResetTokenAsync(_userManager, reset.Code);
                 if (user == null)
                 {
                     return NotFound($"Usuario no encontrado.");
+                }
+
+                if (reset.Password != reset.ConfirmPassword)
+                {
+                    return Conflict("Las contraseñas no coinciden");
                 }
 
                 var result = await _userManager.ResetPasswordAsync(user, reset.Code, reset.Password);

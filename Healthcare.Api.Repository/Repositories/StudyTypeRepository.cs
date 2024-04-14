@@ -36,7 +36,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<StudyType> GetStudyTypeByIdAsync(int id)
         {
-            return await _context.StudyType.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.StudyType.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public void Remove(StudyType entity)
