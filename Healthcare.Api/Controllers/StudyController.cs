@@ -67,12 +67,12 @@ namespace Healthcare.Api.Controllers
                 {
                     return NotFound($"Tipo de estudio no encontrado.");
                 }
-                var fileDate = study.Date.ToArgentinaTime().ToString();
+                var fileDate = study.Date.ToArgentinaTime().ToString().Replace("/", "").Replace(":", "").Trim();
                 string fileName = patient.User.LastName + patient.User.FirstName + studyType.Name + '-' + fileDate + ".pdf";
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     study.StudyFile.CopyTo(memoryStream);
-                    var pdfResult = await _fileService.InsertStudyAsync(memoryStream, fileName, "application/pdf");
+                    var pdfResult = await _fileService.InsertStudyAsync(memoryStream, patient.User.UserName, fileName);
                     if (pdfResult != HttpStatusCode.OK)
                     {
                         return StatusCode((int)pdfResult, "Error al cargar el archivo PDF.");

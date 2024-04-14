@@ -70,6 +70,9 @@ namespace Healthcare.Api.Controllers
             var roles = await _userManager.GetRolesAsync(user);
             var token = _jwtService.GenerateToken(user, roles);
 
+            user.LastLoginDate = DateTime.UtcNow.ToArgentinaTime();
+            await _userManager.UpdateAsync(user);
+
             return Ok(new { Token = token });
         }
 
@@ -149,6 +152,9 @@ namespace Healthcare.Api.Controllers
                 var newAddress = _mapper.Map<Address>(userEdit.Address);
                 _addressService.Edit(newAddress);
 
+                user.LastActivityDate = DateTime.UtcNow.ToArgentinaTime();
+                await _userManager.UpdateAsync(user);
+
                 return Ok($"Usuario con el ID {userId} actualizado exitosamente");
             }
             catch (Exception ex)
@@ -173,6 +179,7 @@ namespace Healthcare.Api.Controllers
                 var resetLink = _emailService.GenerateResetPasswordLink(email, code);
 
                 user.ResetPasswordToken = code;
+                user.LastActivityDate = DateTime.UtcNow.ToArgentinaTime();
                 await _userManager.UpdateAsync(user);
                 string userName = $"{user.FirstName} {user.LastName}";
                 await _emailService.SendForgotPasswordEmailAsync(email, userName, resetLink);
@@ -207,6 +214,7 @@ namespace Healthcare.Api.Controllers
                     return Conflict("Las contraseñas no coinciden");
                 }
 
+                user.LastActivityDate = DateTime.UtcNow.ToArgentinaTime();
                 user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, change.NewPassword);
                 await _userManager.UpdateAsync(user);
 

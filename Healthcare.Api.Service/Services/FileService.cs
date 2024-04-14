@@ -66,11 +66,11 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
-        public async Task<HttpStatusCode> InsertStudyAsync(Stream file, string fileName, string contentType)
+        public async Task<HttpStatusCode> InsertStudyAsync(Stream file, string dni, string fileName)
         {
             try
             {
-                string key = _studiesFolder + "/" + fileName;
+                string key = _studiesFolder + "/" + dni + "/" + fileName;
 
                 TransferUtilityUploadRequest transferUtilityUploadRequest = new TransferUtilityUploadRequest()
                 {
