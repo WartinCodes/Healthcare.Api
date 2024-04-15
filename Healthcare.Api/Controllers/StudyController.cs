@@ -44,6 +44,14 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<StudyResponse>>(studies));
         }
 
+        [HttpGet("getUrl/{userId}")]
+        public async Task<ActionResult<string>> GetByPatient([FromRoute] int userId, string fileName)
+        {
+            var user = await _patientService.GetPatientByUserIdAsync(userId);
+            var studyUrl = _fileService.GetUrl(user.User.UserName, fileName);
+            return Ok(studyUrl);
+        }
+
         [HttpPost("upload-study")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)
         {

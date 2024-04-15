@@ -8,5 +8,6 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<HttpStatusCode> DeletePhotoAsync(string fileName);
         Task<HttpStatusCode> InsertStudyAsync(Stream file, string dni, string fileName);
         Task<HttpStatusCode> DeleteStudyAsync(string fileName);
+        string GetUrl(string userNameFolder, string fileName);
     }
 }
