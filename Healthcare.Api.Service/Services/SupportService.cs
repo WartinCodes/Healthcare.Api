@@ -16,29 +16,33 @@ namespace Healthcare.Api.Service.Services
             _unitOfWork = unitOfWork;
         }
 
-        public Task<Support> Add(Support entity)
+        public async Task<Support> Add(Support entity)
         {
-            throw new NotImplementedException();
+            var support = await _unitOfWork.SupportRepository.AddAsync(entity);
+            await _unitOfWork.SaveAsync();
+            return support;
         }
 
         public void Edit(Support entity)
         {
-            throw new NotImplementedException();
+            _unitOfWork.SupportRepository.Edit(entity);
+            _unitOfWork.Save();
         }
 
         public IQueryable<Support> GetAsQueryable()
         {
-            throw new NotImplementedException();
+            return _supportRepository.GetAsQueryable();
         }
 
         public Task<IEnumerable<Support>> GetAsync()
         {
-            throw new NotImplementedException();
+            return _supportRepository.GetAsync();
         }
 
         public void Remove(Support entity)
         {
-            throw new NotImplementedException();
+            _unitOfWork.SupportRepository.Remove(entity);
+            _unitOfWork.Save();
         }
     }
 }

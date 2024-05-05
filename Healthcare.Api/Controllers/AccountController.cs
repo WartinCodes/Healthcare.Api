@@ -4,6 +4,7 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ namespace Healthcare.Api.Controllers
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
         private readonly IAddressService _addressService;
+        private readonly ISupportService _supportService;
         private readonly IMapper _mapper;
 
         public AccountController(
@@ -28,6 +30,7 @@ namespace Healthcare.Api.Controllers
             SignInManager<User> signInManager,
             IEmailService emailService,
             IAddressService addressService,
+            ISupportService supportService,
             IMapper mapper)
         {
             _jwtService = jwtService;
@@ -36,6 +39,7 @@ namespace Healthcare.Api.Controllers
             _signInManager = signInManager;
             _emailService = emailService;
             _addressService = addressService;
+            _supportService = supportService;
         }
 
         [Authorize(Roles = "Administrador")]
@@ -269,6 +273,7 @@ namespace Healthcare.Api.Controllers
                 support.Status = StatusEnum.Pendiente;
                 string userName = $"{user.FirstName} {user.LastName}";
 
+                await _supportService.Add(support);
                 await _emailService.SendEmailSupportAsync(userName, support);
 
                 return Ok("Correo electrónico enviado a soporte exitosamente.");

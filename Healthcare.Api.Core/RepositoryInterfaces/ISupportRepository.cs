@@ -1,6 +1,9 @@
-﻿namespace Healthcare.Api.Core.RepositoryInterfaces
+﻿using Healthcare.Api.Core.Entities;
+
+namespace Healthcare.Api.Core.RepositoryInterfaces
 {
-    public interface ISupportRepository
+    public interface ISupportRepository : IRepository<Support>
     {
+        IQueryable<Support> GetAsQueryable();
     }
 }
