@@ -34,7 +34,10 @@ namespace Healthcare.Api.Controllers
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<SpecialityResponse>>> Get()
         {
-            var specialities = await _specialityService.GetAsync();
+            var specialities = (await _specialityService.GetAsync())
+                .OrderBy(x => x.Name)
+                .AsEnumerable();
+
             return Ok(_mapper.Map<IEnumerable<SpecialityResponse>>(specialities));
         }
 

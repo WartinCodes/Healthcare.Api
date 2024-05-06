@@ -143,8 +143,7 @@ namespace Healthcare.Api.Controllers
                     mergedLaboratoryDetails.IdStudy = newStudy.Id;
                     await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
                 }
-
-                await _emailService.SendEmailForNewStudyAsync(patient.User.Email, $"{patient.User.FirstName} {patient.User.LastName}");
+                //await _emailService.SendEmailForNewStudyAsync(patient.User.Email, $"{patient.User.FirstName} {patient.User.LastName}");
 
                 return Ok("Se ha guardado correctamente el estudio.");
             }

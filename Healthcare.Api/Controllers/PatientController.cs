@@ -60,7 +60,9 @@ namespace Healthcare.Api.Controllers
                     Email = x.User.Email,
                     Photo = x.User.Photo,
                     PhoneNumber = x.User.PhoneNumber
-                });
+                })
+                .OrderBy(x => x.LastName)
+                .AsEnumerable();
             
             return Ok(patients);
         }

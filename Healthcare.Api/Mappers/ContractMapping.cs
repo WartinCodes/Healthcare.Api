@@ -23,7 +23,10 @@ namespace Helthcare.Api.Mappers
             CreateMap<Study, StudyResponse>().ReverseMap();
             CreateMap<StudyType, StudyTypeResponse>().ReverseMap();
             CreateMap<HealthInsurance, HealthInsuranceByHealthPlanResponse>().ReverseMap();
-            CreateMap<LaboratoryDetail, LaboratoryDetailResponse>().ReverseMap();
+            CreateMap<LaboratoryDetail, LaboratoryDetailResponse>()
+                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Study.Date))
+                .ReverseMap();
+
             CreateMap<User, UserResponse>()
                 .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.UserName))
                 .ReverseMap();

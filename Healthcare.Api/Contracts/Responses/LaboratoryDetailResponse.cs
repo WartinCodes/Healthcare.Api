@@ -3,6 +3,7 @@
     public class LaboratoryDetailResponse
     {
         public int Id { get; set; }
+        public DateTime Date { get; set; }
         public string GlobulosRojos { get; set; }
         public string GlobulosBlancos { get; set; }
         public string Hemoglobina { get; set; }
