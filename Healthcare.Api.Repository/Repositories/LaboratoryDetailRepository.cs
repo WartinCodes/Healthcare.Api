@@ -1,6 +1,7 @@
 ﻿using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Repository.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Api.Repository.Repositories
 {
@@ -15,7 +16,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public IQueryable<LaboratoryDetail> GetAsQueryable()
         {
-            return _context.Hemograma.AsQueryable();
+            return _context.LaboratoryDetail.AsQueryable();
         }
 
         public async Task<IEnumerable<LaboratoryDetail>> GetAsync()
@@ -30,12 +31,21 @@ namespace Healthcare.Api.Repository.Repositories
 
         public void Edit(LaboratoryDetail entity)
         {
-            _context.Hemograma.Update(entity);
+            _context.LaboratoryDetail.Update(entity);
         }
 
         public async Task<LaboratoryDetail> AddAsync(LaboratoryDetail entity)
         {
             return await base.InsertAsync(entity).ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<LaboratoryDetail>> GetLaboratoriesByUserId(int userId)
+        {
+            return await _context.LaboratoryDetail
+                .Include(x => x.Study)
+                .ThenInclude(x => x.Patient)
+                .Where(x => x.Study.Patient.UserId == userId)
+                .ToListAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
@@ -53,6 +54,12 @@ namespace Healthcare.Api.Service.Services
         {
             _unitOfWork.StudyRepository.Remove(entity);
             _unitOfWork.Save();
+        }
+
+        public string GenerateFileName(Patient patient, StudyType studyType, DateTime date)
+        {
+            var fileDate = date.ToArgentinaTime().ToString().Replace("/", "").Replace(":", "").Trim();
+            return $"{patient.User.LastName}{patient.User.FirstName}{studyType.Name}-{fileDate}.pdf";
         }
     }
 }

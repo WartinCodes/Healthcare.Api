@@ -33,9 +33,9 @@ namespace Healthcare.Api.Service.Services
             return _laboratoryDetailsRepository.GetAsync();
         }
 
-        public Task<LaboratoryDetail> GetLaboratoryDetailsByIdAsync(int id)
+        public async Task<IEnumerable<LaboratoryDetail>> GetLaboratoriesDetailsByUserIdAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _laboratoryDetailsRepository.GetLaboratoriesByUserId(userId);
         }
 
         public void Remove(LaboratoryDetail entity)
