@@ -140,8 +140,11 @@ namespace Healthcare.Api.Controllers
                             }
                         }
                     }
-                    mergedLaboratoryDetails.IdStudy = newStudy.Id;
-                    await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
+                    if (IsAllDataLoaded(mergedLaboratoryDetails))
+                    {
+                        mergedLaboratoryDetails.IdStudy = newStudy.Id;
+                        await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
+                    }
                 }
                 //await _emailService.SendEmailForNewStudyAsync(patient.User.Email, $"{patient.User.FirstName} {patient.User.LastName}");
 
@@ -153,7 +156,24 @@ namespace Healthcare.Api.Controllers
             }
         }
 
-        void MergeLaboratoryDetails(LaboratoryDetailRequest mergedDetails, LaboratoryDetailRequest pageDetails)
+        private bool IsAllDataLoaded(LaboratoryDetailRequest mergedLaboratoryDetails)
+        {
+            var properties = mergedLaboratoryDetails.GetType().GetProperties();
+
+            foreach (var property in properties)
+            {
+                var value = property.GetValue(mergedLaboratoryDetails)?.ToString();
+
+                if (string.IsNullOrEmpty(value))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private void MergeLaboratoryDetails(LaboratoryDetailRequest mergedDetails, LaboratoryDetailRequest pageDetails)
         {
             mergedDetails.GlobulosRojos = MergeProperty(mergedDetails.GlobulosRojos, pageDetails.GlobulosRojos);
             mergedDetails.GlobulosBlancos = MergeProperty(mergedDetails.GlobulosBlancos, pageDetails.GlobulosBlancos);
@@ -187,7 +207,7 @@ namespace Healthcare.Api.Controllers
             mergedDetails.TirotrofinaPlamatica = MergeProperty(mergedDetails.TirotrofinaPlamatica, pageDetails.TirotrofinaPlamatica);
         }
 
-        string MergeProperty(string existingValue, string newValue)
+        private string MergeProperty(string existingValue, string newValue)
         {
             if (existingValue == null)
                 return newValue;
