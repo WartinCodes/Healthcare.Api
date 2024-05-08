@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers

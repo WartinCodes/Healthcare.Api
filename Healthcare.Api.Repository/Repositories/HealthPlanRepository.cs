@@ -46,5 +46,13 @@ namespace Healthcare.Api.Repository.Repositories
             _context.Attach(entity.HealthInsurance);
             return await base.InsertAsync(entity).ConfigureAwait(false);
         }
+
+        public async Task<IEnumerable<HealthPlan>> GetHealthPlansByHealthInsuranceId(int id)
+        {
+            return await _context.HealthPlan
+                .Include(x => x.HealthInsurance)
+                .Where(x => x.HealthInsuranceId == id)
+                .ToListAsync();
+        }
     }
 }

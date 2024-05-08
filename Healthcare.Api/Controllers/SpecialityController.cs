@@ -4,6 +4,7 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,10 @@ namespace Healthcare.Api.Controllers
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<SpecialityResponse>>> Get()
         {
-            var specialities = await _specialityService.GetAsync();
+            var specialities = (await _specialityService.GetAsync())
+                .OrderBy(x => x.Name)
+                .AsEnumerable();
+
             return Ok(_mapper.Map<IEnumerable<SpecialityResponse>>(specialities));
         }
 

@@ -43,5 +43,11 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await base.InsertAsync(entity).ConfigureAwait(false);
         }
+
+        public async Task<IEnumerable<DoctorSpeciality>> GetSpecialitiesByDoctorIdAsync(int doctorId)
+        {
+            return await _context.DoctorSpeciality.Where(x => x.DoctorId == doctorId)
+                .ToListAsync();
+        }
     }
 }

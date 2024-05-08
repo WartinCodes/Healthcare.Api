@@ -6,6 +6,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
     {
         IQueryable<DoctorSpeciality> GetAsQueryable();
         Task<IEnumerable<DoctorSpeciality>> GetAsync();
+        Task<IEnumerable<DoctorSpeciality>> GetSpecialitiesByDoctor(int doctorId);
         Task<DoctorSpeciality> Add(DoctorSpeciality entity);
         void Remove(DoctorSpeciality entity);
         void Edit(DoctorSpeciality entity);

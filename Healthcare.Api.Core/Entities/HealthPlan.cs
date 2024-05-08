@@ -7,6 +7,5 @@
         public int HealthInsuranceId { get; set; }
         public virtual HealthInsurance HealthInsurance { get; set; }
         public ICollection<Patient> Patients { get; set; }
-        public ICollection<Doctor> Doctors { get; set; }
     }
 }

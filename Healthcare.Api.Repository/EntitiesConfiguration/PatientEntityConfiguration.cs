@@ -9,14 +9,15 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
         public void Configure(EntityTypeBuilder<Patient> builder)
         {
             builder.ToTable("Patient").HasKey(x => x.Id);
-            builder.Property(p => p.Id).UseIdentityColumn().ValueGeneratedOnAdd();
+            builder.Property(p => p.Id).ValueGeneratedOnAdd();
 
             builder.Property(p => p.CUIL).IsRequired(false);
 
             builder.HasOne(p => p.User)
                .WithOne()
                .HasForeignKey<Patient>(p => p.UserId)
-               .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(p => p.HealthPlans)
                 .WithMany(hp => hp.Patients)
@@ -35,10 +36,6 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                         j.ToTable("PatientHealthPlan");
                     }
                 );
-
-            builder.HasOne(p => p.Address)
-                .WithMany()
-                .HasForeignKey(p => p.IdAddress);
         }
     }
 }

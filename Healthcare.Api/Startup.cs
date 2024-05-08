@@ -1,23 +1,28 @@
-﻿using Healthcare.Api.Core.Entities;
+﻿using Amazon.Auth.AccessControlPolicy;
+using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Repository;
 using Healthcare.Api.Repository.Context;
 using Healthcare.Api.Service;
 using Healthcare.Api.Service.Services;
 using Helthcare.Api.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
+using System.Globalization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Helthcare.Api
 {
     public class Startup
     {
-        readonly string MyPolicy = "MyPolicy";
         public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
@@ -28,17 +33,11 @@ namespace Helthcare.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<HealthcareDbContext>(options =>
-            {
-                options.UseSqlServer(Configuration.GetConnectionString(nameof(HealthcareDbContext)),
-                    sqlServerOptionsAction: sqlOptions =>
-                    {
-                        sqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 5,
-                            maxRetryDelay: TimeSpan.FromSeconds(30),
-                            errorNumbersToAdd: null);
-                    });
-            });
+
+            services.AddDbContext<HealthcareDbContext>(options => 
+                options.UseMySQL(Configuration.GetConnectionString(nameof(HealthcareDbContext))));
+
+            services.AddTransient<IPasswordHasher<User>, BcryptHash>();
 
             services.AddIdentity<User, Role>()
                 .AddRoleManager<RoleManager<Role>>()
@@ -64,21 +63,10 @@ namespace Helthcare.Api
             services.AddMappers();
             services.AddMvc();
 
-            services.AddCors(o => o.AddPolicy(MyPolicy, builder =>
-            {
-                if (Configuration.GetValue<bool>("isAllowAllCrossOrigins"))
-                {
-                    builder
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowAnyOrigin();
-                }
-                else
-                {
-                    builder.WithOrigins(Configuration.GetSection("AllowedOriginsList").GetChildren().ToArray().Select(c => c.Value).ToArray());
-                }
-            }));
+            services.AddCors();
 
+            //var corsPolicy = new EnableCorsAttribute("AllowOrigin");
+            
             var jwtIssuer = Configuration.GetSection("JWT:Issuer").Get<string>();
             var jwtKey = Configuration.GetSection("JWT:SecretKey").Get<string>();
 
@@ -99,8 +87,8 @@ namespace Helthcare.Api
                 };
             });
 
-            services.Configure<SmtpSettings>(Configuration.GetSection(nameof(SmtpSettings)));
-            services.AddTransient<IEmailSender, EmailSender>();
+
+            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -117,7 +105,11 @@ namespace Helthcare.Api
 
             app.UseRouting();
 
-            app.UseCors(MyPolicy);
+            app.UseCors(builder =>
+                builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+            );
 
             app.UseAuthentication();
             app.UseAuthorization();
@@ -130,6 +122,12 @@ namespace Helthcare.Api
             {
                 endpoints.MapControllers();
             });
+
+            var cultureInfo = new CultureInfo("es-AR");
+            cultureInfo.NumberFormat.CurrencySymbol = "$";
+
+            CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+            CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
         }
     }
 }

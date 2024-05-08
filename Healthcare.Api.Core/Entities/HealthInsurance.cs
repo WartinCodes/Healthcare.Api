@@ -5,5 +5,6 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public ICollection<HealthPlan> HealthPlans { get; set; }
+        public ICollection<Doctor> Doctors { get; set; }
     }
 }

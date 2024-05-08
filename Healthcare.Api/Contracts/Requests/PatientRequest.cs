@@ -10,6 +10,7 @@
         public DateTime BirthDate { get; set; }
         public string Photo { get; set; }
         public AddressRequest Address { get; set; }
-        // obra social
+        public List<HealthPlanRequest> HealthPlans { get; set; }
+        public int? RegisteredById { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

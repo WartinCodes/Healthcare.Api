@@ -16,7 +16,7 @@ namespace Helthcare.Api
                 try
                 {
                     var context = services.GetRequiredService<HealthcareDbContext>();
-                    context.Database.Migrate();
+                    //context.Database.Migrate();
                 }
                 catch (Exception ex)
                 {

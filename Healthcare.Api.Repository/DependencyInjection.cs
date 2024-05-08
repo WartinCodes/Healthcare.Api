@@ -21,13 +21,22 @@ namespace Healthcare.Api.Repository
 
         private static IServiceCollection AddReppositories(this IServiceCollection services)
         {
-            services.AddTransient<IPatientRepository, PatientRepository>();
-            services.AddTransient<ISpecialityRepository, SpecialityRepository>();
+            services.AddTransient<IAddressRepository, AddressRepository>();
+            services.AddTransient<ICityRepository, CityRepository>();
             services.AddTransient<IDoctorRepository, DoctorRepository>();
+            services.AddTransient<IDoctorSpecialityRepository, DoctorSpecialityRepository>();
+            services.AddTransient<IDoctorHealthInsuranceRepository, DoctorHealthInsuranceRepository>();
             services.AddTransient<IHealthInsuranceRepository, HealthInsuranceRepository>();
             services.AddTransient<IHealthPlanRepository, HealthPlanRepository>();
-            services.AddTransient<IDoctorSpecialityRepository, DoctorSpecialityRepository>();
-            services.AddTransient<IAddressRepository, AddressRepository>();
+            services.AddTransient<IPatientRepository, PatientRepository>();
+            services.AddTransient<IPatientHealthPlanRepository, PatientHealthPlanRepository>();
+            services.AddTransient<ILaboratoryDetailsRepository, LaboratoryDetailRepository>();
+            services.AddTransient<ICountryRepository, CountryRepository>();
+            services.AddTransient<IStateRepository, StateRepository>();
+            services.AddTransient<ISpecialityRepository, SpecialityRepository>();
+            services.AddTransient<IStudyTypeRepository, StudyTypeRepository>();
+            services.AddTransient<IStudyRepository, StudyRepository>();
+            services.AddTransient<ISupportRepository, SupportRepository>();
 
             return services;
         }

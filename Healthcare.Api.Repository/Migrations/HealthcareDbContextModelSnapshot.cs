@@ -3,7 +3,6 @@ using System;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -17,11 +16,9 @@ namespace Healthcare.Api.Repository.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("healthcare")
+                .HasDefaultSchema("Healthcare")
                 .HasAnnotation("ProductVersion", "6.0.26")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Address", b =>
                 {
@@ -29,34 +26,28 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int>("CityId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .IsUnicode(true)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("Description");
 
                     b.Property<string>("Number")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .IsUnicode(false)
                         .HasColumnType("varchar(10)")
                         .HasColumnName("Number");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
                         .HasColumnType("varchar(20)")
                         .HasColumnName("PhoneNumber");
 
                     b.Property<string>("Street")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)")
@@ -66,7 +57,7 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasIndex("CityId");
 
-                    b.ToTable("Address", "healthcare");
+                    b.ToTable("Address", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.City", b =>
@@ -74,8 +65,6 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("IdState")
                         .HasColumnType("int");
@@ -91,7 +80,7 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasIndex("IdState");
 
-                    b.ToTable("City", "healthcare");
+                    b.ToTable("City", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Country", b =>
@@ -99,8 +88,6 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -111,7 +98,7 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Country", "healthcare");
+                    b.ToTable("Country", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Doctor", b =>
@@ -120,68 +107,62 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("IdAddress")
-                        .HasColumnType("int");
-
                     b.Property<string>("Matricula")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdAddress");
-
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Doctor", "healthcare");
+                    b.ToTable("Doctor", "Healthcare");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorHealthPlan", b =>
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorHealthInsurance", b =>
                 {
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("HealthPlanId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
 
-                    b.HasKey("DoctorId", "HealthPlanId");
+                    b.Property<int>("HealthInsuranceId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("HealthPlanId");
+                    b.HasKey("Id");
 
-                    b.ToTable("DoctorHealthPlan", "healthcare");
+                    b.HasIndex("HealthInsuranceId");
+
+                    b.HasIndex("DoctorId", "HealthInsuranceId")
+                        .IsUnique();
+
+                    b.ToTable("DoctorHealthInsurance", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorSpeciality", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
                     b.Property<int>("DoctorId")
                         .HasColumnType("int");
 
                     b.Property<int>("SpecialityId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.HasKey("DoctorId", "SpecialityId");
+                    b.HasKey("Id");
 
                     b.HasIndex("SpecialityId");
 
-                    b.ToTable("DoctorSpeciality", "healthcare");
+                    b.HasIndex("DoctorId", "SpecialityId")
+                        .IsUnique();
+
+                    b.ToTable("DoctorSpeciality", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.HealthInsurance", b =>
@@ -190,15 +171,13 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.ToTable("HealthInsurance", "healthcare");
+                    b.ToTable("HealthInsurance", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.HealthPlan", b =>
@@ -207,20 +186,154 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int>("HealthInsuranceId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
                     b.HasIndex("HealthInsuranceId");
 
-                    b.ToTable("HealthPlan", "healthcare");
+                    b.ToTable("HealthPlan", "Healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.LaboratoryDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Basofilos")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BilirrubinaDirecta")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BilirrubinaIndirecta")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BilirrubinaTotal")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CHCM")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ColesterolHdl")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ColesterolTotal")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Creatininemia")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Eosinofilos")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Eritrosedimentacion1")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Eritrosedimentacion2")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FosfatasaAlcalina")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("GlobulosBlancos")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("GlobulosRojos")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Glucemia")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("HCM")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Hematocrito")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Hemoglobina")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("IdStudy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Linfocitos")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Monocitos")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NeutrofilosCayados")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NeutrofilosSegmentados")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Plaquetas")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TirotrofinaPlamatica")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TransaminasaGlutamicoOxalac")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TransaminasaGlutamicoPiruvic")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Trigliceridos")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Uremia")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Uricemia")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("VCM")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdStudy");
+
+                    b.ToTable("LaboratoryDetail", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
@@ -229,46 +342,40 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("CUIL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("IdAddress")
-                        .HasColumnType("int");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdAddress");
-
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Patient", "healthcare");
+                    b.ToTable("Patient", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.PatientHealthPlan", b =>
                 {
-                    b.Property<int>("PatientId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     b.Property<int>("HealthPlanId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("PatientId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.HasKey("PatientId", "HealthPlanId");
+                    b.HasKey("Id");
 
                     b.HasIndex("HealthPlanId");
 
-                    b.ToTable("PatientHealthPlan", "healthcare");
+                    b.HasIndex("PatientId", "HealthPlanId")
+                        .IsUnique();
+
+                    b.ToTable("PatientHealthPlan", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Role", b =>
@@ -277,28 +384,25 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("AspNetRoles", "healthcare");
+                    b.ToTable("AspNetRoles", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Speciality", b =>
@@ -307,15 +411,13 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Speciality", "healthcare");
+                    b.ToTable("Speciality", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.State", b =>
@@ -323,8 +425,6 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<int>("IdCountry")
                         .HasColumnType("int");
@@ -340,7 +440,89 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasIndex("IdCountry");
 
-                    b.ToTable("State", "healthcare");
+                    b.ToTable("State", "Healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Study", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("LocationS3")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudyTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("StudyTypeId");
+
+                    b.ToTable("Study", "Healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.StudyType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StudyType", "Healthcare");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Support", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("ReportDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("ResolutionDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Support", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
@@ -349,87 +531,98 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime?>("LastActivityDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("LastLoginDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Photo")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("RegisteredById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RegistrationDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ResetPasswordToken")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", "healthcare");
+                    b.ToTable("AspNetUsers", "Healthcare");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -438,13 +631,11 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -453,7 +644,7 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", "healthcare");
+                    b.ToTable("AspNetRoleClaims", "Healthcare");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
@@ -462,13 +653,11 @@ namespace Healthcare.Api.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -477,19 +666,19 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", "healthcare");
+                    b.ToTable("AspNetUserClaims", "Healthcare");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -498,7 +687,7 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", "healthcare");
+                    b.ToTable("AspNetUserLogins", "Healthcare");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
@@ -513,7 +702,7 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", "healthcare");
+                    b.ToTable("AspNetUserRoles", "Healthcare");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -522,17 +711,17 @@ namespace Healthcare.Api.Repository.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", "healthcare");
+                    b.ToTable("AspNetUserTokens", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Address", b =>
@@ -559,24 +748,16 @@ namespace Healthcare.Api.Repository.Migrations
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Doctor", b =>
                 {
-                    b.HasOne("Healthcare.Api.Core.Entities.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("IdAddress")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Healthcare.Api.Core.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("Healthcare.Api.Core.Entities.Doctor", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Address");
-
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorHealthPlan", b =>
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorHealthInsurance", b =>
                 {
                     b.HasOne("Healthcare.Api.Core.Entities.Doctor", "Doctor")
                         .WithMany()
@@ -584,27 +765,27 @@ namespace Healthcare.Api.Repository.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Healthcare.Api.Core.Entities.HealthPlan", "HealthPlan")
+                    b.HasOne("Healthcare.Api.Core.Entities.HealthInsurance", "HealthInsurance")
                         .WithMany()
-                        .HasForeignKey("HealthPlanId")
+                        .HasForeignKey("HealthInsuranceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Doctor");
 
-                    b.Navigation("HealthPlan");
+                    b.Navigation("HealthInsurance");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.DoctorSpeciality", b =>
                 {
                     b.HasOne("Healthcare.Api.Core.Entities.Doctor", "Doctor")
-                        .WithMany("DoctorSpecialities")
+                        .WithMany()
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Healthcare.Api.Core.Entities.Speciality", "Speciality")
-                        .WithMany("DoctorSpecialities")
+                        .WithMany()
                         .HasForeignKey("SpecialityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -625,21 +806,22 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("HealthInsurance");
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.LaboratoryDetail", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.Study", "Study")
+                        .WithMany()
+                        .HasForeignKey("IdStudy");
+
+                    b.Navigation("Study");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
                 {
-                    b.HasOne("Healthcare.Api.Core.Entities.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("IdAddress")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Healthcare.Api.Core.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("Healthcare.Api.Core.Entities.Patient", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Address");
 
                     b.Navigation("User");
                 });
@@ -672,6 +854,36 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Study", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.Patient", "Patient")
+                        .WithMany("Studies")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Healthcare.Api.Core.Entities.StudyType", "StudyType")
+                        .WithMany("Studies")
+                        .HasForeignKey("StudyTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("StudyType");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
+                {
+                    b.HasOne("Healthcare.Api.Core.Entities.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -735,24 +947,24 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("States");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.Doctor", b =>
-                {
-                    b.Navigation("DoctorSpecialities");
-                });
-
             modelBuilder.Entity("Healthcare.Api.Core.Entities.HealthInsurance", b =>
                 {
                     b.Navigation("HealthPlans");
                 });
 
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.Speciality", b =>
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
                 {
-                    b.Navigation("DoctorSpecialities");
+                    b.Navigation("Studies");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.State", b =>
                 {
                     b.Navigation("Cities");
+                });
+
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.StudyType", b =>
+                {
+                    b.Navigation("Studies");
                 });
 #pragma warning restore 612, 618
         }
