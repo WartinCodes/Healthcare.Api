@@ -2,6 +2,7 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -124,6 +125,8 @@ namespace Healthcare.Api.Controllers
                 var address = _mapper.Map<Address>(userRequest.Address);
                 await _addressService.Add(address);
                 newUser.Address = address;
+                newUser.RegistrationDate = DateTime.Now.ToArgentinaTime();
+                newUser.RegisteredById = userRequest.RegisteredById;
 
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)

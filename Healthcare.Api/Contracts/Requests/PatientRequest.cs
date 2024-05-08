@@ -11,5 +11,6 @@
         public string Photo { get; set; }
         public AddressRequest Address { get; set; }
         public List<HealthPlanRequest> HealthPlans { get; set; }
+        public int? RegisteredById { get; set; }
     }
 }

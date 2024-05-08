@@ -3,6 +3,7 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,13 @@ namespace Healthcare.Api.Controllers
     public class HealthInsuranceController : ControllerBase
     {
         private readonly IHealthInsuranceService _healthInsuranceService;
+        private readonly IHealthPlanService _healthPlanService;
         private readonly IMapper _mapper;
 
-        public HealthInsuranceController(IMapper mapper, IHealthInsuranceService healthInsuranceService)
+        public HealthInsuranceController(IMapper mapper, IHealthInsuranceService healthInsuranceService, IHealthPlanService healthPlanService)
         {
             _healthInsuranceService = healthInsuranceService;
+            _healthPlanService = healthPlanService;
             _mapper = mapper;
         }
 
@@ -35,6 +38,13 @@ namespace Healthcare.Api.Controllers
             {
                 var newHealthInsurance = _mapper.Map<HealthInsurance>(healthInsuranceRequest);
                 await _healthInsuranceService.Add(newHealthInsurance);
+
+                HealthPlan newHealthPlan = new HealthPlan()
+                {
+                    HealthInsurance = newHealthInsurance,
+                    Name = healthInsuranceRequest.Name
+                };
+                await _healthPlanService.Add(newHealthPlan);
 
                 return Ok("Obra social creada exitosamente.");
             }

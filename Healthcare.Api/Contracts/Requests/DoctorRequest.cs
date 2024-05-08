@@ -13,5 +13,6 @@
         public AddressRequest Address { get; set; }
         public List<SpecialityRequest> Specialities { get; set; }
         public List<HealthInsuranceRequest> HealthInsurances { get; set; }
+        public int? RegisteredById { get; set; }
     }
 }
