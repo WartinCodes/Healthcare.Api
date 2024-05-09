@@ -43,5 +43,10 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await base.InsertAsync(entity).ConfigureAwait(false);
         }
+
+        public async Task<Speciality> GetSpecialityByNameAsync(string name)
+        {
+            return await _context.Speciality.FirstOrDefaultAsync(x => x.Name == name);
+        }
     }
 }

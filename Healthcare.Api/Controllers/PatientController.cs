@@ -59,7 +59,9 @@ namespace Healthcare.Api.Controllers
                     BirthDate = x.User.BirthDate,
                     Email = x.User.Email,
                     Photo = x.User.Photo,
-                    PhoneNumber = x.User.PhoneNumber
+                    PhoneNumber = x.User.PhoneNumber,
+                    RegisteredById = x.User.RegisteredById,
+                    RegistrationDate = x.User.RegistrationDate
                 })
                 .OrderBy(x => x.LastName)
                 .AsEnumerable();
@@ -89,7 +91,9 @@ namespace Healthcare.Api.Controllers
                 BirthDate = patientEntity.User.BirthDate,
                 Email = patientEntity.User.Email,
                 Photo = patientEntity.User.Photo,
-                PhoneNumber = patientEntity.User.PhoneNumber
+                PhoneNumber = patientEntity.User.PhoneNumber,
+                RegisteredById = patientEntity.User.RegisteredById,
+                RegistrationDate = patientEntity.User.RegistrationDate
             };
 
             return Ok(patient);

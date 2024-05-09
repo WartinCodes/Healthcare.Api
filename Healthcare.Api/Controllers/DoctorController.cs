@@ -68,7 +68,9 @@ namespace Healthcare.Api.Controllers
                     HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(x.HealthInsurances),
                     Email = x.User.Email,
                     PhoneNumber = x.User.PhoneNumber,
-                    Photo = x.User.Photo
+                    Photo = x.User.Photo,
+                    RegisteredById = x.User.RegisteredById,
+                    RegistrationDate = x.User.RegistrationDate
                 })
                 .OrderBy(x => x.LastName)
                 .AsEnumerable();
@@ -99,7 +101,9 @@ namespace Healthcare.Api.Controllers
                 HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(doctorEntity.HealthInsurances),
                 Email = doctorEntity.User.Email,
                 PhoneNumber = doctorEntity.User.PhoneNumber,
-                Photo = doctorEntity.User.Photo
+                Photo = doctorEntity.User.Photo,        
+                RegisteredById = doctorEntity.User.RegisteredById,
+                RegistrationDate = doctorEntity.User.RegistrationDate
             };
 
             return Ok(doctor);

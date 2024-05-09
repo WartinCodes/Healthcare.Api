@@ -13,5 +13,7 @@
         public AddressResponse Address { get; set; }
         public ICollection<HealthPlanResponse> HealthPlans { get; set; }
         public string PhoneNumber { get; set; }
+        public DateTime? RegistrationDate { get; set; }
+        public int? RegisteredById { get; set; }
     }
 }

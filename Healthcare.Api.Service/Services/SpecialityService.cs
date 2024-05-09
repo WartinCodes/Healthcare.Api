@@ -34,14 +34,19 @@ namespace Healthcare.Api.Service.Services
             return _specialityRepository.GetAsQueryable();
         }
 
-        public Task<IEnumerable<Speciality>> GetAsync()
+        public async Task<IEnumerable<Speciality>> GetAsync()
         {
-            return _specialityRepository.GetAsync();
+            return await _specialityRepository.GetAsync();
         }
 
-        public Task<Speciality> GetSpecialityByIdAsync(int id)
+        public async Task<Speciality> GetSpecialityByIdAsync(int id)
         {
-            return _specialityRepository.GetSpecialityByIdAsync(id);
+            return await _specialityRepository.GetSpecialityByIdAsync(id);
+        }
+
+        public async Task<Speciality> GetSpecialityByNameAsync(string name)
+        {
+            return await _specialityRepository.GetSpecialityByNameAsync(name);
         }
 
         public void Remove(Speciality entity)

@@ -46,6 +46,11 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
+                var existSpeciality = await _specialityService.GetSpecialityByNameAsync(specialityRequest.Name);
+                if (existSpeciality != null) 
+                {
+                    return Conflict("Ya existe una especialidad con ese nombre.");
+                }
                 var newSpeciality = _mapper.Map<Speciality>(specialityRequest);
                 await _specialityService.Add(newSpeciality);
 
