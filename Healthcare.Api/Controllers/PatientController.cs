@@ -117,7 +117,7 @@ namespace Healthcare.Api.Controllers
                 var address = _mapper.Map<Address>(userRequest.Address);
                 await _addressService.Add(address);
                 newUser.Address = address;
-                newUser.RegistrationDate = DateTime.Now.ToArgentinaTime();
+                newUser.RegistrationDate = DateTime.UtcNow.ToArgentinaTime();
                 newUser.RegisteredById = userRequest.RegisteredById;
 
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
