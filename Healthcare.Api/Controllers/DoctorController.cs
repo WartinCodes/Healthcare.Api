@@ -126,11 +126,14 @@ namespace Healthcare.Api.Controllers
                 newUser.PasswordHash = newUser.UserName;
                 newUser.Photo = fileName;
 
+                newUser.RegistrationDate = DateTime.UtcNow.ToArgentinaTime();
+                newUser.RegisteredById = userRequest.RegisteredById;
+                newUser.CUIL = string.IsNullOrEmpty(userRequest.CUIL) ? string.Empty : userRequest.CUIL;
+                newUser.CUIT = string.IsNullOrEmpty(userRequest.CUIT) ? string.Empty : userRequest.CUIT;
+
                 var address = _mapper.Map<Address>(userRequest.Address);
                 await _addressService.Add(address);
                 newUser.Address = address;
-                newUser.RegistrationDate = DateTime.UtcNow.ToArgentinaTime();
-                newUser.RegisteredById = userRequest.RegisteredById;
 
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)

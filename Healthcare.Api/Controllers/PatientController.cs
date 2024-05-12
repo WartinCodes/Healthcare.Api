@@ -111,18 +111,18 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI/Email ya existe.");
                 }
 
-                string fileName = String.Empty;
-                var newUser = _mapper.Map<User>(userRequest);
-                newUser.PasswordHash = newUser.UserName;
-                newUser.Photo = fileName;
+                User newUser = _mapper.Map<User>(userRequest);
+                newUser.PasswordHash = userRequest.UserName;
+                newUser.Photo = string.Empty;
                 DateTime birthDate = DateTime.SpecifyKind(userRequest.BirthDate, DateTimeKind.Utc).ToArgentinaTime();
                 newUser.BirthDate = birthDate;
+                newUser.RegistrationDate = DateTime.UtcNow.ToArgentinaTime();
+                newUser.CUIL = string.IsNullOrEmpty(userRequest.CUIL) ? string.Empty : userRequest.CUIL;
+                newUser.CUIT = string.IsNullOrEmpty(userRequest.CUIT) ? string.Empty : userRequest.CUIT;
 
                 var address = _mapper.Map<Address>(userRequest.Address);
                 await _addressService.Add(address);
                 newUser.Address = address;
-                newUser.RegistrationDate = DateTime.UtcNow.ToArgentinaTime();
-                newUser.RegisteredById = userRequest.RegisteredById;
 
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
@@ -132,8 +132,10 @@ namespace Healthcare.Api.Controllers
                     var patient = new Patient
                     {
                         UserId = newUser.Id,
-                        CUIL = String.Empty,
-                        HealthPlans = null,
+                        Died = string.IsNullOrEmpty(userRequest.Died) ? string.Empty : userRequest.CUIT,
+                        AffiliationNumber = string.IsNullOrEmpty(userRequest.AffiliationNumber) ? string.Empty : userRequest.AffiliationNumber,
+                        Observations = string.IsNullOrEmpty(userRequest.Observations) ? string.Empty : userRequest.Observations,
+                        HealthPlans = null
                     };
 
                     await _patientService.Add(patient);
