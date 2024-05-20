@@ -179,7 +179,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
-        public async Task<IActionResult> Put(int userId, [FromBody] PatientRequestEdit userRequest)
+        public async Task<IActionResult> Put(int userId, [FromBody] PatientRequest userRequest)
         {
             try
             {
@@ -195,7 +195,6 @@ namespace Healthcare.Api.Controllers
                     return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
                 }
 
-                // validacion de si user/document no esten asociadas a otro usuario.
                 var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
                 var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
                 if (existEmail != null && patient.UserId != existEmail.Id)
