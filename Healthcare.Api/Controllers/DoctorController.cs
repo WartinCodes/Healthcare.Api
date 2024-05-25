@@ -54,27 +54,10 @@ namespace Healthcare.Api.Controllers
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<DoctorResponse>>> Get()
         {
-            var doctors = (await _doctorService.GetAsync())
-                .Select(x => new DoctorResponse()
-                {
-                    Id = x.Id,
-                    UserId = x.UserId,
-                    FirstName = x.User.FirstName,
-                    LastName = x.User.LastName,
-                    Matricula = x.Matricula,
-                    DNI = x.User.UserName,
-                    Address = _mapper.Map<AddressResponse>(x.User.Address),
-                    Specialities = _mapper.Map<ICollection<SpecialityResponse>>(x.Specialities),
-                    HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(x.HealthInsurances),
-                    Email = x.User.Email,
-                    PhoneNumber = x.User.PhoneNumber,
-                    Photo = x.User.Photo,
-                    RegisteredById = x.User.RegisteredById,
-                    RegistrationDate = x.User.RegistrationDate
-                })
-                .OrderBy(x => x.LastName)
+            var doctorsEntities = (await _doctorService.GetAsync())
+                .OrderBy(x => x.User.LastName)
                 .AsEnumerable();
-
+            var doctors = _mapper.Map<IEnumerable<DoctorResponse>>(doctorsEntities);
             return Ok(doctors);
         }
 
@@ -87,25 +70,7 @@ namespace Healthcare.Api.Controllers
                 return NotFound($"El doctor con el ID usuario {userId} no existe.");
             }
 
-            var doctor = new DoctorResponse()
-            {
-                Id = doctorEntity.Id,
-                UserId = doctorEntity.UserId,
-                FirstName = doctorEntity.User.FirstName,
-                LastName = doctorEntity.User.LastName,
-                Matricula = doctorEntity.Matricula,
-                DNI = doctorEntity.User.UserName,
-                BirthDate = doctorEntity.User.BirthDate,
-                Address = _mapper.Map<AddressResponse>(doctorEntity.User.Address),
-                Specialities = _mapper.Map<ICollection<SpecialityResponse>>(doctorEntity.Specialities),
-                HealthInsurances = _mapper.Map<ICollection<HealthInsuranceResponse>>(doctorEntity.HealthInsurances),
-                Email = doctorEntity.User.Email,
-                PhoneNumber = doctorEntity.User.PhoneNumber,
-                Photo = doctorEntity.User.Photo,        
-                RegisteredById = doctorEntity.User.RegisteredById,
-                RegistrationDate = doctorEntity.User.RegistrationDate
-            };
-
+            var doctor = _mapper.Map<DoctorResponse>(doctorEntity);
             return Ok(doctor);
         }
 

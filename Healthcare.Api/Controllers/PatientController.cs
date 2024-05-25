@@ -23,7 +23,6 @@ namespace Healthcare.Api.Controllers
         private readonly IAddressService _addressService;
         private readonly IHealthPlanService _healthPlanService;
         private readonly IPatientHealthPlanService _patientHealthPlanService;
-        private readonly IFileService _fileService;
 
         public PatientController(
             UserManager<User> userManager,
@@ -40,32 +39,16 @@ namespace Healthcare.Api.Controllers
             _addressService = addressService;
             _healthPlanService = healthPlanService;
             _patientHealthPlanService = patientHealthPlanService;
-            _fileService = fileService;
         }
 
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<PatientResponse>>> Get()
         {
-            var patients = (await _patientService.GetAsync())
-                .Select(x => new PatientResponse()
-                {
-                    Id = x.Id,
-                    UserId = x.UserId,
-                    FirstName = x.User.FirstName,
-                    LastName = x.User.LastName,
-                    DNI = x.User.UserName,
-                    Address = _mapper.Map<AddressResponse>(x.User.Address),
-                    HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(x.HealthPlans),
-                    BirthDate = x.User.BirthDate,
-                    Email = x.User.Email,
-                    Photo = x.User.Photo,
-                    PhoneNumber = x.User.PhoneNumber,
-                    RegisteredById = x.User.RegisteredById,
-                    RegistrationDate = x.User.RegistrationDate
-                })
-                .OrderBy(x => x.LastName)
+            var patientsEntities = (await _patientService.GetAsync())
+                .OrderBy(x => x.User.LastName)
                 .AsEnumerable();
-            
+
+            var patients = _mapper.Map<IEnumerable<PatientResponse>>(patientsEntities);
             return Ok(patients);
         }
 
@@ -73,29 +56,11 @@ namespace Healthcare.Api.Controllers
         public async Task<ActionResult<PatientResponse>> Get([FromRoute] int userId)
         {
             var patientEntity = await _patientService.GetPatientByUserIdAsync(userId);
-
             if (patientEntity == null)
             {
                 return NotFound($"El paciente con el ID usuario {userId} no existe.");
             }
-
-            var patient = new PatientResponse()
-            {
-                Id = patientEntity.Id,
-                UserId = patientEntity.UserId,
-                FirstName = patientEntity.User.FirstName,
-                LastName = patientEntity.User.LastName,
-                DNI = patientEntity.User.UserName,
-                Address = _mapper.Map<AddressResponse>(patientEntity.User.Address),
-                HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(patientEntity.HealthPlans),
-                BirthDate = patientEntity.User.BirthDate,
-                Email = patientEntity.User.Email,
-                Photo = patientEntity.User.Photo,
-                PhoneNumber = patientEntity.User.PhoneNumber,
-                RegisteredById = patientEntity.User.RegisteredById,
-                RegistrationDate = patientEntity.User.RegistrationDate
-            };
-
+            var patient = _mapper.Map<PatientResponse>(patientEntity);
             return Ok(patient);
         }
 
@@ -151,7 +116,6 @@ namespace Healthcare.Api.Controllers
                         var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
                         await _patientHealthPlanService.Add(patientHealthPlan);
                     }
-
                     //if (!String.IsNullOrEmpty(fileName))
                     //{
                     //    using (MemoryStream memoryStream = new MemoryStream())
@@ -164,7 +128,6 @@ namespace Healthcare.Api.Controllers
                     //        }
                     //    }
                     //}
-                    
                     return Ok("Paciente creado exitosamente.");
                 }
                 else
