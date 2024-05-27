@@ -11,19 +11,19 @@ namespace Healthcare.Api.Controllers
     [Route("api/[controller]")]
     public class CountryController : ControllerBase
     {
-        private readonly ICountryService _CountryService;
+        private readonly ICountryService _countryService;
         private readonly IMapper _mapper;
 
         public CountryController(ICountryService CountryService, IMapper mapper)
         {
-            _CountryService = CountryService;
+            _countryService = CountryService;
             _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CountryResponse>>> Get()
         {
-            var countries = await _CountryService.GetAsync();
+            var countries = await _countryService.GetAsync();
 
             return Ok(_mapper.Map<IEnumerable<CountryResponse>>(countries));
         }
