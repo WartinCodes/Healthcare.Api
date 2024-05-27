@@ -17,6 +17,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
         IStateRepository StateRepository { get; }
         IPatientRepository PatientRepository { get; }
         IPatientHealthPlanRepository PatientHealthPlanRepository { get; }
+        IPatientHistoryRepository PatientHistoryRepository { get; }
         IStudyRepository StudyRepository { get; }
         IStudyTypeRepository StudyTypeRepository { get; }
         ISupportRepository SupportRepository { get; }

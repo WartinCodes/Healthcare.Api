@@ -23,7 +23,6 @@ namespace Healthcare.Api.Controllers
         private readonly IAddressService _addressService;
         private readonly IHealthPlanService _healthPlanService;
         private readonly IPatientHealthPlanService _patientHealthPlanService;
-        private readonly IFileService _fileService;
 
         public PatientController(
             UserManager<User> userManager,
@@ -40,32 +39,16 @@ namespace Healthcare.Api.Controllers
             _addressService = addressService;
             _healthPlanService = healthPlanService;
             _patientHealthPlanService = patientHealthPlanService;
-            _fileService = fileService;
         }
 
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<PatientResponse>>> Get()
         {
-            var patients = (await _patientService.GetAsync())
-                .Select(x => new PatientResponse()
-                {
-                    Id = x.Id,
-                    UserId = x.UserId,
-                    FirstName = x.User.FirstName,
-                    LastName = x.User.LastName,
-                    DNI = x.User.UserName,
-                    Address = _mapper.Map<AddressResponse>(x.User.Address),
-                    HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(x.HealthPlans),
-                    BirthDate = x.User.BirthDate,
-                    Email = x.User.Email,
-                    Photo = x.User.Photo,
-                    PhoneNumber = x.User.PhoneNumber,
-                    RegisteredById = x.User.RegisteredById,
-                    RegistrationDate = x.User.RegistrationDate
-                })
-                .OrderBy(x => x.LastName)
+            var patientsEntities = (await _patientService.GetAsync())
+                .OrderBy(x => x.User.LastName)
                 .AsEnumerable();
-            
+
+            var patients = _mapper.Map<IEnumerable<PatientResponse>>(patientsEntities);
             return Ok(patients);
         }
 
@@ -73,29 +56,11 @@ namespace Healthcare.Api.Controllers
         public async Task<ActionResult<PatientResponse>> Get([FromRoute] int userId)
         {
             var patientEntity = await _patientService.GetPatientByUserIdAsync(userId);
-
             if (patientEntity == null)
             {
                 return NotFound($"El paciente con el ID usuario {userId} no existe.");
             }
-
-            var patient = new PatientResponse()
-            {
-                Id = patientEntity.Id,
-                UserId = patientEntity.UserId,
-                FirstName = patientEntity.User.FirstName,
-                LastName = patientEntity.User.LastName,
-                DNI = patientEntity.User.UserName,
-                Address = _mapper.Map<AddressResponse>(patientEntity.User.Address),
-                HealthPlans = _mapper.Map<ICollection<HealthPlanResponse>>(patientEntity.HealthPlans),
-                BirthDate = patientEntity.User.BirthDate,
-                Email = patientEntity.User.Email,
-                Photo = patientEntity.User.Photo,
-                PhoneNumber = patientEntity.User.PhoneNumber,
-                RegisteredById = patientEntity.User.RegisteredById,
-                RegistrationDate = patientEntity.User.RegistrationDate
-            };
-
+            var patient = _mapper.Map<PatientResponse>(patientEntity);
             return Ok(patient);
         }
 
@@ -111,18 +76,18 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI/Email ya existe.");
                 }
 
-                string fileName = String.Empty;
-                var newUser = _mapper.Map<User>(userRequest);
-                newUser.PasswordHash = newUser.UserName;
-                newUser.Photo = fileName;
+                User newUser = _mapper.Map<User>(userRequest);
+                newUser.PasswordHash = userRequest.UserName;
+                newUser.Photo = string.Empty;
                 DateTime birthDate = DateTime.SpecifyKind(userRequest.BirthDate, DateTimeKind.Utc).ToArgentinaTime();
                 newUser.BirthDate = birthDate;
+                newUser.RegistrationDate = DateTime.UtcNow.ToArgentinaTime();
+                newUser.CUIL = string.IsNullOrEmpty(userRequest.CUIL) ? string.Empty : userRequest.CUIL;
+                newUser.CUIT = string.IsNullOrEmpty(userRequest.CUIT) ? string.Empty : userRequest.CUIT;
 
                 var address = _mapper.Map<Address>(userRequest.Address);
                 await _addressService.Add(address);
                 newUser.Address = address;
-                newUser.RegistrationDate = DateTime.UtcNow.ToArgentinaTime();
-                newUser.RegisteredById = userRequest.RegisteredById;
 
                 var result = await _userManager.CreateAsync(newUser, newUser.PasswordHash);
                 if (result.Succeeded)
@@ -132,8 +97,10 @@ namespace Healthcare.Api.Controllers
                     var patient = new Patient
                     {
                         UserId = newUser.Id,
-                        CUIL = String.Empty,
-                        HealthPlans = null,
+                        Died = string.IsNullOrEmpty(userRequest.Died) ? string.Empty : userRequest.CUIT,
+                        AffiliationNumber = string.IsNullOrEmpty(userRequest.AffiliationNumber) ? string.Empty : userRequest.AffiliationNumber,
+                        Observations = string.IsNullOrEmpty(userRequest.Observations) ? string.Empty : userRequest.Observations,
+                        HealthPlans = null
                     };
 
                     await _patientService.Add(patient);
@@ -149,7 +116,6 @@ namespace Healthcare.Api.Controllers
                         var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
                         await _patientHealthPlanService.Add(patientHealthPlan);
                     }
-
                     //if (!String.IsNullOrEmpty(fileName))
                     //{
                     //    using (MemoryStream memoryStream = new MemoryStream())
@@ -162,7 +128,6 @@ namespace Healthcare.Api.Controllers
                     //        }
                     //    }
                     //}
-                    
                     return Ok("Paciente creado exitosamente.");
                 }
                 else
@@ -177,7 +142,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
-        public async Task<IActionResult> Put(int userId, [FromBody] PatientRequestEdit userRequest)
+        public async Task<IActionResult> Put(int userId, [FromBody] PatientRequest userRequest)
         {
             try
             {
@@ -193,7 +158,6 @@ namespace Healthcare.Api.Controllers
                     return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
                 }
 
-                // validacion de si user/document no esten asociadas a otro usuario.
                 var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
                 var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
                 if (existEmail != null && patient.UserId != existEmail.Id)

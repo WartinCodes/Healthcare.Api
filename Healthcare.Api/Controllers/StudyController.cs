@@ -267,5 +267,25 @@ namespace Healthcare.Api.Controllers
             }
             return laboratoryDetail;
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var study = await _studyService.GetStudyByIdAsync(id);
+                if (study == null)
+                {
+                    return NotFound("Estudio no encontrado.");
+                }
+
+                _studyService.Remove(study);
+                return Ok("Estudio eliminado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while processing your request: {ex}");
+            }
+        }
     }
 }

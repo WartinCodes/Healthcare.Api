@@ -3,6 +3,7 @@ using System;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Healthcare.Api.Repository.Migrations
 {
     [DbContext(typeof(HealthcareDbContext))]
-    partial class HealthcareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240512152019_NewUserPatientColumns")]
+    partial class NewUserPatientColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -382,53 +384,6 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsUnique();
 
                     b.ToTable("PatientHealthPlan", "Healthcare");
-                });
-
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.PatientHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Diagnosis")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("DoctorId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Observation")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("PatientId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Severity")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DoctorId");
-
-                    b.HasIndex("PatientId");
-
-                    b.ToTable("PatientHistory", "Healthcare");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Role", b =>
@@ -915,25 +870,6 @@ namespace Healthcare.Api.Repository.Migrations
                         .IsRequired();
 
                     b.Navigation("HealthPlan");
-
-                    b.Navigation("Patient");
-                });
-
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.PatientHistory", b =>
-                {
-                    b.HasOne("Healthcare.Api.Core.Entities.Doctor", "Doctor")
-                        .WithMany()
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Healthcare.Api.Core.Entities.Patient", "Patient")
-                        .WithMany()
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Doctor");
 
                     b.Navigation("Patient");
                 });
