@@ -20,6 +20,9 @@ namespace Helthcare.Api.Mappers
             CreateMap<Country, CountryResponse>();
             CreateMap<State, StateResponse>();
             CreateMap<City, CityResponse>();
+            CreateMap<PatientHistory, PatientHistoryResponse>();
+                //.ForMember(dest => dest.Doctor, opt => opt.MapFrom(src => src.Doctor.User.FirstName.Concat(src.Doctor.User.LastName)));
+
             CreateMap<Study, StudyResponse>().ReverseMap();
             CreateMap<StudyType, StudyTypeResponse>().ReverseMap();
             CreateMap<HealthInsurance, HealthInsuranceByHealthPlanResponse>().ReverseMap();
@@ -86,7 +89,8 @@ namespace Helthcare.Api.Mappers
             CreateMap<StudyType, StudyTypeRequest>().ReverseMap();
             CreateMap<LaboratoryDetail, LaboratoryDetailRequest>().ReverseMap();
             CreateMap<Support, SupportRequest>().ReverseMap();
-           
+            CreateMap<PatientHistory, PatientHistoryRequest>().ReverseMap();
+
 
             //CreateMap<HealthPlanRequest, HealthPlan>()
             //    .ForMember(dest => dest.HealthInsurance, opt => opt.MapFrom(src => src.HealthInsurance));

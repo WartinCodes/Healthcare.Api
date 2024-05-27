@@ -26,7 +26,11 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<IEnumerable<PatientHistory>> GetPatientHistoryByUserIdAsync(int userId)
         {
-            return await _context.PatientHistory.Where(x => x.Patient.UserId == userId).ToListAsync();
+            return await _context.PatientHistory
+                .Include(x => x.Doctor)
+                .ThenInclude(x => x.User)
+                .Where(x => x.Patient.UserId == userId)
+                .ToListAsync();
         }
 
         public void Remove(PatientHistory entity)
