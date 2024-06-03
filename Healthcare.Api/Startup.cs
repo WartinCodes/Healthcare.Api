@@ -53,7 +53,7 @@ namespace Helthcare.Api
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.Lockout.MaxFailedAccessAttempts = 5;
-                options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = false;
             });
 
             services.SetupSwagger();

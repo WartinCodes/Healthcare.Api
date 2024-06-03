@@ -4,6 +4,7 @@ namespace Healthcare.Api.Core.Entities
 {
     public class User : IdentityUser<int>
     {
+        public override string? Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime BirthDate { get; set; }
