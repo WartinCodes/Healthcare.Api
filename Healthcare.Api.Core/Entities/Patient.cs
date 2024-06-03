@@ -20,6 +20,5 @@
         public string Observations { get; set; }
         public string Died { get; set; }
         public ICollection<HealthPlan> HealthPlans { get; set; }
-        public ICollection<Study> Studies { get; set; }
     }
 }

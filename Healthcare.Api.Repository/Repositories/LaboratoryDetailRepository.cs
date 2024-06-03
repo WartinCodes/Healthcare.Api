@@ -43,8 +43,8 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.LaboratoryDetail
                 .Include(x => x.Study)
-                .ThenInclude(x => x.Patient)
-                .Where(x => x.Study.Patient.UserId == userId)
+                .ThenInclude(x => x.User)
+                .Where(x => x.Study.User.Id == userId)
                 .ToListAsync();
         }
     }

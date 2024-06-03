@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Identity;
 
 namespace Healthcare.Api.Controllers
 {
@@ -27,6 +28,7 @@ namespace Healthcare.Api.Controllers
         private readonly IEmailService _emailService;
         private readonly ILaboratoryDetailService _laboratoryDetailService;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
 
         public StudyController(
             IFileService fileService,
@@ -35,7 +37,8 @@ namespace Healthcare.Api.Controllers
             IStudyTypeService studyTypeService,
             IEmailService emailService,
             IMapper mapper,
-            ILaboratoryDetailService laboratoryDetailService)
+            ILaboratoryDetailService laboratoryDetailService,
+            UserManager<User> userManager)
         {
             _fileService = fileService;
             _patientService = patientService;
@@ -44,6 +47,7 @@ namespace Healthcare.Api.Controllers
             _emailService = emailService;
             _mapper = mapper;
             _laboratoryDetailService = laboratoryDetailService;
+            _userManager = userManager;
         }
 
         [HttpGet("byPatient/{userId}")]
@@ -82,10 +86,10 @@ namespace Healthcare.Api.Controllers
 
             try
             {
-                var patient = await _patientService.GetPatientByUserIdAsync(Convert.ToInt32(study.UserId));
-                if (patient == null)
+                var user = await _userManager.GetUserById(Convert.ToInt32(study.UserId));
+                if (user == null)
                 {
-                    return NotFound($"Paciente no encontrado.");
+                    return NotFound($"Usuario no encontrado.");
                 }
 
                 var studyType = await _studyTypeService.GetStudyTypeByIdAsync(study.StudyTypeId);
@@ -94,12 +98,12 @@ namespace Healthcare.Api.Controllers
                     return NotFound($"Tipo de estudio no encontrado.");
                 }
 
-                string fileName = _studyService.GenerateFileName(patient, studyType, study.Date);
+                string fileName = _studyService.GenerateFileName(user, studyType, study.Date);
 
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     study.StudyFile.CopyTo(memoryStream);
-                    var pdfResult = await _fileService.InsertStudyAsync(memoryStream, patient.User.UserName, fileName);
+                    var pdfResult = await _fileService.InsertStudyAsync(memoryStream, user.UserName, fileName);
                     if (pdfResult != HttpStatusCode.OK)
                     {
                         return StatusCode((int)pdfResult, "Error al cargar el archivo PDF.");
@@ -112,7 +116,7 @@ namespace Healthcare.Api.Controllers
                     LocationS3 = fileName,
                     Date = date,
                     Note = study.Note,
-                    PatientId = patient.Id,
+                    UserId = user.Id,
                     StudyTypeId = study.StudyTypeId,
                 };
 
@@ -146,7 +150,7 @@ namespace Healthcare.Api.Controllers
                         await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
                     }
                 }
-                await _emailService.SendEmailForNewStudyAsync(patient.User.Email, $"{patient.User.FirstName} {patient.User.LastName}");
+                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}");
 
                 return Ok(newStudy);
             }

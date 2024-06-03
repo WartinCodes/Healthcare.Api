@@ -19,9 +19,9 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                 .WithMany(st => st.Studies)
                 .HasForeignKey(s => s.StudyTypeId);
 
-            builder.HasOne(s => s.Patient)
+            builder.HasOne(s => s.User)
                 .WithMany(s => s.Studies)
-                .HasForeignKey(s => s.PatientId)
+                .HasForeignKey(s => s.UserId)
                 .IsRequired();
         }
     }
