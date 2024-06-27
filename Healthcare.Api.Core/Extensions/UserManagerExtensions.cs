@@ -20,5 +20,17 @@ namespace Healthcare.Api.Core.Extensions
                 .ThenInclude(x => x.Country)
                 .SingleOrDefaultAsync(x => x.Id == userId);
         }
+
+
+        public static async Task<List<int>> GetUsersRegisteredInLastWeek(this UserManager<User> um)
+        {
+            var oneWeekAgo = DateTime.UtcNow.AddDays(-7);
+            var userIds = await um.Users
+                                  .Where(x => x.RegistrationDate >= oneWeekAgo)
+                                  .Select(x => x.Id)
+                                  .ToListAsync();
+
+            return userIds;
+        }
     }
 }

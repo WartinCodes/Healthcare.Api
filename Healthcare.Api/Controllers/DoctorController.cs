@@ -61,6 +61,18 @@ namespace Healthcare.Api.Controllers
             return Ok(doctors);
         }
 
+        [HttpGet("lastDoctors")]
+        public async Task<ActionResult<int>> GetLastPatient()
+        {
+            var latestUsers = await UserManagerExtensions.GetUsersRegisteredInLastWeek(_userManager);
+            var countLatestDoctors = (await _doctorService.GetAsync())
+                .Where(x => latestUsers.Contains(x.UserId))
+                .ToList()
+                .Count();
+
+            return Ok(countLatestDoctors);
+        }
+
         [HttpGet("{userId}")]
         public async Task<ActionResult<DoctorResponse>> Get([FromRoute] int userId)
         {
