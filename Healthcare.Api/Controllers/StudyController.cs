@@ -150,6 +150,7 @@ namespace Healthcare.Api.Controllers
                         await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
                     }
                 }
+                
                 await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}");
 
                 return Ok(newStudy);

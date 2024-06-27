@@ -69,7 +69,11 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(userRequest.Email);
+                User user = new User();
+                if (!string.IsNullOrEmpty(userRequest.Email))
+                {
+                    user = await _userManager.FindByEmailAsync(userRequest.Email);
+                }
                 var userDocument = await _userManager.FindByNameAsync(userRequest.UserName);
                 if ((user != null && !String.IsNullOrEmpty(user.Email)) || userDocument != null)
                 {
