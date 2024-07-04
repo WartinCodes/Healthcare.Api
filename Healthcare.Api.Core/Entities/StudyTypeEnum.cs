@@ -1,9 +1,8 @@
 ﻿namespace Healthcare.Api.Core.Entities
 {
-    public static class StudyTypeEnum
+    public enum StudyTypeEnum
     {
-        public const String Radiografia = "Radiografía";
-        public const String Ecografía = "Ecografía";
-        public const String Laboratorio = "Laboratorio";
+        Laboratorio = 1,
+        Ecografia = 2
     }
 }

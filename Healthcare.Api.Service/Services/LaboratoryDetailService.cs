@@ -33,6 +33,11 @@ namespace Healthcare.Api.Service.Services
             return _laboratoryDetailsRepository.GetAsync();
         }
 
+        public async Task<LaboratoryDetail> GetLaboratoriesDetailsByStudyIdAsync(int studyId)
+        {
+            return await _laboratoryDetailsRepository.GetLaboratoriesByStudyId(studyId);
+        }
+
         public async Task<IEnumerable<LaboratoryDetail>> GetLaboratoriesDetailsByUserIdAsync(int userId)
         {
             return await _laboratoryDetailsRepository.GetLaboratoriesByUserId(userId);

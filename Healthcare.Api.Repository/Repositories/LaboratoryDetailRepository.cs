@@ -47,5 +47,17 @@ namespace Healthcare.Api.Repository.Repositories
                 .Where(x => x.Study.User.Id == userId)
                 .ToListAsync();
         }
+
+        public async Task<LaboratoryDetail> GetLaboratoriesByStudyId(int studyId)
+        {
+            var laboratoryDetail = await _context.LaboratoryDetail.SingleOrDefaultAsync(x => x.IdStudy == studyId);
+
+            if (laboratoryDetail == null)
+            {
+                return new LaboratoryDetail();
+            }
+
+            return laboratoryDetail;
+        }
     }
 }

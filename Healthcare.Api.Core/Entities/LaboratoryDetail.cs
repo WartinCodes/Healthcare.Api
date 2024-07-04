@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
         public int IdStudy { get; set; }
-        public virtual Study Study { get; set; }
+        public Study Study { get; set; }
         public string GlobulosRojos { get; set; }
         public string GlobulosBlancos { get; set; }
         public string Hemoglobina { get; set; }

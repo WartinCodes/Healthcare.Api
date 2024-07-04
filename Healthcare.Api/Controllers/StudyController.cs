@@ -76,6 +76,38 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<LaboratoryDetailResponse>>(laboratoriesDetail));
         }
 
+        [HttpGet("all")]
+        public async Task<ActionResult<int>> GetAllStudies()
+        {
+            var countStudies = (await _studyService.GetAsync()).Count();
+            return Ok(countStudies);
+        }
+
+        [HttpGet("all/laboratories")]
+        public async Task<ActionResult<int>> GetLaboratories()
+        {
+            var countLaboratories = (await _studyService.GetAsync())
+                .Where(x => x.StudyTypeId == (int)StudyTypeEnum.Laboratorio)
+                .Count();
+            return Ok(countLaboratories);
+        }
+
+        [HttpGet("all/ecografia")]
+        public async Task<ActionResult<int>> GetEcografias()
+        {
+            var countEcografias = (await _studyService.GetAsync())
+                .Where(x => x.StudyTypeId == (int)StudyTypeEnum.Ecografia)
+                .Count();
+            return Ok(countEcografias);
+        }
+
+        [HttpGet("laboratoryDetails/{studyId}")]
+        public async Task<ActionResult<LaboratoryDetail>> GetLaboratoryDetails([FromRoute] int studyId)
+        {
+            var laboratoryDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudyIdAsync(studyId);
+            return Ok(laboratoryDetails);
+        }
+
         [HttpPost("upload-study")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)
         {
@@ -122,7 +154,7 @@ namespace Healthcare.Api.Controllers
 
                 await _studyService.Add(newStudy);
 
-                if (study.StudyTypeId == 1)
+                if (study.StudyTypeId == (int)StudyTypeEnum.Laboratorio)
                 {
                     var mergedLaboratoryDetails = new LaboratoryDetailRequest();
                     using (var memoryStream = new MemoryStream())
