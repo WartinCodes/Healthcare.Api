@@ -9,10 +9,18 @@ namespace Healthcare.Api.Service.Services
     {
         private readonly IPatientRepository _patientRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHealthPlanService _healthPlanService;
+        private readonly IPatientHealthPlanService _patientHealthPlanService;
 
-        public PatientService(IPatientRepository patientRepository, IUnitOfWork unitOfWork)
+        public PatientService(
+            IPatientRepository patientRepository,
+            IPatientHealthPlanService patientHealthPlanService,
+            IHealthPlanService healthPlanService,
+            IUnitOfWork unitOfWork)
         {
             _patientRepository = patientRepository;
+            _healthPlanService = healthPlanService;
+            _patientHealthPlanService = patientHealthPlanService;
             _unitOfWork = unitOfWork;
         }
 
@@ -23,9 +31,28 @@ namespace Healthcare.Api.Service.Services
             return record;
         }
 
-        public void Edit(Patient entity)
+        public async Task Edit(Patient entity)
         {
             _unitOfWork.PatientRepository.Edit(entity);
+
+            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(entity.Id);
+            foreach (var php in patientHealthPlans)
+            {
+                _patientHealthPlanService.Remove(php);
+            }
+
+            foreach (var healthPlan in entity.HealthPlans)
+            {
+                var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
+                if (healthPlanEntity == null)
+                {
+                    await Task.CompletedTask;
+                }
+
+                var patientHealthPlan = new PatientHealthPlan { PatientId = entity.Id, HealthPlanId = healthPlan.Id };
+                await _patientHealthPlanService.Add(patientHealthPlan);
+            }
+
             _unitOfWork.Save();
         }
 

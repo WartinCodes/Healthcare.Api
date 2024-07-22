@@ -190,32 +190,18 @@ namespace Healthcare.Api.Controllers
                 //{
                 //    await _fileService.DeletePhotoAsync(user.Photo);
                 //}
-                // actualizacion de Address
+
+                var patientData = _mapper.Map<Patient>(userRequest);
+                patientData.User = user;
+                patientData.Id = patient.Id;
+                patientData.HealthPlans = patientData.HealthPlans;
+                await _patientService.Edit(patientData);
+
                 var newAddress = _mapper.Map<Address>(userRequest.Address);
                 _addressService.Edit(newAddress);
 
                 _mapper.Map(userRequest, user);
                 var result = await _userManager.UpdateAsync(user);
-
-                // borrado de las obras sociales asociadas al paciente en tabla PatientHealthPlan
-                var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(patient.Id);
-                foreach (var php in patientHealthPlans)
-                {
-                    _patientHealthPlanService.Remove(php);
-                }
-
-                // agregado de las nuevas obras sociales asociadas al paciente en tabla PatientHealthPlan
-                foreach (var healthPlan in userRequest.HealthPlans)
-                {
-                    var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
-                    if (healthPlanEntity == null)
-                    {
-                        return BadRequest($"Plan con ID {healthPlan.Id} no encontrada.");
-                    }
-
-                    var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
-                    await _patientHealthPlanService.Add(patientHealthPlan);
-                }
 
                 //if (!String.IsNullOrEmpty(user.Photo))
                 //{

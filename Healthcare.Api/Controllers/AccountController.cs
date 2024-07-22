@@ -50,13 +50,13 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<UserResponse>>(users));
         }
 
-        [HttpGet("user")]
-        public async Task<ActionResult<UserResponse>> GetUserById([FromQuery] string id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<UserResponse>> GetUserById(string userId)
         {
-            var user = await UserManagerExtensions.GetUserById(_userManager, Convert.ToInt32(id));
+            var user = await UserManagerExtensions.GetUserById(_userManager, Convert.ToInt32(userId));
             if (user == null)
             {
-                return NotFound($"Usuario con ID {id} no encontrado.");
+                return NotFound($"Usuario con ID {userId} no encontrado.");
             }
             return Ok(_mapper.Map<UserResponse>(user));
         }

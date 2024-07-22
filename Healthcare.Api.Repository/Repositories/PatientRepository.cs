@@ -69,6 +69,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public void Edit(Patient entity)
         {
+            _context.Entry(entity.User).State = EntityState.Detached;
             _context.Patient.Update(entity);
         }
 
