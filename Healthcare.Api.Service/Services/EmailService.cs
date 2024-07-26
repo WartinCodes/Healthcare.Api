@@ -203,8 +203,8 @@ namespace Healthcare.Api.Service.Services
                     <div class='container'>
                         <h1>Nuevo estudio disponible en tu cuenta</h1>
                         <p>Hola {fullName},</p>
-                        <p>Nos complace informarte que se ha subido un nuevo estudio a tu cuenta. Este estudio está ahora disponible para que lo revises y accedas a su contenido.</p>
-                        <p>Para ver el estudio, inicia sesión en tu cuenta y navega hasta la sección correspondiente. Si tienes alguna pregunta o necesitas asistencia adicional, no dudes en contactarnos.</p>
+                        <p>Te informamos que se ha subido un nuevo estudio a tu cuenta.</p>
+                        <p>Para ver el estudio, podes inicia sesión en tu cuenta y navega hasta la sección correspondiente. Si tienes alguna pregunta o necesitas asistencia adicional, no dudes en contactarnos.</p>
                         <p>¡Gracias por confiar en nosotros!</p>
                         <p>Atentamente,</p>
                         <p>Incor - Centro Médico</p>
