@@ -77,28 +77,42 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<int>> GetAllStudies()
+        public async Task<ActionResult<int>> GetStudies([FromQuery] int? studyTypeId)
         {
-            var countStudies = (await _studyService.GetAsync()).Count();
+            var studies = await _studyService.GetAsync();
+            if (studyTypeId.HasValue)
+            {
+                var validStudyTypeId = await _studyTypeService.GetStudyTypeByIdAsync(studyTypeId.Value);
+                if (validStudyTypeId == null)
+                {
+                    return BadRequest();
+                }
+                studies = studies.Where(x => x.StudyTypeId == studyTypeId.Value);
+            }
+
+            var countStudies = studies.Count();
             return Ok(countStudies);
         }
 
-        [HttpGet("all/laboratories")]
-        public async Task<ActionResult<int>> GetLaboratories()
+        [HttpGet("lastStudies")]
+        public async Task<ActionResult<int>> GetLastStudies([FromQuery] int? studyTypeId)
         {
-            var countLaboratories = (await _studyService.GetAsync())
-                .Where(x => x.StudyTypeId == (int)StudyTypeEnum.Laboratorio)
-                .Count();
-            return Ok(countLaboratories);
-        }
+            var oneWeekAgo = DateTime.UtcNow.AddDays(-7);
+            var studies = (await _studyService.GetAsync())
+                .Where(x => x.Date >= oneWeekAgo)
+                .ToList();
+            if (studyTypeId.HasValue)
+            {
+                var validStudyTypeId = await _studyTypeService.GetStudyTypeByIdAsync(studyTypeId.Value);
+                if (validStudyTypeId == null)
+                {
+                    return BadRequest();
+                }
+                studies = studies.Where(x => x.StudyTypeId == studyTypeId.Value).ToList();
+            }
 
-        [HttpGet("all/ecografia")]
-        public async Task<ActionResult<int>> GetEcografias()
-        {
-            var countEcografias = (await _studyService.GetAsync())
-                .Where(x => x.StudyTypeId == (int)StudyTypeEnum.Ecografia)
-                .Count();
-            return Ok(countEcografias);
+            var countStudies = studies.Count();
+            return Ok(countStudies);
         }
 
         [HttpGet("laboratoryDetails/{studyId}")]
