@@ -18,7 +18,7 @@
         public int UserId { get; set; }
         public virtual User User { get; set; }
         public string Matricula { get; set; }
-        public ICollection<Speciality> Specialities { get; set; }
-        public ICollection<HealthInsurance> HealthInsurances { get; set; }
+        public virtual ICollection<Speciality> Specialities { get; set; }
+        public virtual ICollection<HealthInsurance> HealthInsurances { get; set; }
     }
 }

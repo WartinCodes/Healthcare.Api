@@ -207,8 +207,9 @@ namespace Healthcare.Api.Controllers
             var doctorData = _mapper.Map<Doctor>(userRequest);
             doctorData.User = user;
             doctorData.Id = doctor.Id;
-            doctorData.HealthInsurances = doctorData.HealthInsurances;
-            doctorData.Specialities = doctorData.Specialities;
+            doctorData.HealthInsurances = _mapper.Map<ICollection<HealthInsurance>>(userRequest.HealthInsurances);
+            doctorData.Specialities = _mapper.Map<ICollection<Speciality>>(userRequest.Specialities);
+
             await _doctorService.Edit(doctorData);
 
             var newAddress = _mapper.Map<Address>(userRequest.Address);

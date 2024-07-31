@@ -33,8 +33,6 @@ namespace Healthcare.Api.Service.Services
 
         public async Task Edit(Patient entity)
         {
-            _unitOfWork.PatientRepository.Edit(entity);
-
             var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(entity.Id);
             foreach (var php in patientHealthPlans)
             {
@@ -53,6 +51,7 @@ namespace Healthcare.Api.Service.Services
                 await _patientHealthPlanService.Add(patientHealthPlan);
             }
 
+            _unitOfWork.PatientRepository.Edit(entity);
             _unitOfWork.Save();
         }
 

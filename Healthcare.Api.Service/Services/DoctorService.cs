@@ -40,14 +40,12 @@ namespace Healthcare.Api.Service.Services
 
         public async Task Edit(Doctor entity)
         {
-            _unitOfWork.DoctorRepository.Edit(entity);
-
-            var doctorHealthInsurances = await _doctorHealthInsuranceService.GetHealthPlansByDoctor(entity.UserId);
+            var doctorHealthInsurances = await _doctorHealthInsuranceService.GetHealthPlansByDoctor(entity.Id);
             foreach (var php in doctorHealthInsurances)
             {
                 _doctorHealthInsuranceService.Remove(php);
             }
-
+            
             foreach (var healthInsurance in entity.HealthInsurances)
             {
                 var healthInsuranceEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthInsurance.Id);
@@ -60,7 +58,7 @@ namespace Healthcare.Api.Service.Services
                 await _doctorHealthInsuranceService.Add(doctorHealthInsurance);
             }
 
-            var doctorSpecialities = await _doctorSpecialityService.GetSpecialitiesByDoctor(entity.UserId);
+            var doctorSpecialities = await _doctorSpecialityService.GetSpecialitiesByDoctor(entity.Id);
             foreach (var ds in doctorSpecialities)
             {
                 _doctorSpecialityService.Remove(ds);
@@ -78,6 +76,7 @@ namespace Healthcare.Api.Service.Services
                 await _doctorSpecialityService.Add(doctorSpeciality);
             }
 
+            _unitOfWork.DoctorRepository.Edit(entity);
             _unitOfWork.Save();
         }
 

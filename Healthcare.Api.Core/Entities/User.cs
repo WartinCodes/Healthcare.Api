@@ -23,6 +23,6 @@ namespace Healthcare.Api.Core.Entities
         public string? RhFactor { get; set; }
         public string? MaritalStatus { get; set; }
         public string? Gender { get; set; }
-        public ICollection<Study> Studies { get; set; }
+        public virtual ICollection<Study> Studies { get; set; }
     }
 }
