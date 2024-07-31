@@ -178,19 +178,19 @@ namespace Healthcare.Api.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] DoctorRequest userRequest)
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> Put(int userId, [FromBody] DoctorRequest userRequest)
         {
-            var doctor = await _doctorService.GetDoctorByIdAsync(id);
-            if (doctor == null)
-            {
-                return NotFound($"No se encontró el doctor con el ID: {id}");
-            }
-
-            var user = await _userManager.FindByIdAsync(doctor.UserId.ToString());
+            var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
-                return NotFound($"No se encontró el usuario con el ID: {id}");
+                return NotFound($"No se encontró el usuario con el ID: {userId}");
+            }
+
+            var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
+            if (doctor == null)
+            {
+                return NotFound($"No se encontró el doctor con el ID: {userId}");
             }
 
             var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
@@ -204,57 +204,25 @@ namespace Healthcare.Api.Controllers
                 return Conflict("DNI ya existe.");
             }
 
+            var doctorData = _mapper.Map<Doctor>(userRequest);
+            doctorData.User = user;
+            doctorData.Id = doctor.Id;
+            doctorData.HealthInsurances = doctorData.HealthInsurances;
+            doctorData.Specialities = doctorData.Specialities;
+            await _doctorService.Edit(doctorData);
+
             var newAddress = _mapper.Map<Address>(userRequest.Address);
             _addressService.Edit(newAddress);
 
             _mapper.Map(userRequest, user);
             var result = await _userManager.UpdateAsync(user);
 
-            // borrado de las obras sociales asociadas al doctor en tabla DoctorHealthPlanService
-            var doctorHealthInsurances = await _doctorHealthInsuranceService.GetHealthPlansByDoctor(id);
-            foreach (var php in doctorHealthInsurances)
-            {
-                _doctorHealthInsuranceService.Remove(php);
-            }
-
-            foreach (var healthInsurance in userRequest.HealthInsurances)
-            {
-                var healthInsuranceEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthInsurance.Id);
-                if (healthInsuranceEntity == null)
-                {
-                    return BadRequest($"Obra social con ID {healthInsuranceEntity} no encontrada.");
-                }
-
-                var doctorHealthInsurance = new DoctorHealthInsurance { DoctorId = doctor.Id, HealthInsuranceId = healthInsuranceEntity.Id };
-                await _doctorHealthInsuranceService.Add(doctorHealthInsurance);
-            }
-
-            // borrado de las especialidades asociadas al doctor
-            var doctorSpecialities = await _doctorSpecialityService.GetSpecialitiesByDoctor(id);
-            foreach (var ds in doctorSpecialities)
-            {
-                _doctorSpecialityService.Remove(ds);
-            }
-
-            // asignacion de nuevas especialidades
-            foreach (var speciality in userRequest.Specialities)
-            {
-                var specialityEntity = await _specialityService.GetSpecialityByIdAsync(speciality.Id);
-                if (specialityEntity == null)
-                {
-                    return BadRequest($"Especialidad con ID {specialityEntity} no encontrada.");
-                }
-
-                var doctorSpeciality = new DoctorSpeciality { DoctorId = doctor.Id, SpecialityId = specialityEntity.Id };
-                await _doctorSpecialityService.Add(doctorSpeciality);
-            }
-
             if (!result.Succeeded)
             {
                 return BadRequest($"Error al actualizar el médico: {user.UserName}");
             }
 
-            return Ok($"Usuario con el ID {id} actualizado exitosamente");
+            return Ok($"Usuario con el ID {userId} actualizado exitosamente");
         }
 
         [HttpDelete("{userId}")]
