@@ -194,7 +194,7 @@ namespace Healthcare.Api.Controllers
                 var patientData = _mapper.Map<Patient>(userRequest);
                 patientData.User = user;
                 patientData.Id = patient.Id;
-                patientData.HealthPlans = patientData.HealthPlans;
+                patientData.HealthPlans = _mapper.Map<ICollection<HealthPlan>>(userRequest.HealthPlans);
                 await _patientService.Edit(patientData);
 
                 var newAddress = _mapper.Map<Address>(userRequest.Address);

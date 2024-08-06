@@ -23,10 +23,10 @@ namespace Healthcare.Api.Service.Services
             return record;
         }
 
-        public void Edit(PatientHealthPlan entity)
+        public async Task Edit(PatientHealthPlan entity)
         {
             _unitOfWork.PatientHealthPlanRepository.Edit(entity);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
 
         public IQueryable<PatientHealthPlan> GetAsQueryable()
@@ -44,10 +44,10 @@ namespace Healthcare.Api.Service.Services
             return await _patientHealthPlanRepository.GetHealthPlansByPatientIdAsync(patientId);
         }
 
-        public void Remove(PatientHealthPlan entity)
+        public async Task Remove(PatientHealthPlan entity)
         {
             _unitOfWork.PatientHealthPlanRepository.Remove(entity);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
     }
 }

@@ -33,10 +33,12 @@ namespace Healthcare.Api.Service.Services
 
         public async Task Edit(Patient entity)
         {
+            _unitOfWork.PatientRepository.Edit(entity);
+
             var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(entity.Id);
             foreach (var php in patientHealthPlans)
             {
-                _patientHealthPlanService.Remove(php);
+                await _patientHealthPlanService.Remove(php);
             }
 
             foreach (var healthPlan in entity.HealthPlans)
@@ -45,14 +47,14 @@ namespace Healthcare.Api.Service.Services
                 if (healthPlanEntity == null)
                 {
                     await Task.CompletedTask;
+                    continue;
                 }
 
                 var patientHealthPlan = new PatientHealthPlan { PatientId = entity.Id, HealthPlanId = healthPlan.Id };
                 await _patientHealthPlanService.Add(patientHealthPlan);
             }
 
-            _unitOfWork.PatientRepository.Edit(entity);
-            _unitOfWork.Save();
+            await _unitOfWork.SaveAsync();
         }
 
         public IQueryable<Patient> GetAsQueryable()

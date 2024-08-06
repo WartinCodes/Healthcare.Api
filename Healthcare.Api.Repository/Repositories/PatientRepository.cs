@@ -70,6 +70,14 @@ namespace Healthcare.Api.Repository.Repositories
         public void Edit(Patient entity)
         {
             _context.Entry(entity.User).State = EntityState.Detached;
+            foreach (var healthPlan in entity.HealthPlans)
+            {
+                _context.Entry(healthPlan).State = EntityState.Detached;
+                if (healthPlan.HealthInsurance != null)
+                {
+                    _context.Entry(healthPlan.HealthInsurance).State = EntityState.Detached;
+                }
+            }
             _context.Patient.Update(entity);
         }
 
