@@ -8,7 +8,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<IEnumerable<PatientHealthPlan>> GetAsync();
         Task<IEnumerable<PatientHealthPlan>> GetHealthPlansByPatient(int patientId);
         Task<PatientHealthPlan> Add(PatientHealthPlan entity);
-        Task Remove(PatientHealthPlan entity);
-        Task Edit(PatientHealthPlan entity);
+        void Remove(PatientHealthPlan entity);
+        Task Update(Patient entity);
     }
 }

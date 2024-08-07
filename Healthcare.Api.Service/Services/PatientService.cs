@@ -26,41 +26,17 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<Patient> Add(Patient entity)
         {
-            var record = await _unitOfWork.PatientRepository.AddAsync(entity);
+            var record = await _unitOfWork.PatientRepository.InsertAsync(entity);
             await _unitOfWork.SaveAsync();
             return record;
         }
 
         public async Task Edit(Patient entity)
         {
-            _unitOfWork.PatientRepository.Edit(entity);
-
-            var patientHealthPlans = await _patientHealthPlanService.GetHealthPlansByPatient(entity.Id);
-            foreach (var php in patientHealthPlans)
-            {
-                await _patientHealthPlanService.Remove(php);
-            }
-
-            foreach (var healthPlan in entity.HealthPlans)
-            {
-                var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
-                if (healthPlanEntity == null)
-                {
-                    await Task.CompletedTask;
-                    continue;
-                }
-
-                var patientHealthPlan = new PatientHealthPlan { PatientId = entity.Id, HealthPlanId = healthPlan.Id };
-                await _patientHealthPlanService.Add(patientHealthPlan);
-            }
-
-            await _unitOfWork.SaveAsync();
+            _unitOfWork.PatientRepository.Update(entity);
+            _unitOfWork.Save();
         }
 
-        public IQueryable<Patient> GetAsQueryable()
-        {
-            return _patientRepository.GetAsQueryable();
-        }
 
         public async Task<IEnumerable<Patient>> GetAsync()
         {
@@ -79,8 +55,13 @@ namespace Healthcare.Api.Service.Services
 
         public void Remove(Patient entity)
         {
-            _unitOfWork.PatientRepository.Remove(entity);
+            _unitOfWork.PatientRepository.Delete(entity);
             _unitOfWork.Save();
+        }
+
+        public IQueryable<Patient> GetAsQueryable()
+        {
+            throw new NotImplementedException();
         }
     }
 }

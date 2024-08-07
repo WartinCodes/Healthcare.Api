@@ -45,7 +45,7 @@ namespace Healthcare.Api.Controllers
         public async Task<ActionResult<IEnumerable<PatientResponse>>> Get()
         {
             var patientsEntities = (await _patientService.GetAsync())
-                .OrderBy(x => x.User.LastName)
+                //.OrderBy(x => x.User.LastName)
                 .AsEnumerable();
 
             var patients = _mapper.Map<IEnumerable<PatientResponse>>(patientsEntities);
@@ -133,18 +133,6 @@ namespace Healthcare.Api.Controllers
                         var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
                         await _patientHealthPlanService.Add(patientHealthPlan);
                     }
-                    //if (!String.IsNullOrEmpty(fileName))
-                    //{
-                    //    using (MemoryStream memoryStream = new MemoryStream())
-                    //    {
-                    //        await userRequest.Photo.CopyToAsync(memoryStream);
-                    //        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, fileName, "image/jpeg");
-                    //        if (imageResult != HttpStatusCode.OK)
-                    //        {
-                    //            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
-                    //        }
-                    //    }
-                    //}
                     return Ok("Paciente creado exitosamente.");
                 }
                 else
@@ -186,35 +174,19 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI ya existe.");
                 }
 
-                //if (!String.IsNullOrEmpty(user.Photo))
-                //{
-                //    await _fileService.DeletePhotoAsync(user.Photo);
-                //}
-
                 var patientData = _mapper.Map<Patient>(userRequest);
                 patientData.User = user;
                 patientData.Id = patient.Id;
                 patientData.HealthPlans = _mapper.Map<ICollection<HealthPlan>>(userRequest.HealthPlans);
+
                 await _patientService.Edit(patientData);
+                await _patientHealthPlanService.Update(patientData);
 
                 var newAddress = _mapper.Map<Address>(userRequest.Address);
                 _addressService.Edit(newAddress);
 
                 _mapper.Map(userRequest, user);
                 var result = await _userManager.UpdateAsync(user);
-
-                //if (!String.IsNullOrEmpty(user.Photo))
-                //{
-                //    using (MemoryStream memoryStream = new MemoryStream())
-                //    {
-                //        await userRequest.Photo.CopyToAsync(memoryStream);
-                //        var imageResult = await _fileService.InsertPhotoAsync(memoryStream, userRequest.Photo.FileName, "image/jpeg");
-                //        if (imageResult != HttpStatusCode.OK)
-                //        {
-                //            return StatusCode((int)imageResult, "Error al cargar la imagen en S3.");
-                //        }
-                //    }
-                //}
 
                 if (!result.Succeeded)
                 {

@@ -59,31 +59,5 @@ namespace Healthcare.Api.Repository.Repositories
                 .ThenInclude(x => x.HealthInsurance)
                 .FirstOrDefaultAsync();
         }
-
-        public void Remove(Patient entity)
-        {
-            _context.Entry(entity.User).State = EntityState.Detached;
-            _context.Entry(entity.User.Address).State = EntityState.Detached;
-            _context.Remove(entity);
-        }
-
-        public void Edit(Patient entity)
-        {
-            _context.Entry(entity.User).State = EntityState.Detached;
-            foreach (var healthPlan in entity.HealthPlans)
-            {
-                _context.Entry(healthPlan).State = EntityState.Detached;
-                if (healthPlan.HealthInsurance != null)
-                {
-                    _context.Entry(healthPlan.HealthInsurance).State = EntityState.Detached;
-                }
-            }
-            _context.Patient.Update(entity);
-        }
-
-        public async Task<Patient> AddAsync(Patient entity)
-        {
-            return await base.InsertAsync(entity).ConfigureAwait(false);
-        }
     }
 }

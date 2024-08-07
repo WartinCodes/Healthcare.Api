@@ -2,7 +2,7 @@
 
 namespace Healthcare.Api.Core.RepositoryInterfaces
 {
-    public interface IPatientHealthPlanRepository : IRepository<PatientHealthPlan>
+    public interface IPatientHealthPlanRepository : IBaseRepository<PatientHealthPlan>
     {
         Task<IEnumerable<PatientHealthPlan>> GetHealthPlansByPatientIdAsync(int id);
     }
