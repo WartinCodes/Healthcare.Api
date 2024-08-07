@@ -19,20 +19,6 @@ namespace Healthcare.Api.Repository.Repositories
             return _context.Patient.AsQueryable();
         }
 
-        public async Task<IEnumerable<Patient>> GetAsync()
-        {
-            return await _context.Patient
-                .Include(x => x.User)
-                .ThenInclude(x => x.Address)
-                .ThenInclude(x => x.City)
-                .ThenInclude(x => x.State)
-                .ThenInclude(x => x.Country)
-                .Include(x => x.HealthPlans)
-                .ThenInclude(x => x.HealthInsurance)
-                .AsNoTracking()
-                .ToListAsync();
-        }
-
         public async Task<Patient> GetPatientByUserIdAsync(int userId)
         {
             return await _context.Patient.Where(x => x.UserId == userId)

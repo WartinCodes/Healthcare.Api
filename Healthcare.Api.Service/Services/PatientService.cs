@@ -37,10 +37,13 @@ namespace Healthcare.Api.Service.Services
             _unitOfWork.Save();
         }
 
-
         public async Task<IEnumerable<Patient>> GetAsync()
         {
-            return await _patientRepository.GetAsync();
+            return await _patientRepository.GetAsync(
+                null,
+                null,
+                "User,User.Address,User.Address.City,User.Address.City.State,User.Address.City.State.Country,HealthPlans,HealthPlans.HealthInsurance"
+            );
         }
 
         public Task<Patient> GetPatientByUserIdAsync(int userId)

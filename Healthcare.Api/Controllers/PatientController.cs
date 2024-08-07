@@ -45,7 +45,7 @@ namespace Healthcare.Api.Controllers
         public async Task<ActionResult<IEnumerable<PatientResponse>>> Get()
         {
             var patientsEntities = (await _patientService.GetAsync())
-                //.OrderBy(x => x.User.LastName)
+                .OrderBy(x => x.User.LastName)
                 .AsEnumerable();
 
             var patients = _mapper.Map<IEnumerable<PatientResponse>>(patientsEntities);
