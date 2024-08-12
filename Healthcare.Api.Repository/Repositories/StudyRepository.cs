@@ -38,8 +38,8 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.Study
                 .Include(x => x.StudyType)
-                .Include(x => x.Patient)
-                .Where(x => x.Patient.UserId == userId)
+                .Include(x => x.User)
+                .Where(x => x.User.Id == userId)
                 .ToListAsync();
         }
 

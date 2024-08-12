@@ -8,30 +8,43 @@ namespace Healthcare.Api.Service.Services
     public class PatientHealthPlanService : IPatientHealthPlanService
     {
         private readonly IPatientHealthPlanRepository _patientHealthPlanRepository;
+        private readonly IHealthPlanService _healthPlanService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public PatientHealthPlanService(IPatientHealthPlanRepository patientHealthPlanRepository, IUnitOfWork unitOfWork)
+        public PatientHealthPlanService(IPatientHealthPlanRepository patientHealthPlanRepository, IHealthPlanService healthPlanService, IUnitOfWork unitOfWork)
         {
             _patientHealthPlanRepository = patientHealthPlanRepository;
             _unitOfWork = unitOfWork;
+            _healthPlanService = healthPlanService;
         }
 
         public async Task<PatientHealthPlan> Add(PatientHealthPlan entity)
         {
-            var record = await _unitOfWork.PatientHealthPlanRepository.AddAsync(entity);
-            await _unitOfWork.SaveAsync();
-            return record;
+            return await _unitOfWork.PatientHealthPlanRepository.InsertAsync(entity);
         }
 
-        public void Edit(PatientHealthPlan entity)
+        public async Task Update(Patient entity)
         {
-            _unitOfWork.PatientHealthPlanRepository.Edit(entity);
-            _unitOfWork.Save();
+            var patientHealthPlans = await GetHealthPlansByPatient(entity.Id);
+
+            foreach (var existingHealthPlan in patientHealthPlans)
+            {
+                _patientHealthPlanRepository.Delete(existingHealthPlan);
+            }
+
+            foreach (var healthPlan in entity.HealthPlans)
+            {
+                var healthPlanEntity = await _healthPlanService.GetHealthPlanByIdAsync(healthPlan.Id);
+                if (healthPlanEntity == null) continue;
+                
+                var newPatientHealthPlan = new PatientHealthPlan { PatientId = entity.Id, HealthPlanId = healthPlan.Id };
+                await _patientHealthPlanRepository.InsertAsync(newPatientHealthPlan);
+            }
         }
 
         public IQueryable<PatientHealthPlan> GetAsQueryable()
         {
-            return _patientHealthPlanRepository.GetAsQueryable();
+            throw new NotImplementedException();
         }
 
         public Task<IEnumerable<PatientHealthPlan>> GetAsync()
@@ -46,8 +59,7 @@ namespace Healthcare.Api.Service.Services
 
         public void Remove(PatientHealthPlan entity)
         {
-            _unitOfWork.PatientHealthPlanRepository.Remove(entity);
-            _unitOfWork.Save();
+            _unitOfWork.PatientHealthPlanRepository.Delete(entity);
         }
     }
 }

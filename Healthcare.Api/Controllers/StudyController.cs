@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Identity;
 
 namespace Healthcare.Api.Controllers
 {
@@ -27,6 +28,7 @@ namespace Healthcare.Api.Controllers
         private readonly IEmailService _emailService;
         private readonly ILaboratoryDetailService _laboratoryDetailService;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
 
         public StudyController(
             IFileService fileService,
@@ -35,7 +37,8 @@ namespace Healthcare.Api.Controllers
             IStudyTypeService studyTypeService,
             IEmailService emailService,
             IMapper mapper,
-            ILaboratoryDetailService laboratoryDetailService)
+            ILaboratoryDetailService laboratoryDetailService,
+            UserManager<User> userManager)
         {
             _fileService = fileService;
             _patientService = patientService;
@@ -44,20 +47,24 @@ namespace Healthcare.Api.Controllers
             _emailService = emailService;
             _mapper = mapper;
             _laboratoryDetailService = laboratoryDetailService;
+            _userManager = userManager;
         }
 
-        [HttpGet("byPatient/{userId}")]
-        public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesByPatient([FromRoute] int userId)
+        [HttpGet("byUser/{userId}")]
+        public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesByUserId([FromRoute] int userId)
         {
             var studies = await _studyService.GetStudiesByUserId(userId);
             return Ok(_mapper.Map<IEnumerable<StudyResponse>>(studies));
         }
 
         [HttpGet("getUrl/{userId}")]
-        public async Task<ActionResult<string>> GetByPatient([FromRoute] int userId, string fileName)
+        public async Task<ActionResult<string>> GetUrlByUserId([FromRoute] int userId, string fileName)
         {
-            var user = await _patientService.GetPatientByUserIdAsync(userId);
-            var studyUrl = _fileService.GetUrl(user.User.UserName, fileName);
+            var user = await _userManager.GetUserById(userId);
+            if (user == null) return NoContent();
+
+            var studyUrl = _fileService.GetUrl(user.UserName, fileName);
+
             return Ok(studyUrl);
         }
 
@@ -72,6 +79,52 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<LaboratoryDetailResponse>>(laboratoriesDetail));
         }
 
+        [HttpGet("all")]
+        public async Task<ActionResult<int>> GetStudies([FromQuery] int? studyTypeId)
+        {
+            var studies = await _studyService.GetAsync();
+            if (studyTypeId.HasValue)
+            {
+                var validStudyTypeId = await _studyTypeService.GetStudyTypeByIdAsync(studyTypeId.Value);
+                if (validStudyTypeId == null)
+                {
+                    return BadRequest();
+                }
+                studies = studies.Where(x => x.StudyTypeId == studyTypeId.Value);
+            }
+
+            var countStudies = studies.Count();
+            return Ok(countStudies);
+        }
+
+        [HttpGet("lastStudies")]
+        public async Task<ActionResult<int>> GetLastStudies([FromQuery] int? studyTypeId)
+        {
+            var oneWeekAgo = DateTime.UtcNow.AddDays(-7);
+            var studies = (await _studyService.GetAsync())
+                .Where(x => x.Date >= oneWeekAgo)
+                .ToList();
+            if (studyTypeId.HasValue)
+            {
+                var validStudyTypeId = await _studyTypeService.GetStudyTypeByIdAsync(studyTypeId.Value);
+                if (validStudyTypeId == null)
+                {
+                    return BadRequest();
+                }
+                studies = studies.Where(x => x.StudyTypeId == studyTypeId.Value).ToList();
+            }
+
+            var countStudies = studies.Count();
+            return Ok(countStudies);
+        }
+
+        [HttpGet("laboratoryDetails/{studyId}")]
+        public async Task<ActionResult<LaboratoryDetail>> GetLaboratoryDetails([FromRoute] int studyId)
+        {
+            var laboratoryDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudyIdAsync(studyId);
+            return Ok(laboratoryDetails);
+        }
+
         [HttpPost("upload-study")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)
         {
@@ -82,10 +135,10 @@ namespace Healthcare.Api.Controllers
 
             try
             {
-                var patient = await _patientService.GetPatientByUserIdAsync(Convert.ToInt32(study.UserId));
-                if (patient == null)
+                var user = await _userManager.GetUserById(Convert.ToInt32(study.UserId));
+                if (user == null)
                 {
-                    return NotFound($"Paciente no encontrado.");
+                    return NotFound($"Usuario no encontrado.");
                 }
 
                 var studyType = await _studyTypeService.GetStudyTypeByIdAsync(study.StudyTypeId);
@@ -94,12 +147,12 @@ namespace Healthcare.Api.Controllers
                     return NotFound($"Tipo de estudio no encontrado.");
                 }
 
-                string fileName = _studyService.GenerateFileName(patient, studyType, study.Date);
+                string fileName = _studyService.GenerateFileName(user, studyType, study.Date);
 
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
                     study.StudyFile.CopyTo(memoryStream);
-                    var pdfResult = await _fileService.InsertStudyAsync(memoryStream, patient.User.UserName, fileName);
+                    var pdfResult = await _fileService.InsertStudyAsync(memoryStream, user.UserName, fileName);
                     if (pdfResult != HttpStatusCode.OK)
                     {
                         return StatusCode((int)pdfResult, "Error al cargar el archivo PDF.");
@@ -112,13 +165,13 @@ namespace Healthcare.Api.Controllers
                     LocationS3 = fileName,
                     Date = date,
                     Note = study.Note,
-                    PatientId = patient.Id,
+                    UserId = user.Id,
                     StudyTypeId = study.StudyTypeId,
                 };
 
                 await _studyService.Add(newStudy);
 
-                if (study.StudyTypeId == 1)
+                if (study.StudyTypeId == (int)StudyTypeEnum.Laboratorio)
                 {
                     var mergedLaboratoryDetails = new LaboratoryDetailRequest();
                     using (var memoryStream = new MemoryStream())
@@ -146,9 +199,10 @@ namespace Healthcare.Api.Controllers
                         await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
                     }
                 }
-                //await _emailService.SendEmailForNewStudyAsync(patient.User.Email, $"{patient.User.FirstName} {patient.User.LastName}");
+                
+                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}");
 
-                return Ok("Se ha guardado correctamente el estudio.");
+                return Ok(newStudy);
             }
             catch (Exception ex)
             {
@@ -266,6 +320,26 @@ namespace Healthcare.Api.Controllers
                 }
             }
             return laboratoryDetail;
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var study = await _studyService.GetStudyByIdAsync(id);
+                if (study == null)
+                {
+                    return NotFound("Estudio no encontrado.");
+                }
+
+                _studyService.Remove(study);
+                return Ok("Estudio eliminado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while processing your request: {ex}");
+            }
         }
     }
 }

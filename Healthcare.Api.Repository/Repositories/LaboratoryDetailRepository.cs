@@ -43,9 +43,21 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.LaboratoryDetail
                 .Include(x => x.Study)
-                .ThenInclude(x => x.Patient)
-                .Where(x => x.Study.Patient.UserId == userId)
+                .ThenInclude(x => x.User)
+                .Where(x => x.Study.User.Id == userId)
                 .ToListAsync();
+        }
+
+        public async Task<LaboratoryDetail> GetLaboratoriesByStudyId(int studyId)
+        {
+            var laboratoryDetail = await _context.LaboratoryDetail.SingleOrDefaultAsync(x => x.IdStudy == studyId);
+
+            if (laboratoryDetail == null)
+            {
+                return new LaboratoryDetail();
+            }
+
+            return laboratoryDetail;
         }
     }
 }

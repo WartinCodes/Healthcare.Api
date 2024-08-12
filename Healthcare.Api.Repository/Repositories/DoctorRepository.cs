@@ -56,9 +56,6 @@ namespace Healthcare.Api.Repository.Repositories
         public void Edit(Doctor entity)
         {
             _context.Entry(entity.User).State = EntityState.Detached;
-            _context.Entry(entity.User.Address.City).State = EntityState.Detached;
-            _context.Entry(entity.User.Address.City.State).State = EntityState.Detached;
-            _context.Entry(entity.User.Address.City.State.Country).State = EntityState.Detached;
             _context.Doctor.Update(entity);
         }
 
@@ -77,6 +74,7 @@ namespace Healthcare.Api.Repository.Repositories
                 .ThenInclude(x => x.Country)
                 .Include(x => x.Specialities)
                 .Include(x => x.HealthInsurances)
+                .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
     }

@@ -171,61 +171,68 @@ namespace Healthcare.Api.Service.Services
         {
             try
             {
-                var messageBody = $@"
-                    <html>
-                    <head>
-                        <style>
-                            body {{
-                                font-family: Arial, sans-serif;
-                                background-color: #f4f4f4;
-                                margin: 0;
-                                padding: 20px;
-                            }}
-                            .container {{
-                                max-width: 600px;
-                                margin: auto;
-                                background-color: #ffffff;
-                                padding: 20px;
-                                border-radius: 5px;
-                                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                            }}
-                            h1 {{
-                                color: #333333;
-                            }}
-                            p {{
-                                color: #666666;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <div class='container'>
-                            <h1>Nuevo estudio disponible en tu cuenta</h1>
-                            <p>Estimado {fullName},</p>
-                            <p>Nos complace informarte que se ha subido un nuevo estudio a tu cuenta. Este estudio está ahora disponible para que lo revises y accedas a su contenido.</p>
-                            <p>Para ver el estudio, inicia sesión en tu cuenta y navega hasta la sección correspondiente. Si tienes alguna pregunta o necesitas asistencia adicional, no dudes en contactarnos.</p>
-                            <p>¡Gracias por confiar en nosotros!</p>
-                            <p>Atentamente,</p>
-                            <p>Incor - Centro Médico</p>
-                        </div>
-                    </body>
-                    </html>
-                ";
-
-                var mailMessage = new MailMessage
+                if (!string.IsNullOrEmpty(email))
                 {
-                    From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
-                    Subject = "Nuevo estudio disponible en tu cuenta",
-                    Body = messageBody,
-                    IsBodyHtml = true,
-                };
-                mailMessage.To.Add(email);
+                    var messageBody = $@"
+                <html>
+                <head>
+                    <style>
+                        body {{
+                            font-family: Arial, sans-serif;
+                            background-color: #f4f4f4;
+                            margin: 0;
+                            padding: 20px;
+                        }}
+                        .container {{
+                            max-width: 600px;
+                            margin: auto;
+                            background-color: #ffffff;
+                            padding: 20px;
+                            border-radius: 5px;
+                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                        }}
+                        h1 {{
+                            color: #333333;
+                        }}
+                        p {{
+                            color: #666666;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <h1>Nuevo estudio disponible en tu cuenta</h1>
+                        <p>Hola {fullName},</p>
+                        <p>Te informamos que se ha subido un nuevo estudio a tu cuenta.</p>
+                        <p>Para ver el estudio, podes inicia sesión en tu cuenta y navega hasta la sección correspondiente. Si tienes alguna pregunta o necesitas asistencia adicional, no dudes en contactarnos.</p>
+                        <p>¡Gracias por confiar en nosotros!</p>
+                        <p>Atentamente,</p>
+                        <p>Incor - Centro Médico</p>
+                    </div>
+                </body>
+                </html>
+            ";
 
-                using (var client = new SmtpClient(_smtpSettings.Server, _smtpSettings.Port))
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
+                        Subject = "Incor Centro Médico - Aviso de Estudio Disponible",
+                        Body = messageBody,
+                        IsBodyHtml = true,
+                    };
+                    mailMessage.To.Add(email);
+
+                    using (var client = new SmtpClient(_smtpSettings.Server, _smtpSettings.Port))
+                    {
+                        client.EnableSsl = _smtpSettings.UseSsl;
+                        client.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
+
+                        await client.SendMailAsync(mailMessage);
+                    }
+                }
+                else
                 {
-                    client.EnableSsl = _smtpSettings.UseSsl;
-                    client.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
-
-                    await client.SendMailAsync(mailMessage);
+                    await Task.CompletedTask;
                 }
             }
             catch (Exception ex)
@@ -234,5 +241,6 @@ namespace Healthcare.Api.Service.Services
                 throw;
             }
         }
+
     }
 }

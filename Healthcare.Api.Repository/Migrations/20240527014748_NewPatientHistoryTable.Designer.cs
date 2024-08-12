@@ -3,6 +3,7 @@ using System;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Healthcare.Api.Repository.Migrations
 {
     [DbContext(typeof(HealthcareDbContext))]
-    partial class HealthcareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240527014748_NewPatientHistoryTable")]
+    partial class NewPatientHistoryTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -512,17 +514,17 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("StudyTypeId")
+                    b.Property<int>("PatientId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("StudyTypeId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudyTypeId");
+                    b.HasIndex("PatientId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("StudyTypeId");
 
                     b.ToTable("Study", "Healthcare");
                 });
@@ -951,21 +953,21 @@ namespace Healthcare.Api.Repository.Migrations
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Study", b =>
                 {
+                    b.HasOne("Healthcare.Api.Core.Entities.Patient", "Patient")
+                        .WithMany("Studies")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Healthcare.Api.Core.Entities.StudyType", "StudyType")
                         .WithMany("Studies")
                         .HasForeignKey("StudyTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Healthcare.Api.Core.Entities.User", "User")
-                        .WithMany("Studies")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Patient");
 
                     b.Navigation("StudyType");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
@@ -1045,17 +1047,17 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("HealthPlans");
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
+                {
+                    b.Navigation("Studies");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.State", b =>
                 {
                     b.Navigation("Cities");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.StudyType", b =>
-                {
-                    b.Navigation("Studies");
-                });
-
-            modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
                 {
                     b.Navigation("Studies");
                 });

@@ -56,10 +56,10 @@ namespace Healthcare.Api.Service.Services
             _unitOfWork.Save();
         }
 
-        public string GenerateFileName(Patient patient, StudyType studyType, DateTime date)
+        public string GenerateFileName(User user, StudyType studyType, DateTime date)
         {
             var fileDate = date.ToArgentinaTime().ToString().Replace("/", "").Replace(":", "").Trim();
-            return $"{patient.User.LastName}{patient.User.FirstName}{studyType.Name}-{fileDate}.pdf";
+            return $"{user.LastName}{user.FirstName}{studyType.Name}-{fileDate}.pdf";
         }
     }
 }

@@ -5,8 +5,8 @@
         public int Id { get; set; }
         public string LocationS3 { get; set; }
 
-        public int PatientId { get; set; }
-        public Patient Patient { get; set; }
+        public int UserId { get; set; }
+        public User User { get; set; }
 
         public int StudyTypeId { get; set; }
         public StudyType StudyType { get; set; }

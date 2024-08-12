@@ -19,7 +19,6 @@ namespace Healthcare.Api.Service.Services
         public async Task<DoctorHealthInsurance> Add(DoctorHealthInsurance entity)
         {
             var record = await _unitOfWork.DoctorHealthInsuranceRepository.AddAsync(entity);
-            await _unitOfWork.SaveAsync();
             return record;
         }
 
@@ -47,7 +46,6 @@ namespace Healthcare.Api.Service.Services
         public void Remove(DoctorHealthInsurance entity)
         {
             _unitOfWork.DoctorHealthInsuranceRepository.Remove(entity);
-            _unitOfWork.Save();
         }
     }
 }

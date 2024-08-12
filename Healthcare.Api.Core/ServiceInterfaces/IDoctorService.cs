@@ -10,6 +10,6 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<Doctor> GetDoctorByIdAsync(int id);
         Task<Doctor> Add(Doctor entity);
         void Remove(Doctor entity);
-        void Edit(Doctor entity);
+        Task Edit(Doctor entity);
     }
 }

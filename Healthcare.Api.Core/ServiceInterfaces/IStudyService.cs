@@ -11,6 +11,6 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<Study> Add(Study entity);
         void Remove(Study entity);
         void Edit(Study entity);
-        string GenerateFileName(Patient patient, StudyType studyType, DateTime date);
+        string GenerateFileName(User user, StudyType studyType, DateTime date);
     }
 }

@@ -11,7 +11,9 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.ToTable("Patient").HasKey(x => x.Id);
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
 
-            builder.Property(p => p.CUIL).IsRequired(false);
+            builder.Property(p => p.AffiliationNumber).IsRequired(false);
+            builder.Property(p => p.Observations).IsRequired(false);
+            builder.Property(p => p.Died).IsRequired(false);
 
             builder.HasOne(p => p.User)
                .WithOne()
