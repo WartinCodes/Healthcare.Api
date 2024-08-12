@@ -50,18 +50,21 @@ namespace Healthcare.Api.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("byPatient/{userId}")]
-        public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesByPatient([FromRoute] int userId)
+        [HttpGet("byUser/{userId}")]
+        public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesByUserId([FromRoute] int userId)
         {
             var studies = await _studyService.GetStudiesByUserId(userId);
             return Ok(_mapper.Map<IEnumerable<StudyResponse>>(studies));
         }
 
         [HttpGet("getUrl/{userId}")]
-        public async Task<ActionResult<string>> GetByPatient([FromRoute] int userId, string fileName)
+        public async Task<ActionResult<string>> GetUrlByUserId([FromRoute] int userId, string fileName)
         {
-            var user = await _patientService.GetPatientByUserIdAsync(userId);
-            var studyUrl = _fileService.GetUrl(user.User.UserName, fileName);
+            var user = await _userManager.GetUserById(userId);
+            if (user == null) return NoContent();
+
+            var studyUrl = _fileService.GetUrl(user.UserName, fileName);
+
             return Ok(studyUrl);
         }
 
