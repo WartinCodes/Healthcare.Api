@@ -42,10 +42,10 @@ namespace Healthcare.Api.Contracts.Requests
         #endregion
 
         #region Eritrosedimentacion
-        [DisplayName("ERITROSEDIMENTACION 1° HORA")]
+        [DisplayName("Eritrosedimentacion 1° Hora")]
         public string Eritrosedimentacion1 { get; set; }
 
-        [DisplayName("ERITROSEDIMENTACION  2° HORA")]
+        [DisplayName("Eritrosedimentacion  2° Hora")]
         public string Eritrosedimentacion2 { get; set; }
         #endregion
 
@@ -83,7 +83,7 @@ namespace Healthcare.Api.Contracts.Requests
         [DisplayName("Tiempo de Protrombina")]
         public string TiempoProtrombina { get; set; }
 
-        [DisplayName("Tiempo de Tromboplastina")]
+        [DisplayName("KPTT")]
         public string TiempoTromboplastina { get; set; }
         #endregion
 
@@ -101,7 +101,7 @@ namespace Healthcare.Api.Contracts.Requests
         [DisplayName("Glutamil Transpeptidasa")]
         public string GlutamilTranspeptidasa { get; set; }
 
-        [DisplayName("5- Nucleotidasa")]
+        [DisplayName("Nucleotidasa")]
         public string Nucleotidasa { get; set; }
 
         [DisplayName("Transaminasa Glutamico Oxalac")]
@@ -140,6 +140,9 @@ namespace Healthcare.Api.Contracts.Requests
 
         public string Transferrina { get; set; }
 
+        [DisplayName("Saturación de Transferrina")]
+        public string SaturacionTransferrina { get; set; }
+
         public string Ferritina { get; set; }
 
         [DisplayName("Tiroxina Efectiva - T4 libre")]
@@ -154,11 +157,14 @@ namespace Healthcare.Api.Contracts.Requests
         [DisplayName("Antigeno Prostatico Especifico")]
         public string AntigenoProstaticoEspecifico { get; set; }
 
+        [DisplayName("Psa Libre")]
+        public string PsaLibre { get; set; }
+
+        [DisplayName("/Psa")]
+        public string RelacionPsaLibre { get; set; }
+
         [DisplayName("Vitamina D3")]
         public string VitaminaD3 { get; set; }
-
-        [DisplayName("Antigeno Prostatico Especifico Libre")]
-        public string AntigenoProstáticoEspecíficoLibre { get; set; }
 
         [DisplayName("Cociente Albumina/Creatinina en Orina")]
         public string CocienteAlbumina { get; set; }

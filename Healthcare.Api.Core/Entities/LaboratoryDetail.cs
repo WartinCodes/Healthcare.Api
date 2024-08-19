@@ -52,13 +52,19 @@ namespace Healthcare.Api.Core.Entities
         public string Pseudocolinesterasa { get; set; }
         public string Ferremia { get; set; }
         public string Transferrina { get; set; }
+        public string SaturacionTransferrina { get; set; }
         public string Ferritina { get; set; }
         public string TiroxinaEfectiva { get; set; }
         public string TiroxinaTotal { get; set; }
         public string HemoglobinaGlicosilada { get; set; }
         public string AntigenoProstaticoEspecifico { get; set; }
+        public string PsaLibre { get; set; }
+        public string RelacionPsaLibre { get; set; }
         public string VitaminaD3 { get; set; }
-        public string AntigenoProstáticoEspecíficoLibre { get; set; }
         public string CocienteAlbumina { get; set; }
+        public string TiempoCoagulacion { get; set; }
+        public string TiempoSangria { get; set; }
+        public string TiempoProtrombina { get; set; }
+        public string TiempoTromboplastina { get; set; }
     }
 }
