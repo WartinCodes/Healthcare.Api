@@ -3,39 +3,34 @@ name: Deploy to Production
 on:
   push:
     branches:
-      
-develop
+      - develop
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      
-name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      
-name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.3
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      
-name: Add server to known_hosts
-      run: |
-        ssh-keyscan 52.200.237.4 >> ~/.ssh/known_hosts
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan 52.200.237.4 >> ~/.ssh/known_hosts
 
-      
-name: Copy files via SSH
-      run: |
-        scp -r . ubuntu@52.200.237.4:/Healthcare/Healthcare.Api
+      - name: Copy files via SSH
+        run: |
+          scp -r . ubuntu@52.200.237.4:/Healthcare/Healthcare.Api
 
-      
-name: Deploy with Docker Compose
-      run: |
-        ssh ubuntu@52.200.237.4 "
-        cd /Healthcare/Healthcare.Api && \
-        docker-compose down && \
-        docker-compose build && \
-        docker-compose up -d"
+      - name: Deploy with Docker Compose
+        run: |
+          ssh ubuntu@52.200.237.4 "
+          cd /Healthcare/Healthcare.Api && \
+          docker-compose down && \
+          docker-compose build && \
+          docker-compose up -d
+          "
