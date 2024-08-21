@@ -38,7 +38,7 @@ namespace Healthcare.Api.Controllers
             _patientHealthPlanService = patientHealthPlanService;
         }
 
-        [HttpGet("health/check")]
+        [HttpGet("health/v2")]
         public async Task<IActionResult> HealthCheck()
         {
             return Ok("OK DEPLOY");
