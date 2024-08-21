@@ -24,7 +24,7 @@ jobs:
 
       - name: Copy files via SSH
         run: |
-          scp -r . ubuntu@52.200.237.4:/Healthcare/Healthcare.Api
+          scp -r ./Healthcare.Api/* ubuntu@52.200.237.4:/Healthcare/Healthcare.Api
 
       - name: Deploy with Docker Compose
         run: |
