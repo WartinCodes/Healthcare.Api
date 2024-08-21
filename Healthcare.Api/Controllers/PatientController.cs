@@ -41,6 +41,13 @@ namespace Healthcare.Api.Controllers
             _patientHealthPlanService = patientHealthPlanService;
         }
 
+        [AllowAnonymous]
+        [HttpGet("health/check")]
+        public async Task<IActionResult> HealthCheck()
+        {
+            return Ok("OK DEPLOY");
+        }
+
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<PatientResponse>>> Get()
         {
