@@ -42,14 +42,6 @@ namespace Healthcare.Api.Controllers
             _supportService = supportService;
         }
 
-        [Authorize(Roles = "Administrador")]
-        [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<UserResponse>>> Get()
-        {
-            var users = await _userManager.Users.Select(x => x).ToListAsync();
-            return Ok(_mapper.Map<IEnumerable<UserResponse>>(users));
-        }
-
         [HttpGet("{userId}")]
         public async Task<ActionResult<UserResponse>> GetUserById(string userId)
         {
