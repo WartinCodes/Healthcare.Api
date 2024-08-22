@@ -24,10 +24,6 @@ jobs:
           docker build -t wartincodes/healthcare.api:latest . && \
           docker push wartincodes/healthcare.api:latest
 
-      - name: KEY
-        run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -n -1
-
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
@@ -36,22 +32,16 @@ jobs:
       - name: Add server to known_hosts
         run: |
           ssh-keyscan 52.200.237.4 >> ~/.ssh/known_hosts
-      
-      - name: Forzar la eliminación de cualquier contenedor usando el puerto 8080
+
+      - name: Stop and remove all containers
         run: |
           ssh ubuntu@52.200.237.4 "
-          EXISTING_CONTAINER_ID=$(docker ps -q --filter publish=8080) && \
-          if [ -n "$EXISTING_CONTAINER_ID" ]; then docker stop $EXISTING_CONTAINER_ID && docker rm -f $EXISTING_CONTAINER_ID; else echo 'No se encontró ningún contenedor usando el puerto 8080'; fi
+          docker stop \$(docker ps -q) && docker rm \$(docker ps -a -q)
           "
-       
-      - name: Esperar a que el puerto 8080 esté liberado
-        run: sleep 5
 
       - name: Pull and run Docker container on server
         run: |
           ssh ubuntu@52.200.237.4 "
           docker pull wartincodes/healthcare.api:latest && \
-          CONTAINER_ID=$(docker ps -q --filter ancestor=wartincodes/healthcare.api:latest) && \
-          if [ -n "$CONTAINER_ID" ]; then docker stop $CONTAINER_ID && docker rm -f $CONTAINER_ID; fi && \
           docker run -d -p 8080:80 -e ASPNETCORE_ENVIRONMENT=Development wartincodes/healthcare.api:latest
           "
