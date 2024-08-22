@@ -26,11 +26,17 @@ jobs:
         run: |
           scp -r ./Healthcare.Api/* ubuntu@52.200.237.4:/home/ubuntu/Healthcare/Healthcare.Api/
 
-      - name: Deploy with Docker Compose
+      - name: Stop and remove any existing container
+        run: |
+          ssh ubuntu@52.200.237.4 "
+          docker stop $(docker ps -q --filter ancestor=happ) || true && \
+          docker rm $(docker ps -a -q --filter ancestor=happ) || true
+          "
+
+      - name: Build and run the Docker container
         run: |
           ssh ubuntu@52.200.237.4 "
           cd /home/ubuntu/Healthcare/Healthcare.Api/ && \
-          docker-compose down && \
-          docker-compose build && \
-          docker-compose up -d
+          docker build --no-cache -t happ . && \
+          docker run -d -p 7001:80 -e ASPNETCORE_ENVIRONMENT=Development happ
           "
