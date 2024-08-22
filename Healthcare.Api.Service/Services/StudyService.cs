@@ -58,7 +58,7 @@ namespace Healthcare.Api.Service.Services
 
         public string GenerateFileName(User user, StudyType studyType, DateTime date)
         {
-            var fileDate = date.ToArgentinaTime().ToString().Replace("/", "").Replace(":", "").Trim();
+            var fileDate = date.ToString().Replace("/", "").Replace(":", "").Trim();
             return $"{user.LastName}{user.FirstName}{studyType.Name}-{fileDate}.pdf";
         }
     }

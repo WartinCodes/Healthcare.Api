@@ -159,11 +159,10 @@ namespace Healthcare.Api.Controllers
                     }
                 }
 
-                DateTime date = study.Date.ToArgentinaTime();
-                Study newStudy = new Study() 
+                Study newStudy = new Study()
                 {
                     LocationS3 = fileName,
-                    Date = date,
+                    Date = study.Date,
                     Note = study.Note,
                     UserId = user.Id,
                     StudyTypeId = study.StudyTypeId,
@@ -200,7 +199,7 @@ namespace Healthcare.Api.Controllers
                     }
                 }
                 
-                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}");
+                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
 
                 return Ok(newStudy);
             }
