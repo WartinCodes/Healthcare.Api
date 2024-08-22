@@ -33,17 +33,11 @@ jobs:
         run: |
           ssh-keyscan 52.200.237.4 >> ~/.ssh/known_hosts
 
-      - name: Log in to Docker Hub on server
-        run: |
-          ssh ubuntu@52.200.237.4 "
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username wartincodes --password-stdin
-          "
-
       - name: Pull and run Docker container on server
         run: |
           ssh ubuntu@52.200.237.4 "
           docker pull wartincodes/healthcare.api:latest && \
           CONTAINER_ID=$(docker ps -q --filter ancestor=wartincodes/healthcare.api:latest) && \
           if [ -n \"$CONTAINER_ID\" ]; then docker stop $CONTAINER_ID && docker rm $CONTAINER_ID; fi && \
-          docker run -d -p 7001:80 -e ASPNETCORE_ENVIRONMENT=Development wartincodes/healthcare.api:latest
+          docker run -d -p 8080:80 -e ASPNETCORE_ENVIRONMENT=Development wartincodes/healthcare.api:latest
           "
