@@ -33,11 +33,11 @@ jobs:
         run: |
           ssh-keyscan 52.200.237.4 >> ~/.ssh/known_hosts
 
-      - name: Remove any container using port 8080
+      - name: Force remove any container using port 8080
         run: |
           ssh ubuntu@52.200.237.4 "
           EXISTING_CONTAINER_ID=$(docker ps -q --filter publish=8080) && \
-          if [ -n \"$EXISTING_CONTAINER_ID\" ]; then docker stop $EXISTING_CONTAINER_ID && docker rm $EXISTING_CONTAINER_ID; fi
+          if [ -n \"$EXISTING_CONTAINER_ID\" ]; then docker stop $EXISTING_CONTAINER_ID && docker rm -f $EXISTING_CONTAINER_ID; fi
           "
 
       - name: Pull and run Docker container on server
@@ -45,6 +45,6 @@ jobs:
           ssh ubuntu@52.200.237.4 "
           docker pull wartincodes/healthcare.api:latest && \
           CONTAINER_ID=$(docker ps -q --filter ancestor=wartincodes/healthcare.api:latest) && \
-          if [ -n \"$CONTAINER_ID\" ]; then docker stop $CONTAINER_ID && docker rm $CONTAINER_ID; fi && \
+          if [ -n \"$CONTAINER_ID\" ]; then docker stop $CONTAINER_ID && docker rm -f $CONTAINER_ID; fi && \
           docker run -d -p 8080:80 -e ASPNETCORE_ENVIRONMENT=Development wartincodes/healthcare.api:latest
           "
