@@ -33,6 +33,13 @@ jobs:
         run: |
           ssh-keyscan 52.200.237.4 >> ~/.ssh/known_hosts
 
+      - name: Remove any container using port 8080
+        run: |
+          ssh ubuntu@52.200.237.4 "
+          EXISTING_CONTAINER_ID=$(docker ps -q --filter publish=8080) && \
+          if [ -n \"$EXISTING_CONTAINER_ID\" ]; then docker stop $EXISTING_CONTAINER_ID && docker rm $EXISTING_CONTAINER_ID; fi
+          "
+
       - name: Pull and run Docker container on server
         run: |
           ssh ubuntu@52.200.237.4 "
