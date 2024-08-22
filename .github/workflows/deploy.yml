@@ -36,8 +36,8 @@ jobs:
       - name: Force remove any container using port 8080
         run: |
           ssh ubuntu@52.200.237.4 "
-          EXISTING_CONTAINER_ID=$(docker ps -q --filter publish=8080) && \
-          if [ -n \"$EXISTING_CONTAINER_ID\" ]; then docker stop $EXISTING_CONTAINER_ID && docker rm -f $EXISTING_CONTAINER_ID; fi
+          docker stop $(docker ps -q --filter publish=8080) || true && \
+          docker rm -f $(docker ps -aq --filter publish=8080) || true
           "
 
       - name: Pull and run Docker container on server
