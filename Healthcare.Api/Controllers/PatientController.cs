@@ -38,12 +38,6 @@ namespace Healthcare.Api.Controllers
             _patientHealthPlanService = patientHealthPlanService;
         }
 
-        [HttpGet("health/v2")]
-        public async Task<IActionResult> HealthCheck()
-        {
-            return Ok("OK DEPLOY");
-        }
-
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<PatientResponse>>> Get()
         {
