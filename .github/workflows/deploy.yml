@@ -24,6 +24,10 @@ jobs:
           docker build -t wartincodes/healthcare.api:latest . && \
           docker push wartincodes/healthcare.api:latest
 
+      - name: KEY
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | head -n -1
+
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
