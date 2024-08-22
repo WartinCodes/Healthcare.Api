@@ -21,4 +21,13 @@
     <ProjectReference Include="..\Healthcare.Api.Core\Healthcare.Api.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="HtmlTemplate\ForgotPasswordTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="HtmlTemplate\NewStudyTemplate.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

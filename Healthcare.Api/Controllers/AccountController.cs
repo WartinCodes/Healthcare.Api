@@ -42,14 +42,6 @@ namespace Healthcare.Api.Controllers
             _supportService = supportService;
         }
 
-        [Authorize(Roles = "Administrador")]
-        [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<UserResponse>>> Get()
-        {
-            var users = await _userManager.Users.Select(x => x).ToListAsync();
-            return Ok(_mapper.Map<IEnumerable<UserResponse>>(users));
-        }
-
         [HttpGet("{userId}")]
         public async Task<ActionResult<UserResponse>> GetUserById(string userId)
         {
@@ -245,10 +237,32 @@ namespace Healthcare.Api.Controllers
                 {
                     return Conflict("Las contraseñas no coinciden");
                 }
-
                 var result = await _userManager.ResetPasswordAsync(user, reset.Code, reset.Password);
 
                 return Ok("Nueva contraseña establecida con éxito.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [Authorize(Roles = RoleEnum.Secretaria)]
+        [HttpPost("reset/default/password/{userId}")]
+        public async Task<IActionResult> ResetDefaultPassword(int userId)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId.ToString());
+                if (user == null)
+                {
+                    return NotFound($"Usuario no encontrado.");
+                }
+
+                user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, user.UserName);
+                await _userManager.UpdateAsync(user);
+
+                return Ok("Se ha restablecido la contraseña por defecto.");
             }
             catch (Exception ex)
             {

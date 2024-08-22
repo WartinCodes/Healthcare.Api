@@ -1,0 +1,98 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            position: relative;
+        }
+
+        .header img {
+            max-width: 300px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 20px;
+            text-align: left;
+            color: #333;
+        }
+
+        .content h2 {
+            margin-top: 0;
+            color: #01A9A4;
+        }
+
+        .content p {
+            line-height: 1.6;
+        }
+
+        .content .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #01A9A4;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #aaa;
+        }
+    </style>
+
+</head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <img src="https://incor-ranking.s3.us-east-1.amazonaws.com/storage/images/mi-portal-logo-verde.png" alt="Logo de Incor - Mi Portal">
+            </div>
+            <div class="content">
+                <h2>Estimado/a <%FullName%>,</h2>
+                <p>Te contactactamos desde Incor Centro M&eacute;dico.</p>
+                <p>Te confirmamos que ya est&aacute;n disponibles los resultados del estudio realizado el d&iacute;a <%StudyDate%>.</p>
+                <p>Para acceder a los resultados de su estudio, por favor inicie sesi&oacute;n en nuestro portal y dir&iacute;jase a la secci&oacute;n <strong>"Mis Estudios"</strong>.</p>
+
+                <a href="https://miportal.incorcentromedico.com.ar/" class="button">Ir al Portal</a>
+
+                <p>Si tiene alguna duda o necesita asistencia, no dude en ponerse en contacto con nosotros.</p>
+            </div>
+            <div class="footer">
+                <p>Este es un mensaje automatizado. No responda a este correo electr&oacute;nico.</p>
+                <p>&copy; 2024 Incor Centro M&eacute;dico. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </body>
+</html>
