@@ -6,12 +6,23 @@ on:
       - develop
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t wartincodes/healthcare.api:latest . && \
+          docker push wartincodes/healthcare.api:latest
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
@@ -22,21 +33,11 @@ jobs:
         run: |
           ssh-keyscan 52.200.237.4 >> ~/.ssh/known_hosts
 
-      - name: Copy files via SSH
-        run: |
-          scp -r ./Healthcare.Api/* ubuntu@52.200.237.4:/home/ubuntu/Healthcare/Healthcare.Api/
-
-      - name: Stop and remove any existing container
+      - name: Pull and run Docker container on server
         run: |
           ssh ubuntu@52.200.237.4 "
-          docker stop $(docker ps -q --filter ancestor=happ) || true && \
-          docker rm $(docker ps -a -q --filter ancestor=happ) || true
-          "
-
-      - name: Build and run the Docker container
-        run: |
-          ssh ubuntu@52.200.237.4 "
-          cd /home/ubuntu/Healthcare/Healthcare.Api/ && \
-          docker build --no-cache -t happ . && \
-          docker run -d -p 7001:80 -e ASPNETCORE_ENVIRONMENT=Development happ
+          docker pull wartincodes/healthcare.api:latest && \
+          docker stop $(docker ps -q --filter ancestor=wartincodes/healthcare.api:latest) || true && \
+          docker rm $(docker ps -a -q --filter ancestor=wartincodes/healthcare.api:latest) || true && \
+          docker run -d -p 8080:80 -e ASPNETCORE_ENVIRONMENT=Development wartincodes/healthcare.api:latest
           "
