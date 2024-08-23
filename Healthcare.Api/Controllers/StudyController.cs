@@ -197,11 +197,8 @@ namespace Healthcare.Api.Controllers
                             }
                         }
                     }
-                    //if (IsAllDataLoaded(mergedLaboratoryDetails))
-                    //{
-                        mergedLaboratoryDetails.IdStudy = newStudy.Id;
-                        await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
-                    //}
+                    mergedLaboratoryDetails.IdStudy = newStudy.Id;
+                    await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
                 }
                 
                 await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
@@ -212,23 +209,6 @@ namespace Healthcare.Api.Controllers
             {
                 return StatusCode(500, $"Ocurrió un error: {ex.Message}");
             }
-        }
-
-        private bool IsAllDataLoaded(LaboratoryDetailRequest mergedLaboratoryDetails)
-        {
-            var properties = mergedLaboratoryDetails.GetType().GetProperties();
-
-            foreach (var property in properties)
-            {
-                var value = property.GetValue(mergedLaboratoryDetails)?.ToString();
-
-                if (string.IsNullOrEmpty(value))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         private void MergeLaboratoryDetails(LaboratoryDetailRequest mergedDetails, LaboratoryDetailRequest pageDetails)
