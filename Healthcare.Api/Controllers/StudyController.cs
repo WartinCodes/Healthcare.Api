@@ -159,11 +159,10 @@ namespace Healthcare.Api.Controllers
                     }
                 }
 
-                DateTime date = study.Date.ToArgentinaTime();
-                Study newStudy = new Study() 
+                Study newStudy = new Study()
                 {
                     LocationS3 = fileName,
-                    Date = date,
+                    Date = study.Date,
                     Note = study.Note,
                     UserId = user.Id,
                     StudyTypeId = study.StudyTypeId,
@@ -184,23 +183,25 @@ namespace Healthcare.Api.Controllers
                             {
                                 for (int i = 1; i <= pdfDocument.GetNumberOfPages(); i++)
                                 {
+                                    var properties = typeof(LaboratoryDetailRequest)
+                                        .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
+                                        .Where(property => property.GetValue(mergedLaboratoryDetails) == null)
+                                        .ToList();
+
                                     var page = pdfDocument.GetPage(i);
                                     string text = PdfTextExtractor.GetTextFromPage(page);
 
-                                    var pageLaboratoryDetails = ParsePdfText(text);
+                                    var pageLaboratoryDetails = ParsePdfText(text, properties);
                                     MergeLaboratoryDetails(mergedLaboratoryDetails, pageLaboratoryDetails);
                                 }
                             }
                         }
                     }
-                    if (IsAllDataLoaded(mergedLaboratoryDetails))
-                    {
-                        mergedLaboratoryDetails.IdStudy = newStudy.Id;
-                        await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
-                    }
+                    mergedLaboratoryDetails.IdStudy = newStudy.Id;
+                    await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
                 }
                 
-                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}");
+                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
 
                 return Ok(newStudy);
             }
@@ -208,23 +209,6 @@ namespace Healthcare.Api.Controllers
             {
                 return StatusCode(500, $"Ocurrió un error: {ex.Message}");
             }
-        }
-
-        private bool IsAllDataLoaded(LaboratoryDetailRequest mergedLaboratoryDetails)
-        {
-            var properties = mergedLaboratoryDetails.GetType().GetProperties();
-
-            foreach (var property in properties)
-            {
-                var value = property.GetValue(mergedLaboratoryDetails)?.ToString();
-
-                if (string.IsNullOrEmpty(value))
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         private void MergeLaboratoryDetails(LaboratoryDetailRequest mergedDetails, LaboratoryDetailRequest pageDetails)
@@ -248,17 +232,46 @@ namespace Healthcare.Api.Controllers
             mergedDetails.Glucemia = MergeProperty(mergedDetails.Glucemia, pageDetails.Glucemia);
             mergedDetails.Uremia = MergeProperty(mergedDetails.Uremia, pageDetails.Uremia);
             mergedDetails.Creatininemia = MergeProperty(mergedDetails.Creatininemia, pageDetails.Creatininemia);
+            mergedDetails.Creatinfosfoquinasa = MergeProperty(mergedDetails.Creatinfosfoquinasa, pageDetails.Creatinfosfoquinasa);
             mergedDetails.ColesterolTotal = MergeProperty(mergedDetails.ColesterolTotal, pageDetails.ColesterolTotal);
             mergedDetails.ColesterolHdl = MergeProperty(mergedDetails.ColesterolHdl, pageDetails.ColesterolHdl);
+            mergedDetails.ColesterolLdl = MergeProperty(mergedDetails.ColesterolLdl, pageDetails.ColesterolLdl);
             mergedDetails.Trigliceridos = MergeProperty(mergedDetails.Trigliceridos, pageDetails.Trigliceridos);
             mergedDetails.Uricemia = MergeProperty(mergedDetails.Uricemia, pageDetails.Uricemia);
             mergedDetails.BilirrubinaDirecta = MergeProperty(mergedDetails.BilirrubinaDirecta, pageDetails.BilirrubinaDirecta);
             mergedDetails.BilirrubinaIndirecta = MergeProperty(mergedDetails.BilirrubinaIndirecta, pageDetails.BilirrubinaIndirecta);
             mergedDetails.BilirrubinaTotal = MergeProperty(mergedDetails.BilirrubinaTotal, pageDetails.BilirrubinaTotal);
+            mergedDetails.Amilasemia = MergeProperty(mergedDetails.Amilasemia, pageDetails.Amilasemia);
             mergedDetails.TransaminasaGlutamicoOxalac = MergeProperty(mergedDetails.TransaminasaGlutamicoOxalac, pageDetails.TransaminasaGlutamicoOxalac);
             mergedDetails.TransaminasaGlutamicoPiruvic = MergeProperty(mergedDetails.TransaminasaGlutamicoPiruvic, pageDetails.TransaminasaGlutamicoPiruvic);
             mergedDetails.FosfatasaAlcalina = MergeProperty(mergedDetails.FosfatasaAlcalina, pageDetails.FosfatasaAlcalina);
             mergedDetails.TirotrofinaPlamatica = MergeProperty(mergedDetails.TirotrofinaPlamatica, pageDetails.TirotrofinaPlamatica);
+            mergedDetails.Sodio = MergeProperty(mergedDetails.Sodio, pageDetails.Sodio);
+            mergedDetails.Potasio = MergeProperty(mergedDetails.Potasio, pageDetails.Potasio);
+            mergedDetails.CloroPlasmatico = MergeProperty(mergedDetails.CloroPlasmatico, pageDetails.CloroPlasmatico);
+            mergedDetails.CalcemiaTotal = MergeProperty(mergedDetails.CalcemiaTotal, pageDetails.CalcemiaTotal);
+            mergedDetails.MagnesioSangre = MergeProperty(mergedDetails.MagnesioSangre, pageDetails.MagnesioSangre);
+            mergedDetails.ProteinasTotales = MergeProperty(mergedDetails.ProteinasTotales, pageDetails.ProteinasTotales);
+            mergedDetails.Albumina = MergeProperty(mergedDetails.Albumina, pageDetails.Albumina);
+            mergedDetails.Pseudocolinesterasa = MergeProperty(mergedDetails.Pseudocolinesterasa, pageDetails.Pseudocolinesterasa);
+            mergedDetails.Ferremia = MergeProperty(mergedDetails.Ferremia, pageDetails.Ferremia);
+            mergedDetails.Transferrina = MergeProperty(mergedDetails.Transferrina, pageDetails.Transferrina);
+            mergedDetails.SaturacionTransferrina = MergeProperty(mergedDetails.SaturacionTransferrina, pageDetails.SaturacionTransferrina);
+            mergedDetails.Ferritina = MergeProperty(mergedDetails.Ferritina, pageDetails.Ferritina);
+            mergedDetails.TiroxinaEfectiva = MergeProperty(mergedDetails.TiroxinaEfectiva, pageDetails.TiroxinaEfectiva);
+            mergedDetails.TiroxinaTotal = MergeProperty(mergedDetails.TiroxinaTotal, pageDetails.TiroxinaTotal);
+            mergedDetails.HemoglobinaGlicosilada = MergeProperty(mergedDetails.HemoglobinaGlicosilada, pageDetails.HemoglobinaGlicosilada);
+            mergedDetails.GlutamilTranspeptidasa = MergeProperty(mergedDetails.GlutamilTranspeptidasa, pageDetails.GlutamilTranspeptidasa);
+            mergedDetails.TiempoCoagulacion = MergeProperty(mergedDetails.TiempoCoagulacion, pageDetails.TiempoCoagulacion);
+            mergedDetails.TiempoProtrombina = MergeProperty(mergedDetails.TiempoProtrombina, pageDetails.TiempoProtrombina);
+            mergedDetails.TiempoSangria = MergeProperty(mergedDetails.TiempoSangria, pageDetails.TiempoSangria);
+            mergedDetails.TiempoTromboplastina = MergeProperty(mergedDetails.TiempoTromboplastina, pageDetails.TiempoTromboplastina);
+            mergedDetails.AntigenoProstaticoEspecifico = MergeProperty(mergedDetails.AntigenoProstaticoEspecifico, pageDetails.AntigenoProstaticoEspecifico);
+            mergedDetails.PsaLibre = MergeProperty(mergedDetails.PsaLibre, pageDetails.PsaLibre);
+            mergedDetails.RelacionPsaLibre = MergeProperty(mergedDetails.RelacionPsaLibre, pageDetails.RelacionPsaLibre);
+            mergedDetails.VitaminaD3 = MergeProperty(mergedDetails.VitaminaD3, pageDetails.VitaminaD3);
+            mergedDetails.CocienteAlbumina = MergeProperty(mergedDetails.CocienteAlbumina, pageDetails.CocienteAlbumina);
+            mergedDetails.Nucleotidasa = MergeProperty(mergedDetails.Nucleotidasa, pageDetails.Nucleotidasa);
         }
 
         private string MergeProperty(string existingValue, string newValue)
@@ -272,55 +285,79 @@ namespace Healthcare.Api.Controllers
             return existingValue + newValue;
         }
 
-        private static LaboratoryDetailRequest ParsePdfText(string text)
+        private static LaboratoryDetailRequest ParsePdfText(string text, List<PropertyInfo> properties)
         {
             var laboratoryDetail = new LaboratoryDetailRequest();
-            var properties = typeof(LaboratoryDetailRequest).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-            string[] lines = text.Split('\n');
+
+            string[] lines = text.Split('\n').Skip(1).ToArray();
 
             for (int i = 0; i < lines.Length; i++)
             {
-                string cleanLine = lines[i].Trim().ToLowerInvariant().Replace(".", "");
-                foreach (var property in properties)
+                string cleanLine = lines[i].Trim();
+
+                foreach (var property in properties.Where(property => property.GetValue(laboratoryDetail) == null))
                 {
                     var displayNameAttribute = (DisplayNameAttribute)property.GetCustomAttribute(typeof(DisplayNameAttribute));
                     string propertyNameToShow = displayNameAttribute != null ? displayNameAttribute.DisplayName : property.Name;
 
-                    if (cleanLine.Contains(propertyNameToShow.ToLowerInvariant()))
+                    if (cleanLine.Contains(propertyNameToShow, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        MatchCollection matches = Regex.Matches(cleanLine, @"m?\d+([,.]\d+)?");
-                        if (matches.Count > 0)
-                        {
-                            var numericValue = Convert.ChangeType(
-                                cleanLine.Contains("eritrosedimentacion") ? matches.Last().Value : matches.First().Value,
-                                property.PropertyType, CultureInfo.InvariantCulture);
+                        Match timeMatch = Regex.Match(cleanLine, @"\b\d{1,2}:\d{2}\b");
 
+                        if (timeMatch.Success)
+                        {
+                            var timeValue = Convert.ChangeType(timeMatch.Value, property.PropertyType, CultureInfo.InvariantCulture);
                             if (property.GetValue(laboratoryDetail) == null)
                             {
-                                property.SetValue(laboratoryDetail, numericValue);
+                                property.SetValue(laboratoryDetail, timeValue);
                             }
-
-                            break;
                         }
-                        else if (i + 2 < lines.Length)
+                        else
                         {
-                            cleanLine = lines[i + 2].Trim().ToLowerInvariant().Replace(".", "");
-                            matches = Regex.Matches(cleanLine, @"m?\d+([,.]\d+)?");
+                            cleanLine = Regex.Replace(cleanLine, @"^\d+\s*-\s*", "").Trim();
+                            cleanLine = Regex.Replace(cleanLine, @"\s*[-(]\s*\d+.*$", "").Trim();
+                            MatchCollection matches = Regex.Matches(cleanLine, @"(?<![a-zA-Z])\d{1,3}(?:\.\d{3})*(?:,\d+)?(?![a-zA-Z])");
+
                             if (matches.Count > 0)
                             {
-                                var numericValue = Convert.ChangeType(matches.First().Value, property.PropertyType, CultureInfo.InvariantCulture);
+                                string formattedNumber = string.Join(".", matches.Cast<Match>().Select(m => m.Value));
+                                if (cleanLine.Contains("eritrosedimentacion", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    formattedNumber = matches.Last().Value.Split(',').Last();
+                                }
+
                                 if (property.GetValue(laboratoryDetail) == null)
                                 {
-                                    property.SetValue(laboratoryDetail, numericValue);
+                                    property.SetValue(laboratoryDetail, formattedNumber);
                                 }
                             }
-                            break;
+                            else if (i + 2 < lines.Length)
+                            {
+                                cleanLine = lines[i + 2].Trim();
+                                matches = Regex.Matches(cleanLine, @"(?<![a-zA-Z])\d{1,3}(?:\.\d{3})*(?:,\d+)?(?![a-zA-Z])");
+                                if (matches.Count == 0 && i + 3 < lines.Length)
+                                {
+                                    cleanLine = lines[i + 3].Trim();
+                                    matches = Regex.Matches(cleanLine, @"(?<![a-zA-Z])\d{1,3}(?:\.\d{3})*(?:,\d+)?(?![a-zA-Z])");
+                                }
+                                if (matches.Count > 0)
+                                {
+                                    string formattedNumber = string.Join(",", matches.Cast<Match>().Select(m => m.Value));
+                                    if (property.GetValue(laboratoryDetail) == null)
+                                    {
+                                        property.SetValue(laboratoryDetail, formattedNumber);
+                                    }
+                                }
+                            }
                         }
+
+                        break;
                     }
                 }
             }
             return laboratoryDetail;
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

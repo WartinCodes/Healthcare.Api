@@ -1,21 +1,31 @@
 ﻿using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Helper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 
 namespace Healthcare.Api.Service.Services
 {
     public class EmailService : IEmailService
     {
         private readonly SmtpSettings _smtpSettings;
+        private readonly TemplateConfiguration _templateConfiguration;
         private readonly IConfiguration _configuration;
+        private readonly IFileHelper _fileHelper;
 
-        public EmailService(IOptions<SmtpSettings> smtpSettings, IConfiguration configuration)
+        public EmailService(
+            IOptions<SmtpSettings> smtpSettings,
+            IOptions<TemplateConfiguration> templateConfiguration,
+            IFileHelper fileHelper,
+            IConfiguration configuration)
         {
             _smtpSettings = smtpSettings?.Value ?? throw new ArgumentNullException(nameof(SmtpSettings));
+            _templateConfiguration = templateConfiguration?.Value ?? throw new ArgumentNullException(nameof(TemplateConfiguration));
             _configuration = configuration;
+            _fileHelper = fileHelper;
         }
 
         public string GenerateResetPasswordLink(string email, string token)
@@ -28,57 +38,16 @@ namespace Healthcare.Api.Service.Services
         {
             try
             {
-                var messageBody = $@"
-                    <html>
-                    <head>
-                        <style>
-                            body {{
-                                font-family: Arial, sans-serif;
-                                background-color: #f4f4f4;
-                                margin: 0;
-                                padding: 20px;
-                            }}
-                            .container {{
-                                max-width: 600px;
-                                margin: auto;
-                                background-color: #ffffff;
-                                padding: 20px;
-                                border-radius: 5px;
-                                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                            }}
-                            h1 {{
-                                color: #333333;
-                            }}
-                            p {{
-                                color: #666666;
-                            }}
-                            a {{
-                                color: #007bff;
-                                text-decoration: none;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <div class='container'>
-                            <h1>Recuperación de Contraseña</h1>
-                            <p>Estimado {fullName},</p>
-                            <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta. Si no has solicitado este cambio, puedes ignorar este mensaje.</p>
-                            <p>Para restablecer tu contraseña, haz clic en el siguiente enlace:</p>
-                            <p><a href='{resetLink}'>{resetLink}</a></p>
-                            <p>Este enlace expirará en 24 horas. Si necesitas ayuda adicional, por favor contáctanos.</p>
-                            <p>¡Gracias por confiar en nosotros!</p>
-                            <p>Atentamente,</p>
-                            <p>Incor - Centro Médico</p>
-                        </div>
-                    </body>
-                    </html>
-                ";
+                var forgotPasswordTemplate = Path.Combine(_fileHelper.GetExecutingDirectory(), _templateConfiguration.ForgotPasswordTemplate);
+                var forgotPasswordTemplateHtml = new StringBuilder(_fileHelper.ReadAllText(forgotPasswordTemplate));
+                forgotPasswordTemplateHtml = forgotPasswordTemplateHtml.Replace("<%FullName%>", fullName);
+                forgotPasswordTemplateHtml = forgotPasswordTemplateHtml.Replace("<%ResetLink%>", resetLink);
 
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
                     Subject = "Restablecer contraseña",
-                    Body = messageBody,
+                    Body = forgotPasswordTemplateHtml.ToString(),
                     IsBodyHtml = true,
                 };
                 mailMessage.To.Add(email);
@@ -102,52 +71,21 @@ namespace Healthcare.Api.Service.Services
         { 
             try
             {
-                var messageBody = $@"
-                    <html>
-                    <head>
-                        <style>
-                            body {{
-                                font-family: Arial, sans-serif;
-                                background-color: #f4f4f4;
-                                margin: 0;
-                                padding: 20px;
-                            }}
-                            .container {{
-                                max-width: 600px;
-                                margin: auto;
-                                background-color: #ffffff;
-                                padding: 20px;
-                                border-radius: 5px;
-                                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                            }}
-                            h1 {{
-                                color: #333333;
-                            }}
-                            p {{
-                                color: #666666;
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <div class='container'>
-                            <h1>Solicitud de soporte técnico</h1>
-                            <p><strong>Usuario:</strong> {userName}</p>
-                            <p><strong>Estado:</strong> {support.Status}</p>
-                            <p><strong>Prioridad:</strong> {support.Priority}</p>
-                            <p><strong>Módulo:</strong> {support.Module}</p>
-                            <p><strong>Descripción:</strong> {support.Description}</p>
-                            <p><strong>Fecha de reporte:</strong> {support.ReportDate}</p>
-                            <p><strong>Fecha de resolución:</strong> {support.ResolutionDate}</p>
-                        </div>
-                    </body>
-                    </html>
-                ";
+                var supportTemplate = Path.Combine(_fileHelper.GetExecutingDirectory(), _templateConfiguration.SupportTemplate);
+                var supportTemplateHtml = new StringBuilder(_fileHelper.ReadAllText(supportTemplate));
+                supportTemplateHtml = supportTemplateHtml.Replace("<%UserName%>", userName);
+                supportTemplateHtml = supportTemplateHtml.Replace("<%Status%>", support.Status);
+                supportTemplateHtml = supportTemplateHtml.Replace("<%Priority%>", support.Priority);
+                supportTemplateHtml = supportTemplateHtml.Replace("<%Module%>", support.Module);
+                supportTemplateHtml = supportTemplateHtml.Replace("<%Description%>", support.Description);
+                supportTemplateHtml = supportTemplateHtml.Replace("<%ReportDate%>", support.ReportDate.ToString("dd/MM/yyyy"));
+                supportTemplateHtml = supportTemplateHtml.Replace("<%ResolutionDate%>", support.ResolutionDate?.ToString("dd/MM/yyyy") ?? "N/A");
 
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
                     Subject = $"Soporte técnico - {support.ReportDate} - {support.Status}",
-                    Body = messageBody,
+                    Body = supportTemplateHtml.ToString(),
                     IsBodyHtml = true
                 };
                 mailMessage.To.Add("soporte@rosariodata.com");
@@ -167,58 +105,23 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
-        public async Task SendEmailForNewStudyAsync(string email, string fullName)
+        public async Task SendEmailForNewStudyAsync(string email, string fullName, DateTime studyDate)
         {
             try
             {
                 if (!string.IsNullOrEmpty(email))
                 {
-                    var messageBody = $@"
-                <html>
-                <head>
-                    <style>
-                        body {{
-                            font-family: Arial, sans-serif;
-                            background-color: #f4f4f4;
-                            margin: 0;
-                            padding: 20px;
-                        }}
-                        .container {{
-                            max-width: 600px;
-                            margin: auto;
-                            background-color: #ffffff;
-                            padding: 20px;
-                            border-radius: 5px;
-                            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                        }}
-                        h1 {{
-                            color: #333333;
-                        }}
-                        p {{
-                            color: #666666;
-                        }}
-                    </style>
-                </head>
-                <body>
-                    <div class='container'>
-                        <h1>Nuevo estudio disponible en tu cuenta</h1>
-                        <p>Hola {fullName},</p>
-                        <p>Te informamos que se ha subido un nuevo estudio a tu cuenta.</p>
-                        <p>Para ver el estudio, podes inicia sesión en tu cuenta y navega hasta la sección correspondiente. Si tienes alguna pregunta o necesitas asistencia adicional, no dudes en contactarnos.</p>
-                        <p>¡Gracias por confiar en nosotros!</p>
-                        <p>Atentamente,</p>
-                        <p>Incor - Centro Médico</p>
-                    </div>
-                </body>
-                </html>
-            ";
+                    var newStudyTemplate = Path.Combine(_fileHelper.GetExecutingDirectory(), _templateConfiguration.NewStudyTemplate);
+                    var newStudyTemplateHtml = new StringBuilder(_fileHelper.ReadAllText(newStudyTemplate));
+                    newStudyTemplateHtml = newStudyTemplateHtml.Replace("<%FullName%>", fullName);
+                    newStudyTemplateHtml = newStudyTemplateHtml.Replace("<%StudyDate%>", studyDate.ToString("dd/MM/yyyy"));
 
                     var mailMessage = new MailMessage
                     {
                         From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
                         Subject = "Incor Centro Médico - Aviso de Estudio Disponible",
-                        Body = messageBody,
-                        IsBodyHtml = true,
+                        Body = newStudyTemplateHtml.ToString(),
+                        IsBodyHtml = true
                     };
                     mailMessage.To.Add(email);
 
@@ -242,5 +145,44 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
+        public async Task SendWelcomeEmailAsync(string email, string userName, string fullName)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(email))
+                {
+                    var welcomeTemplate = Path.Combine(_fileHelper.GetExecutingDirectory(), _templateConfiguration.WelcomeTemplate);
+                    var welcomeTemplateHtml = new StringBuilder(_fileHelper.ReadAllText(welcomeTemplate));
+                    welcomeTemplateHtml = welcomeTemplateHtml.Replace("<%FullName%>", fullName);
+                    welcomeTemplateHtml = welcomeTemplateHtml.Replace("<%UserName%>", userName);
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
+                        Subject = "Bienvenido a Mi Portal - Incor Centro Médico",
+                        Body = welcomeTemplateHtml.ToString(),
+                        IsBodyHtml = true
+                    };
+                    mailMessage.To.Add(email);
+
+                    using (var client = new SmtpClient(_smtpSettings.Server, _smtpSettings.Port))
+                    {
+                        client.EnableSsl = _smtpSettings.UseSsl;
+                        client.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
+
+                        await client.SendMailAsync(mailMessage);
+                    }
+                }
+                else
+                {
+                    await Task.CompletedTask;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al enviar el mail: {ex}");
+                throw;
+            }
+        }
     }
 }

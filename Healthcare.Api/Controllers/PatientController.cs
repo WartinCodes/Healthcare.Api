@@ -4,11 +4,8 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
@@ -23,6 +20,7 @@ namespace Healthcare.Api.Controllers
         private readonly IAddressService _addressService;
         private readonly IHealthPlanService _healthPlanService;
         private readonly IPatientHealthPlanService _patientHealthPlanService;
+        private readonly IEmailService _emailService;
 
         public PatientController(
             UserManager<User> userManager,
@@ -31,7 +29,8 @@ namespace Healthcare.Api.Controllers
             IPatientHealthPlanService patientHealthPlanService,
             IAddressService addressService,
             IHealthPlanService healthPlanService,
-            IFileService fileService)
+            IFileService fileService,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _patientService = patientService;
@@ -39,6 +38,7 @@ namespace Healthcare.Api.Controllers
             _addressService = addressService;
             _healthPlanService = healthPlanService;
             _patientHealthPlanService = patientHealthPlanService;
+            _emailService = emailService;
         }
 
         [HttpGet("all")]
@@ -132,6 +132,11 @@ namespace Healthcare.Api.Controllers
 
                         var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
                         await _patientHealthPlanService.Add(patientHealthPlan);
+                    }
+
+                    if (!String.IsNullOrEmpty(newUser.Email))
+                    {
+                        await _emailService.SendWelcomeEmailAsync(newUser.Email, newUser.UserName, $"{newUser.FirstName} {newUser.LastName}");
                     }
                     return Ok("Paciente creado exitosamente.");
                 }

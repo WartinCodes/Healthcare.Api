@@ -1,0 +1,41 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333333;
+        }
+
+        p {
+            color: #666666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Solicitud de soporte técnico</h1>
+        <p><strong>Usuario:</strong> <%UserName%></p>
+        <p><strong>Estado:</strong> <%Status%></p>
+        <p><strong>Prioridad:</strong> <%Priority%></p>
+        <p><strong>Módulo:</strong> <%Module%></p>
+        <p><strong>Descripción:</strong> <%Description%></p>
+        <p><strong>Fecha de reporte:</strong> <%ReportDate%></p>
+        <p><strong>Fecha de resolución:</strong> <%ResolutionDate%></p>
+    </div>
+</body>
+</html>

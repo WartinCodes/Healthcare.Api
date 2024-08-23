@@ -1,0 +1,105 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            position: relative;
+        }
+
+        .header img {
+            max-width: 300px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 20px;
+            text-align: justify;
+            color: #333;
+        }
+
+        .content h2 {
+            margin-top: 0;
+            color: #01A9A4
+        }
+
+        .content p {
+            line-height: 1.6;
+        }
+
+        .content .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #01A9A4;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #f4f4f4;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://incor-ranking.s3.us-east-1.amazonaws.com/storage/images/mi-portal-logo-verde.png" alt="Logo de Incor - Mi Portal">
+        </div>
+        <div class="content">
+            <h2>&iexcl;Bienvenido/a, <%FullName%>!</h2>
+            <p>Nos complace darte la bienvenida a Mi Portal - Incor Centro M&eacute;dico. A partir de ahora, podr&aacute;s acceder a nuestro portal en l&iacute;nea, donde tendr&aacute;s la posibilidad de gestionar y revisar toda la informaci&oacute;n relacionada con tu salud.</p>
+
+            <h3>&iquest;Qu&eacute; puedes hacer en nuestro portal?</h3>
+            <ul>
+                <li>Ver y descargar los resultados de tus estudios m&eacute;dicos.</li>
+                <li>Actualizar tu informaci&oacute;n personal.</li>
+            </ul>
+
+            <p>Para acceder a tu cuenta, por favor utiliza las siguientes credenciales:</p>
+            <p><strong>Usuario:</strong> <%UserName%></p>
+            <p><strong>Contrase&ntilde;a:</strong> <%UserName%></p>
+
+            <a href="https://www.miportal.incorcentromedico.com.ar/iniciar-sesion" class="button">Iniciar Sesi&oacute;n</a>
+
+            <p>Si tienes alguna pregunta o necesitas ayuda para comenzar, no dudes en ponerte en contacto con nosotros. Estamos aqu&iacute; para asistirte en todo lo que necesites.</p>
+        </div>
+        <div class="footer">
+            <p>Este es un mensaje automatizado. No responda a este correo electr&oacute;nico.</p>
+            <p>&copy; 2024 Incor Centro M&eacute;dico. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
