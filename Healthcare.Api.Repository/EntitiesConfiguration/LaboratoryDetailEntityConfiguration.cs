@@ -14,6 +14,7 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.HasOne(x => x.Study)
                .WithMany()
                .HasForeignKey(x => x.IdStudy)
+                .OnDelete(DeleteBehavior.Cascade)
                .IsRequired(false);
         }
     }
