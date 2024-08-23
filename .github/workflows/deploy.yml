@@ -79,7 +79,8 @@ jobs:
       - name: Stop and remove all containers
         run: |
           ssh ubuntu@34.224.196.210 "
-          docker stop \$(docker ps -q) && docker rm \$(docker ps -a -q)
+          containers=$(docker ps -q) && \
+          if [ -n "$containers" ]; then docker stop $containers && docker rm $(docker ps -a -q); fi
           "
 
       - name: Pull and run Docker container on server
