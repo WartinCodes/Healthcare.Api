@@ -1,8 +1,6 @@
-﻿<html>
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restablecimiento de Contraseña</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -44,8 +42,7 @@
 
         .content h2 {
             margin-top: 0;
-            color: #01A9A4;
-            text-align: center;
+            color: #01A9A4
         }
 
         .content p {
@@ -61,7 +58,6 @@
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
-            text-align: center;
         }
 
         .footer {
@@ -77,31 +73,33 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://incor-ranking.s3.us-east-1.amazonaws.com/storage/images/mi-portal-logo-verde.png"
-                 alt="Logo de Incor - Mi Portal">
+            <img src="https://incor-ranking.s3.us-east-1.amazonaws.com/storage/images/mi-portal-logo-verde.png" alt="Logo de Incor - Mi Portal">
         </div>
         <div class="content">
-            <h2>Restablecimiento de Contraseña</h2>
-            <p>Hola <%FullName%>,</p>
-            <p>
-                Hemos recibido una solicitud para restablecer la contrase&ntilde;a de tu cuenta en Mi Portal - Incor Centro M&eacute;dico.
-                Si no has solicitado este cambio, puedes ignorar este correo electr&oacute;nico.
-            </p>
-            <p>Para restablecer tu contrase&ntilde;a, haz clic en el bot&oacute;n de abajo o sigue el enlace proporcionado:</p>
+            <h2>&iexcl;Bienvenido/a, <%FullName%>!</h2>
+            <p>Nos complace darte la bienvenida a Mi Portal - Incor Centro M&eacute;dico. A partir de ahora, podr&aacute;s acceder a nuestro portal en l&iacute;nea, donde tendr&aacute;s la posibilidad de gestionar y revisar toda la informaci&oacute;n relacionada con tu salud.</p>
 
-            <a href="<%ResetLink%>" class="button">Restablecer Contraseña</a>
+            <h3>&iquest;Qu&eacute; puedes hacer en nuestro portal?</h3>
+            <ul>
+                <li>Ver y descargar los resultados de tus estudios m&eacute;dicos.</li>
+                <li>Actualizar tu informaci&oacute;n personal.</li>
+            </ul>
 
-            <p>Este enlace es v&aacute;lido por 24 horas. Si tienes alg&uacute;n problema, por favor cont&aacute;ctanos para obtener asistencia.</p>
+            <p>Para acceder a tu cuenta, por favor utiliza las siguientes credenciales:</p>
+            <p><strong>Usuario:</strong> <%UserName%></p>
+            <p><strong>Contrase&ntilde;a:</strong> <%UserName%></p>
+
+            <a href="https://www.miportal.incorcentromedico.com.ar/iniciar-sesion" class="button">Iniciar Sesi&oacute;n</a>
+
+            <p>Si tienes alguna pregunta o necesitas ayuda para comenzar, no dudes en ponerte en contacto con nosotros. Estamos aqu&iacute; para asistirte en todo lo que necesites.</p>
         </div>
         <div class="footer">
-            <p>Este es un mensaje automatizado. No responda a este correo electrónico.</p>
+            <p>Este es un mensaje automatizado. No responda a este correo electr&oacute;nico.</p>
             <p>&copy; 2024 Incor Centro M&eacute;dico. Todos los derechos reservados.</p>
         </div>
     </div>
 </body>
-
 </html>

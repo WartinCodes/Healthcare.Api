@@ -20,6 +20,7 @@ namespace Healthcare.Api.Controllers
         private readonly IAddressService _addressService;
         private readonly IHealthPlanService _healthPlanService;
         private readonly IPatientHealthPlanService _patientHealthPlanService;
+        private readonly IEmailService _emailService;
 
         public PatientController(
             UserManager<User> userManager,
@@ -28,7 +29,8 @@ namespace Healthcare.Api.Controllers
             IPatientHealthPlanService patientHealthPlanService,
             IAddressService addressService,
             IHealthPlanService healthPlanService,
-            IFileService fileService)
+            IFileService fileService,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _patientService = patientService;
@@ -36,6 +38,7 @@ namespace Healthcare.Api.Controllers
             _addressService = addressService;
             _healthPlanService = healthPlanService;
             _patientHealthPlanService = patientHealthPlanService;
+            _emailService = emailService;
         }
 
         [HttpGet("all")]
@@ -129,6 +132,11 @@ namespace Healthcare.Api.Controllers
 
                         var patientHealthPlan = new PatientHealthPlan { PatientId = patient.Id, HealthPlanId = healthPlan.Id };
                         await _patientHealthPlanService.Add(patientHealthPlan);
+                    }
+
+                    if (!String.IsNullOrEmpty(newUser.Email))
+                    {
+                        await _emailService.SendWelcomeEmailAsync(newUser.Email, newUser.UserName, $"{newUser.FirstName} {newUser.LastName}");
                     }
                     return Ok("Paciente creado exitosamente.");
                 }
