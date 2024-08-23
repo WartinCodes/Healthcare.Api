@@ -125,6 +125,46 @@ namespace Healthcare.Api.Controllers
             return Ok(laboratoryDetails);
         }
 
+        [HttpPost("create/laboratoryDetails")]
+        public async Task<ActionResult<LaboratoryDetail>> CreateLaboratoryDetails([FromForm] TempCreateLaboratoryDetailRequest laboratoryDetailRequest)
+        {
+            if (laboratoryDetailRequest.StudyFile == null || laboratoryDetailRequest.StudyFile.Length <= 0)
+            {
+                return BadRequest("Es necesario el estudio.");
+            }
+
+            var mergedLaboratoryDetails = new LaboratoryDetailRequest();
+            using (var memoryStream = new MemoryStream())
+            {
+                laboratoryDetailRequest.StudyFile.CopyTo(memoryStream);
+                memoryStream.Position = 0;
+                using (var pdfReader = new PdfReader(memoryStream))
+                {
+                    using (var pdfDocument = new PdfDocument(pdfReader))
+                    {
+                        for (int i = 1; i <= pdfDocument.GetNumberOfPages(); i++)
+                        {
+                            var properties = typeof(LaboratoryDetailRequest)
+                                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
+                                .Where(property => property.GetValue(mergedLaboratoryDetails) == null)
+                                .ToList();
+
+                            var page = pdfDocument.GetPage(i);
+                            string text = PdfTextExtractor.GetTextFromPage(page);
+
+                            var pageLaboratoryDetails = ParsePdfText(text, properties);
+                            MergeLaboratoryDetails(mergedLaboratoryDetails, pageLaboratoryDetails);
+                        }
+                    }
+                }
+            }
+            mergedLaboratoryDetails.IdStudy = laboratoryDetailRequest.StudyId;
+            var newLaboratoryDetail = await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
+
+            return newLaboratoryDetail;
+        }
+
+
         [HttpPost("upload-study")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)
         {
