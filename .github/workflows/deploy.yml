@@ -64,8 +64,8 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t wartincodes/healthcare.api:latest . && \
-          docker push wartincodes/healthcare.api:latest
+          docker build -t wartincodes/healthcare.api:master . && \
+          docker push wartincodes/healthcare.api:master
 
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
@@ -79,13 +79,12 @@ jobs:
       - name: Stop and remove all containers
         run: |
           ssh ubuntu@34.224.196.210 "
-          containers=$(docker ps -q) && \
-          if [ -n "$containers" ]; then docker stop $containers && docker rm $(docker ps -a -q); fi
+          docker stop \$(docker ps -q) && docker rm \$(docker ps -a -q)
           "
 
       - name: Pull and run Docker container on server
         run: |
           ssh ubuntu@34.224.196.210 "
-          docker pull wartincodes/healthcare.api:latest && \
-          docker run -d -p 8080:80 wartincodes/healthcare.api:latest
+          docker pull wartincodes/healthcare.api:master && \
+          docker run -d -p 8080:80 wartincodes/healthcare.api:master
           "
