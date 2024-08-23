@@ -145,5 +145,44 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
+        public async Task SendWelcomeEmailAsync(string email, string userName, string fullName)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(email))
+                {
+                    var welcomeTemplate = Path.Combine(_fileHelper.GetExecutingDirectory(), _templateConfiguration.WelcomeTemplate);
+                    var welcomeTemplateHtml = new StringBuilder(_fileHelper.ReadAllText(welcomeTemplate));
+                    welcomeTemplateHtml = welcomeTemplateHtml.Replace("<%FullName%>", fullName);
+                    welcomeTemplateHtml = welcomeTemplateHtml.Replace("<%UserName%>", userName);
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(_smtpSettings.FromAddress, _smtpSettings.FromName),
+                        Subject = "Bienvenido a Mi Portal - Incor Centro Médico",
+                        Body = welcomeTemplateHtml.ToString(),
+                        IsBodyHtml = true
+                    };
+                    mailMessage.To.Add(email);
+
+                    using (var client = new SmtpClient(_smtpSettings.Server, _smtpSettings.Port))
+                    {
+                        client.EnableSsl = _smtpSettings.UseSsl;
+                        client.Credentials = new NetworkCredential(_smtpSettings.Username, _smtpSettings.Password);
+
+                        await client.SendMailAsync(mailMessage);
+                    }
+                }
+                else
+                {
+                    await Task.CompletedTask;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al enviar el mail: {ex}");
+                throw;
+            }
+        }
     }
 }

@@ -237,7 +237,10 @@ namespace Healthcare.Api.Controllers
                 {
                     return Conflict("Las contraseñas no coinciden");
                 }
-                var result = await _userManager.ResetPasswordAsync(user, reset.Code, reset.Password);
+
+                user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, reset.Password);
+                user.ResetPasswordToken = null;
+                await _userManager.UpdateAsync(user);
 
                 return Ok("Nueva contraseña establecida con éxito.");
             }
