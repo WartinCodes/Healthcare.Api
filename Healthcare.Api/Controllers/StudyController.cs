@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
+using MySqlX.XDevAPI.Common;
 
 namespace Healthcare.Api.Controllers
 {
@@ -27,6 +28,7 @@ namespace Healthcare.Api.Controllers
         private readonly IFileService _fileService;
         private readonly IEmailService _emailService;
         private readonly ILaboratoryDetailService _laboratoryDetailService;
+        private readonly IUltrasoundImageService _ultrasoundImageService;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
 
@@ -38,6 +40,7 @@ namespace Healthcare.Api.Controllers
             IEmailService emailService,
             IMapper mapper,
             ILaboratoryDetailService laboratoryDetailService,
+            IUltrasoundImageService ultrasoundImageService,
             UserManager<User> userManager)
         {
             _fileService = fileService;
@@ -47,6 +50,7 @@ namespace Healthcare.Api.Controllers
             _emailService = emailService;
             _mapper = mapper;
             _laboratoryDetailService = laboratoryDetailService;
+            _ultrasoundImageService = ultrasoundImageService;
             _userManager = userManager;
         }
 
@@ -128,9 +132,13 @@ namespace Healthcare.Api.Controllers
         [HttpPost("upload-study")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)
         {
-            if (study.StudyFile == null || study.StudyFile.Length <= 0)
+            if (study.StudyFiles == null || study.StudyFiles.Count == 0)
             {
                 return BadRequest("Es necesario el estudio.");
+            }
+            if (study.StudyTypeId == (int)StudyTypeEnum.Laboratorio && study.StudyFiles.Count > 1)
+            {
+                return BadRequest("Solo se permite un archivo para este tipo de estudio.");
             }
 
             try
@@ -138,24 +146,27 @@ namespace Healthcare.Api.Controllers
                 var user = await _userManager.GetUserById(Convert.ToInt32(study.UserId));
                 if (user == null)
                 {
-                    return NotFound($"Usuario no encontrado.");
+                    return NotFound("Usuario no encontrado.");
                 }
 
                 var studyType = await _studyTypeService.GetStudyTypeByIdAsync(study.StudyTypeId);
                 if (studyType == null)
                 {
-                    return NotFound($"Tipo de estudio no encontrado.");
+                    return NotFound("Tipo de estudio no encontrado.");
                 }
 
                 string fileName = _studyService.GenerateFileName(user, studyType, study.Date);
 
-                using (MemoryStream memoryStream = new MemoryStream())
+                foreach (var file in study.StudyFiles)
                 {
-                    study.StudyFile.CopyTo(memoryStream);
-                    var pdfResult = await _fileService.InsertStudyAsync(memoryStream, user.UserName, fileName);
-                    if (pdfResult != HttpStatusCode.OK)
+                    using (MemoryStream memoryStream = new MemoryStream())
                     {
-                        return StatusCode((int)pdfResult, "Error al cargar el archivo PDF.");
+                        file.CopyTo(memoryStream);
+                        var pdfResult = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, fileName);
+                        if (pdfResult != HttpStatusCode.OK)
+                        {
+                            return StatusCode((int)pdfResult, "Error al cargar el archivo PDF.");
+                        }
                     }
                 }
 
@@ -170,38 +181,71 @@ namespace Healthcare.Api.Controllers
 
                 await _studyService.Add(newStudy);
 
-                if (study.StudyTypeId == (int)StudyTypeEnum.Laboratorio)
+                switch (study.StudyTypeId)
                 {
-                    var mergedLaboratoryDetails = new LaboratoryDetailRequest();
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        study.StudyFile.CopyTo(memoryStream);
-                        memoryStream.Position = 0;
-                        using (var pdfReader = new PdfReader(memoryStream))
+                    case (int)StudyTypeEnum.Laboratorio:
+                        var mergedLaboratoryDetails = new LaboratoryDetailRequest();
+                        using (var memoryStream = new MemoryStream())
                         {
-                            using (var pdfDocument = new PdfDocument(pdfReader))
+                            study.StudyFiles[0].CopyTo(memoryStream);
+                            memoryStream.Position = 0;
+                            using (var pdfReader = new PdfReader(memoryStream))
                             {
-                                for (int i = 1; i <= pdfDocument.GetNumberOfPages(); i++)
+                                using (var pdfDocument = new PdfDocument(pdfReader))
                                 {
-                                    var properties = typeof(LaboratoryDetailRequest)
-                                        .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
-                                        .Where(property => property.GetValue(mergedLaboratoryDetails) == null)
-                                        .ToList();
+                                    for (int i = 1; i <= pdfDocument.GetNumberOfPages(); i++)
+                                    {
+                                        var properties = typeof(LaboratoryDetailRequest)
+                                            .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
+                                            .Where(property => property.GetValue(mergedLaboratoryDetails) == null)
+                                            .ToList();
 
-                                    var page = pdfDocument.GetPage(i);
-                                    string text = PdfTextExtractor.GetTextFromPage(page);
+                                        var page = pdfDocument.GetPage(i);
+                                        string text = PdfTextExtractor.GetTextFromPage(page);
 
-                                    var pageLaboratoryDetails = ParsePdfText(text, properties);
-                                    MergeLaboratoryDetails(mergedLaboratoryDetails, pageLaboratoryDetails);
+                                        var pageLaboratoryDetails = ParsePdfText(text, properties);
+                                        MergeLaboratoryDetails(mergedLaboratoryDetails, pageLaboratoryDetails);
+                                    }
                                 }
                             }
                         }
-                    }
-                    mergedLaboratoryDetails.IdStudy = newStudy.Id;
-                    await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
+                        mergedLaboratoryDetails.IdStudy = newStudy.Id;
+                        await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
+                        break;
+
+                    case (int)StudyTypeEnum.Ecografia:
+                        var imageFiles = study.StudyFiles.Where(f =>
+                            f.FileName.Contains(".jpg", StringComparison.InvariantCultureIgnoreCase) ||
+                            f.FileName.Contains(".png", StringComparison.InvariantCultureIgnoreCase) ||
+                            f.FileName.Contains(".jpeg", StringComparison.InvariantCultureIgnoreCase)
+                        ).ToList();
+
+                        int index = 1;
+
+                        foreach (var imageFile in imageFiles) 
+                        {
+                            var imageName = _studyService.GenerateUltrasoundImageName(user, studyType, study.Date, study.Note, index);
+                            UltrasoundImage newUltrasoundImage = new UltrasoundImage()
+                            {
+                                IdStudy = newStudy.Id,
+                                LocationS3 = imageName
+                            };
+                            await _ultrasoundImageService.Add(newUltrasoundImage);
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                imageFile.CopyTo(memoryStream);
+                                var result = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, imageName);
+                            }
+
+                            index++;
+                        }
+                        break;
+
+                    default:
+                        return NotFound("Tipo de estudio no encontrado.");
                 }
-                
-                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
+
+                //await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
 
                 return Ok(newStudy);
             }

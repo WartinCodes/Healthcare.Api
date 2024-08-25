@@ -12,5 +12,6 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         void Remove(Study entity);
         void Edit(Study entity);
         string GenerateFileName(User user, StudyType studyType, DateTime date);
+        string GenerateUltrasoundImageName(User user, StudyType studyType, DateTime date, string note, int number);
     }
 }

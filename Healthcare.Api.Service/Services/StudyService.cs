@@ -61,5 +61,11 @@ namespace Healthcare.Api.Service.Services
             var fileDate = date.ToString().Replace("/", "").Replace(":", "").Trim();
             return $"{user.LastName}{user.FirstName}{studyType.Name}-{fileDate}.pdf";
         }
+
+        public string GenerateUltrasoundImageName(User user, StudyType studyType, DateTime date, string note, int number)
+        {
+            var fileDate = date.ToString().Replace("/", "").Replace(":", "").Trim();
+            return $"{number}-{user.LastName}{user.FirstName}{studyType.Name}-{note}-{fileDate}.pdf";
+        }
     }
 }
