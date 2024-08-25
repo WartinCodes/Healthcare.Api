@@ -23,6 +23,18 @@ namespace Healthcare.Api.Service.Services
             return record;
         }
 
+        public async Task<IEnumerable<UltrasoundImage>> GetUltrasoundImagesByStudyIdAsync(int studyId)
+        {
+            return (await _ultrasoundImageRepository.GetAsync())
+                .Where(x => x.IdStudy == studyId)
+                .AsEnumerable();
+        }
+
+        public async Task<IEnumerable<UltrasoundImage>> GetUltrasoundImagesByUserIdAsync(int userId)
+        {
+            return await _ultrasoundImageRepository.GetUltrasoundImagesByUserId(userId);
+        }
+
         public void Remove(UltrasoundImage entity)
         {
             _unitOfWork.UltrasoundImageRepository.Delete(entity);

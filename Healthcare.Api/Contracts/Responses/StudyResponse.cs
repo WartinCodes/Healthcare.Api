@@ -7,5 +7,6 @@
         public StudyTypeResponse StudyType { get; set; }
         public DateTime Date { get; set; }
         public string Note { get; set; }
+        public List<UltrasoundImageResponse> UltrasoundImages { get; set; }
     }
 }

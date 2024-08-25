@@ -73,7 +73,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("laboratories/{userId}")]
-        public async Task<ActionResult<IEnumerable<LaboratoryDetailResponse>>> GetLaboratoriesByPatient([FromRoute] int userId)
+        public async Task<ActionResult<IEnumerable<LaboratoryDetailResponse>>> GetLaboratoriesByUser([FromRoute] int userId)
         {
             var laboratoriesDetail = await _laboratoryDetailService.GetLaboratoriesDetailsByUserIdAsync(userId);
             if (!laboratoriesDetail.Any())
@@ -81,6 +81,29 @@ namespace Healthcare.Api.Controllers
                 return NoContent();
             }
             return Ok(_mapper.Map<IEnumerable<LaboratoryDetailResponse>>(laboratoriesDetail));
+        }
+
+        [HttpGet("ultrasoundImages/byUser/{userId}")]
+        public async Task<ActionResult<IEnumerable<UltrasoundImageResponse>>> GetUltrasoundImagesByUser([FromRoute] int userId)
+        {
+            var ultrasoundImages = await _ultrasoundImageService.GetUltrasoundImagesByUserIdAsync(userId);
+            if (!ultrasoundImages.Any())
+            {
+                return NoContent();
+            }
+            return Ok(_mapper.Map<IEnumerable<UltrasoundImageResponse>>(ultrasoundImages));
+        }
+
+
+        [HttpGet("ultrasoundImages/byStudy/{studyId}")]
+        public async Task<ActionResult<IEnumerable<UltrasoundImageResponse>>> GetUltrasoundImages([FromRoute] int studyId)
+        {
+            var ultrasoundImages = await _ultrasoundImageService.GetUltrasoundImagesByStudyIdAsync(studyId);
+            if (!ultrasoundImages.Any())
+            {
+                return NoContent();
+            }
+            return Ok(_mapper.Map<IEnumerable<UltrasoundImageResponse>>(ultrasoundImages));
         }
 
         [HttpGet("all")]
@@ -128,6 +151,7 @@ namespace Healthcare.Api.Controllers
             var laboratoryDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudyIdAsync(studyId);
             return Ok(laboratoryDetails);
         }
+
 
         [HttpPost("upload-study")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)

@@ -29,6 +29,7 @@ namespace Helthcare.Api.Mappers
             CreateMap<LaboratoryDetail, LaboratoryDetailResponse>()
                 .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Study.Date))
                 .ReverseMap();
+            CreateMap<UltrasoundImage, UltrasoundImageResponse>().ReverseMap();
 
             CreateMap<User, UserResponse>()
                 .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.UserName))
