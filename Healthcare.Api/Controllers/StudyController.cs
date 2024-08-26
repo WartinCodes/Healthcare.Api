@@ -197,6 +197,8 @@ namespace Healthcare.Api.Controllers
 
             try
             {
+                StudyResponse studyResponse = new StudyResponse();
+
                 var user = await _userManager.GetUserById(Convert.ToInt32(study.UserId));
                 if (user == null)
                 {
@@ -232,6 +234,7 @@ namespace Healthcare.Api.Controllers
                 };
 
                 await _studyService.Add(newStudy);
+                _mapper.Map(newStudy, studyResponse);
 
                 switch (study.StudyTypeId)
                 {
@@ -274,6 +277,7 @@ namespace Healthcare.Api.Controllers
 
                         int index = 1;
 
+                        List<UltrasoundImageResponse> ultrasoundImageResponse = new List<UltrasoundImageResponse>();
                         foreach (var imageFile in imageFiles) 
                         {
                             var imageName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), study.Note, index, Path.GetExtension(imageFile.FileName)));
@@ -283,6 +287,7 @@ namespace Healthcare.Api.Controllers
                                 LocationS3 = imageName
                             };
                             await _ultrasoundImageService.Add(newUltrasoundImage);
+                            ultrasoundImageResponse.Add(_mapper.Map<UltrasoundImageResponse>(newUltrasoundImage));
                             using (var memoryStream = new MemoryStream())
                             {
                                 imageFile.CopyTo(memoryStream);
@@ -295,15 +300,16 @@ namespace Healthcare.Api.Controllers
 
                             index++;
                         }
+                        studyResponse.UltrasoundImages = ultrasoundImageResponse;
                         break;
 
                     default:
                         return NotFound("Tipo de estudio no encontrado.");
                 }
 
-                //await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
+                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
 
-                return Ok(newStudy);
+                return Ok(studyResponse);
             }
             catch (Exception ex)
             {
