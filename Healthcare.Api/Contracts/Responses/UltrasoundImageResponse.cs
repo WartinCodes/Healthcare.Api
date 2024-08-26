@@ -1,6 +1,4 @@
-﻿using Healthcare.Api.Core.Entities;
-
-namespace Healthcare.Api.Contracts.Responses
+﻿namespace Healthcare.Api.Contracts.Responses
 {
     public class UltrasoundImageResponse
     {

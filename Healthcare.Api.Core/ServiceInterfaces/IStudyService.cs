@@ -1,4 +1,5 @@
 ﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Utilities;
 
 namespace Healthcare.Api.Core.ServiceInterfaces
 {
@@ -11,7 +12,6 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<Study> Add(Study entity);
         void Remove(Study entity);
         void Edit(Study entity);
-        string GenerateFileName(User user, StudyType studyType, DateTime date);
-        string GenerateUltrasoundImageName(User user, StudyType studyType, DateTime date, string note, int number);
+        string GenerateFileName(FileNameParameters parameters);
     }
 }

@@ -15,6 +15,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Identity;
 using MySqlX.XDevAPI.Common;
+using Healthcare.Api.Core.Utilities;
+using static iText.IO.Image.Jpeg2000ImageData;
 
 namespace Healthcare.Api.Controllers
 {
@@ -72,7 +74,7 @@ namespace Healthcare.Api.Controllers
             return Ok(studyUrl);
         }
 
-        [HttpGet("laboratories/{userId}")]
+        [HttpGet("laboratories/byUser/{userId}")]
         public async Task<ActionResult<IEnumerable<LaboratoryDetailResponse>>> GetLaboratoriesByUser([FromRoute] int userId)
         {
             var laboratoriesDetail = await _laboratoryDetailService.GetLaboratoriesDetailsByUserIdAsync(userId);
@@ -83,17 +85,12 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<LaboratoryDetailResponse>>(laboratoriesDetail));
         }
 
-        [HttpGet("ultrasoundImages/byUser/{userId}")]
-        public async Task<ActionResult<IEnumerable<UltrasoundImageResponse>>> GetUltrasoundImagesByUser([FromRoute] int userId)
+        [HttpGet("laboratoryDetails/byStudy/{studyId}")]
+        public async Task<ActionResult<LaboratoryDetail>> GetLaboratoryDetails([FromRoute] int studyId)
         {
-            var ultrasoundImages = await _ultrasoundImageService.GetUltrasoundImagesByUserIdAsync(userId);
-            if (!ultrasoundImages.Any())
-            {
-                return NoContent();
-            }
-            return Ok(_mapper.Map<IEnumerable<UltrasoundImageResponse>>(ultrasoundImages));
+            var laboratoryDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudyIdAsync(studyId);
+            return Ok(laboratoryDetails);
         }
-
 
         [HttpGet("ultrasoundImages/byStudy/{studyId}")]
         public async Task<ActionResult<IEnumerable<UltrasoundImageResponse>>> GetUltrasoundImages([FromRoute] int studyId)
@@ -145,13 +142,6 @@ namespace Healthcare.Api.Controllers
             return Ok(countStudies);
         }
 
-        [HttpGet("laboratoryDetails/{studyId}")]
-        public async Task<ActionResult<LaboratoryDetail>> GetLaboratoryDetails([FromRoute] int studyId)
-        {
-            var laboratoryDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudyIdAsync(studyId);
-            return Ok(laboratoryDetails);
-        }
-
 
         [HttpPost("upload-study")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)
@@ -179,24 +169,22 @@ namespace Healthcare.Api.Controllers
                     return NotFound("Tipo de estudio no encontrado.");
                 }
 
-                string fileName = _studyService.GenerateFileName(user, studyType, study.Date);
+                var pdfFile = study.StudyFiles.SingleOrDefault(f => f.FileName.Contains(".pdf", StringComparison.InvariantCultureIgnoreCase));
+                string pdfFileName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), null, null, Path.GetExtension(pdfFile.FileName)));
 
-                foreach (var file in study.StudyFiles)
+                using (MemoryStream memoryStream = new MemoryStream())
                 {
-                    using (MemoryStream memoryStream = new MemoryStream())
+                    pdfFile.CopyTo(memoryStream);
+                    var pdfResult = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, pdfFileName);
+                    if (pdfResult != HttpStatusCode.OK)
                     {
-                        file.CopyTo(memoryStream);
-                        var pdfResult = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, fileName);
-                        if (pdfResult != HttpStatusCode.OK)
-                        {
-                            return StatusCode((int)pdfResult, "Error al cargar el archivo PDF.");
-                        }
+                        return StatusCode((int)pdfResult, "Error al cargar el archivo PDF.");
                     }
                 }
 
                 Study newStudy = new Study()
                 {
-                    LocationS3 = fileName,
+                    LocationS3 = pdfFileName,
                     Date = study.Date,
                     Note = study.Note,
                     UserId = user.Id,
@@ -211,7 +199,7 @@ namespace Healthcare.Api.Controllers
                         var mergedLaboratoryDetails = new LaboratoryDetailRequest();
                         using (var memoryStream = new MemoryStream())
                         {
-                            study.StudyFiles[0].CopyTo(memoryStream);
+                            pdfFile.CopyTo(memoryStream);
                             memoryStream.Position = 0;
                             using (var pdfReader = new PdfReader(memoryStream))
                             {
@@ -248,7 +236,7 @@ namespace Healthcare.Api.Controllers
 
                         foreach (var imageFile in imageFiles) 
                         {
-                            var imageName = _studyService.GenerateUltrasoundImageName(user, studyType, study.Date, study.Note, index);
+                            var imageName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), study.Note, index, Path.GetExtension(imageFile.FileName)));
                             UltrasoundImage newUltrasoundImage = new UltrasoundImage()
                             {
                                 IdStudy = newStudy.Id,
@@ -258,7 +246,11 @@ namespace Healthcare.Api.Controllers
                             using (var memoryStream = new MemoryStream())
                             {
                                 imageFile.CopyTo(memoryStream);
-                                var result = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, imageName);
+                                var imageResult = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, imageName);
+                                if (imageResult != HttpStatusCode.OK)
+                                {
+                                    return StatusCode((int)imageResult, "Error al cargar las imagenes.");
+                                }
                             }
 
                             index++;
