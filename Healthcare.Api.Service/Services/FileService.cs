@@ -67,7 +67,7 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
-        public async Task<HttpStatusCode> InsertStudyAsync(Stream file, string dni, string fileName)
+        public async Task<HttpStatusCode> InsertFileStudyAsync(Stream file, string dni, string fileName)
         {
             try
             {

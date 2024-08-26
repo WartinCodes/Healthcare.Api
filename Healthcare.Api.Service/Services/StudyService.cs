@@ -3,6 +3,7 @@ using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
+using Healthcare.Api.Core.Utilities;
 
 namespace Healthcare.Api.Service.Services
 {
@@ -56,10 +57,17 @@ namespace Healthcare.Api.Service.Services
             _unitOfWork.Save();
         }
 
-        public string GenerateFileName(User user, StudyType studyType, DateTime date)
+        public string GenerateFileName(FileNameParameters parameters)
         {
-            var fileDate = date.ToString().Replace("/", "").Replace(":", "").Trim();
-            return $"{user.LastName}{user.FirstName}{studyType.Name}-{fileDate}.pdf";
+            var fileDate = parameters.Date.ToString().Replace("/", "").Trim();
+            if (parameters.Number.HasValue && !string.IsNullOrEmpty(parameters.Note) && !string.IsNullOrEmpty(parameters.Extension))
+            {
+                return $"{parameters.Number.Value}-{parameters.User.LastName}{parameters.User.FirstName}{parameters.StudyType.Name}-{parameters.Note}-{fileDate}{parameters.Extension}";
+            }
+            else
+            {
+                return $"{parameters.User.LastName}{parameters.User.FirstName}{parameters.StudyType.Name}-{fileDate}{parameters.Extension}";
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     public class StudyRequest
     {
-        public IFormFile StudyFile { get; set; }
+        public List<IFormFile> StudyFiles { get; set; }
         public string UserId { get; set; }
         public int StudyTypeId { get; set; }
         public DateTime Date { get; set; }
