@@ -8,6 +8,7 @@ using Healthcare.Api.Service.Services;
 using Helthcare.Api.Configurations;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -54,6 +55,11 @@ namespace Helthcare.Api
                 options.Password.RequireUppercase = false;
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.User.RequireUniqueEmail = false;
+            });
+
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 104857600;
             });
 
             services.SetupSwagger();
