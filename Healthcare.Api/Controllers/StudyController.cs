@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using MySqlX.XDevAPI.Common;
 using Healthcare.Api.Core.Utilities;
 using static iText.IO.Image.Jpeg2000ImageData;
+using System.Collections.Generic;
 
 namespace Healthcare.Api.Controllers
 {
@@ -59,8 +60,14 @@ namespace Healthcare.Api.Controllers
         [HttpGet("byUser/{userId}")]
         public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesByUserId([FromRoute] int userId)
         {
-            var studies = await _studyService.GetStudiesByUserId(userId);
-            return Ok(_mapper.Map<IEnumerable<StudyResponse>>(studies));
+            var studiesEntity = await _studyService.GetStudiesByUserId(userId);
+            var studiesResponse = _mapper.Map<IEnumerable<StudyResponse>>(studiesEntity);
+            foreach (var study in studiesResponse)
+            {
+                study.UltrasoundImages = _mapper.Map<List<UltrasoundImageResponse>>(await _ultrasoundImageService.GetUltrasoundImagesByStudyIdAsync(study.Id));
+            }
+
+            return Ok(studiesResponse);
         }
 
         [HttpGet("getUrl/{userId}")]
@@ -92,6 +99,11 @@ namespace Healthcare.Api.Controllers
             return Ok(laboratoryDetails);
         }
 
+        /// <summary>
+        /// Cuando se migre borrar este endpoint
+        /// </summary>
+        /// <param name="studyId"></param>
+        /// <returns></returns>
         [HttpGet("ultrasoundImages/byStudy/{studyId}")]
         public async Task<ActionResult<IEnumerable<UltrasoundImageResponse>>> GetUltrasoundImages([FromRoute] int studyId)
         {
@@ -301,6 +313,7 @@ namespace Healthcare.Api.Controllers
                             index++;
                         }
                         studyResponse.UltrasoundImages = ultrasoundImageResponse;
+                        studyResponse.StudyType = _mapper.Map<StudyTypeResponse>(studyType);
                         break;
 
                     default:
