@@ -42,13 +42,13 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<PatientResponse>>> Get()
+        public async Task<ActionResult<IEnumerable<PatientAllResponse>>> Get()
         {
             var patientsEntities = (await _patientService.GetAsync())
                 .OrderBy(x => x.User.LastName)
                 .AsEnumerable();
 
-            var patients = _mapper.Map<IEnumerable<PatientResponse>>(patientsEntities);
+            var patients = _mapper.Map<IEnumerable<PatientAllResponse>>(patientsEntities);
             return Ok(patients);
         }
 
@@ -66,14 +66,14 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<PatientResponse>> Get([FromRoute] int userId)
+        public async Task<ActionResult<PatientIdResponse>> Get([FromRoute] int userId)
         {
             var patientEntity = await _patientService.GetPatientByUserIdAsync(userId);
             if (patientEntity == null)
             {
                 return NotFound($"El paciente con el ID usuario {userId} no existe.");
             }
-            var patient = _mapper.Map<PatientResponse>(patientEntity);
+            var patient = _mapper.Map<PatientIdResponse>(patientEntity);
             return Ok(patient);
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace Healthcare.Api.Contracts.Responses
 {
-    public class PatientResponse
+    public class PatientIdResponse
     {
         public int Id { get; set; }
         public int UserId { get; set; }
