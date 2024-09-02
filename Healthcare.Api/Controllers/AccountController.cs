@@ -189,6 +189,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("change/password")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria},{RoleEnum.Paciente}")]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest change)
         {
             try
@@ -250,8 +251,8 @@ namespace Healthcare.Api.Controllers
             }
         }
 
-        [Authorize(Roles = RoleEnum.Secretaria)]
         [HttpPost("reset/default/password/{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> ResetDefaultPassword(int userId)
         {
             try
@@ -274,6 +275,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("support")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Support(SupportRequest supportRequest)
         {
             try

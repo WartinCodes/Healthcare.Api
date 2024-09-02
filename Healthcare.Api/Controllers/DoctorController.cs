@@ -52,6 +52,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<ActionResult<IEnumerable<DoctorResponse>>> Get()
         {
             var doctorsEntities = (await _doctorService.GetAsync())
@@ -62,6 +63,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("lastDoctors")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<ActionResult<int>> GetLastPatient()
         {
             var latestUsers = await UserManagerExtensions.GetUsersRegisteredInLastWeek(_userManager);
@@ -74,6 +76,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<ActionResult<DoctorResponse>> Get([FromRoute] int userId)
         {
             var doctorEntity = await _doctorService.GetDoctorByUserIdAsync(userId);
@@ -87,6 +90,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Post([FromBody] DoctorRequest userRequest)
         {
             try
@@ -179,6 +183,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Put(int userId, [FromBody] DoctorRequest userRequest)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -227,6 +232,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpDelete("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Delete(int userId)
         {
             var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
