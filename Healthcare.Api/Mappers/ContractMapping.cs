@@ -35,24 +35,14 @@ namespace Helthcare.Api.Mappers
                 .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.UserName))
                 .ReverseMap();
 
-            CreateMap<Doctor, DoctorResponse>()
+            CreateMap<Doctor, DoctorAllResponse>()
                 .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
                 .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
                 .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.User.UserName))
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.User.Address))
-                .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => src.User.BirthDate))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
-                .ForMember(dest => dest.PhoneNumber2, opt => opt.MapFrom(src => src.User.PhoneNumber2))
                 .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.User.Photo))
-                .ForMember(dest => dest.RegisteredById, opt => opt.MapFrom(src => src.User.RegisteredById))
-                .ForMember(dest => dest.RegistrationDate, opt => opt.MapFrom(src => src.User.RegistrationDate))
-                .ForMember(dest => dest.BloodType, opt => opt.MapFrom(src => src.User.BloodType))
-                .ForMember(dest => dest.RhFactor, opt => opt.MapFrom(src => src.User.RhFactor))
-                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender))
-                .ForMember(dest => dest.CUIL, opt => opt.MapFrom(src => src.User.CUIL))
-                .ForMember(dest => dest.CUIT, opt => opt.MapFrom(src => src.User.CUIT))
-                .ForMember(dest => dest.MaritalStatus, opt => opt.MapFrom(src => src.User.MaritalStatus))
+                .ForMember(dest => dest.Matricula, opt => opt.MapFrom(src => src.Matricula))
                 .ReverseMap();
 
             CreateMap<Patient, PatientAllResponse>()
@@ -83,6 +73,26 @@ namespace Helthcare.Api.Mappers
                 .ForMember(dest => dest.CUIT, opt => opt.MapFrom(src => src.User.CUIT))
                 .ForMember(dest => dest.MaritalStatus, opt => opt.MapFrom(src => src.User.MaritalStatus))
                 .ReverseMap();
+
+            CreateMap<Doctor, DoctorIdResponse>()
+              .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
+              .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
+              .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.User.UserName))
+              .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.User.Address))
+              .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => src.User.BirthDate))
+              .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+              .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
+              .ForMember(dest => dest.PhoneNumber2, opt => opt.MapFrom(src => src.User.PhoneNumber2))
+              .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.User.Photo))
+              .ForMember(dest => dest.RegisteredById, opt => opt.MapFrom(src => src.User.RegisteredById))
+              .ForMember(dest => dest.RegistrationDate, opt => opt.MapFrom(src => src.User.RegistrationDate))
+              .ForMember(dest => dest.BloodType, opt => opt.MapFrom(src => src.User.BloodType))
+              .ForMember(dest => dest.RhFactor, opt => opt.MapFrom(src => src.User.RhFactor))
+              .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.User.Gender))
+              .ForMember(dest => dest.CUIL, opt => opt.MapFrom(src => src.User.CUIL))
+              .ForMember(dest => dest.CUIT, opt => opt.MapFrom(src => src.User.CUIT))
+              .ForMember(dest => dest.MaritalStatus, opt => opt.MapFrom(src => src.User.MaritalStatus))
+              .ReverseMap();
             #endregion
 
             #region Requests
