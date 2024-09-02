@@ -330,6 +330,66 @@ namespace Healthcare.Api.Controllers
             }
         }
 
+        [HttpPut("update/ultrasoundImages")]
+        public async Task<IActionResult> UpdateStudyWithUltrasoundImage([FromForm] PutUltrasoundImageRequest study)
+        {
+            try
+            {
+                StudyResponse studyResponse = new StudyResponse();
+
+                var getStudy = await _studyService.GetStudyByIdAsync(study.StudyId);
+                if (getStudy == null) 
+                {
+                    return NotFound("Estudio no encontrado.");
+                }
+
+                var studyType = await _studyTypeService.GetStudyTypeByIdAsync(getStudy.StudyTypeId);
+                if (getStudy.StudyTypeId != (int)StudyTypeEnum.Ecografia)
+                {
+                    return NotFound("Tipo de estudio inválido para cargar ecografías.");
+                }
+
+                _mapper.Map(getStudy, studyResponse);
+
+                var imageFiles = study.StudyFiles.Where(f =>
+                    f.FileName.Contains(".jpg", StringComparison.InvariantCultureIgnoreCase) ||
+                    f.FileName.Contains(".png", StringComparison.InvariantCultureIgnoreCase) ||
+                    f.FileName.Contains(".jpeg", StringComparison.InvariantCultureIgnoreCase)
+                ).ToList();
+
+                int index = 1;
+                List<UltrasoundImageResponse> ultrasoundImageResponse = new List<UltrasoundImageResponse>();
+                foreach (var imageFile in imageFiles)
+                {
+                    var imageName = _studyService.GenerateFileName(new FileNameParameters(getStudy.User, studyType, getStudy.Date.ToShortDateString(), getStudy.Note, index, Path.GetExtension(imageFile.FileName)));
+                    UltrasoundImage newUltrasoundImage = new UltrasoundImage()
+                    {
+                        IdStudy = study.StudyId,
+                        LocationS3 = imageName
+                    };
+                    await _ultrasoundImageService.Add(newUltrasoundImage);
+                    ultrasoundImageResponse.Add(_mapper.Map<UltrasoundImageResponse>(newUltrasoundImage));
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        imageFile.CopyTo(memoryStream);
+                        var imageResult = await _fileService.InsertFileStudyAsync(memoryStream, getStudy.User.UserName, imageName);
+                        if (imageResult != HttpStatusCode.OK)
+                        {
+                            return StatusCode((int)imageResult, "Error al cargar las imagenes.");
+                        }
+                    }
+
+                    index++;
+                }
+                studyResponse.UltrasoundImages = ultrasoundImageResponse;
+                return Ok(studyResponse);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         private void MergeLaboratoryDetails(LaboratoryDetailRequest mergedDetails, LaboratoryDetailRequest pageDetails)
         {
             mergedDetails.GlobulosRojos = MergeProperty(mergedDetails.GlobulosRojos, pageDetails.GlobulosRojos);

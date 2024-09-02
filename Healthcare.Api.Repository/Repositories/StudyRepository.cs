@@ -45,7 +45,10 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<Study> GetStudyByIdAsync(int id)
         {
-            return await _context.Study.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.Study
+                .Include(x => x.StudyType)
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public void Remove(Study entity)
