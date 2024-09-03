@@ -4,14 +4,17 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Healthcare.Api.Controllers
 {
     [ApiController]
+    [ServiceFilter(typeof(ValidationUserFilter))]
     [Route("api/[controller]")]
     public class PatientController : ControllerBase
     {
@@ -79,28 +82,6 @@ namespace Healthcare.Api.Controllers
             {
                 return NotFound($"El paciente con el ID usuario {userId} no existe.");
             }
-
-            var currentUserId = User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-
-            if (!int.TryParse(currentUserId, out int parsedUserId))
-            {
-                return Unauthorized("Usuario no autorizado.");
-            }
-
-            var currentUser = await _userManager.FindByIdAsync(parsedUserId.ToString());
-
-            if (currentUser == null)
-            {
-                return Unauthorized("Usuario no encontrado.");
-            }
-
-            bool isValid = await _jwtService.ValidatePatientToken(currentUser);
-
-            if (!isValid && parsedUserId != userId)
-            {
-                return Forbid("No tiene permiso para acceder a los datos de este paciente.");
-            }
-
             var registeredById = await _userManager.FindByIdAsync(patientEntity.User.RegisteredById.ToString());
             var RegisteredByName = $"{registeredById.FirstName}" + " " + $"{registeredById.LastName}";
 
