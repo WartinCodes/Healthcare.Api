@@ -99,11 +99,6 @@ namespace Healthcare.Api.Controllers
             return Ok(laboratoryDetails);
         }
 
-        /// <summary>
-        /// Cuando se migre borrar este endpoint
-        /// </summary>
-        /// <param name="studyId"></param>
-        /// <returns></returns>
         [HttpGet("ultrasoundImages/byStudy/{studyId}")]
         public async Task<ActionResult<IEnumerable<UltrasoundImageResponse>>> GetUltrasoundImages([FromRoute] int studyId)
         {
