@@ -4,21 +4,17 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
-using iText.Kernel.Pdf.Canvas.Parser;
+using Healthcare.Api.Core.Utilities;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas.Parser;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using System.ComponentModel;
 using System.Globalization;
+using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Identity;
-using MySqlX.XDevAPI.Common;
-using Healthcare.Api.Core.Utilities;
-using static iText.IO.Image.Jpeg2000ImageData;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Healthcare.Api.Controllers
 {
