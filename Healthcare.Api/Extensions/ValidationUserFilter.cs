@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Healthcare.Api.Core.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Runtime.ConstrainedExecution;
 
 namespace Healthcare.Api.Extensions
 {
@@ -8,11 +10,23 @@ namespace Healthcare.Api.Extensions
         public void OnActionExecuting(ActionExecutingContext context)
         {
             var controller = context.Controller as ControllerBase;
-            var userIdClaim = controller?.User?.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            var user = controller?.User;
 
+            if (user == null)
+            {
+                context.Result = new UnauthorizedResult();
+                return;
+            }
+
+            var userIdClaim = user.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
             if (userIdClaim == null)
             {
                 context.Result = new UnauthorizedResult();
+                return;
+            }
+
+            if (user.IsInRole(RoleEnum.Medico) || user.IsInRole(RoleEnum.Secretaria))
+            {
                 return;
             }
 
