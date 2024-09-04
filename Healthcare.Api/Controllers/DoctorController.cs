@@ -52,16 +52,18 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<DoctorResponse>>> Get()
+        //[Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        public async Task<ActionResult<IEnumerable<DoctorAllResponse>>> Get()
         {
             var doctorsEntities = (await _doctorService.GetAsync())
                 .OrderBy(x => x.User.LastName)
                 .AsEnumerable();
-            var doctors = _mapper.Map<IEnumerable<DoctorResponse>>(doctorsEntities);
+            var doctors = _mapper.Map<IEnumerable<DoctorAllResponse>>(doctorsEntities);
             return Ok(doctors);
         }
 
         [HttpGet("lastDoctors")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<ActionResult<int>> GetLastPatient()
         {
             var latestUsers = await UserManagerExtensions.GetUsersRegisteredInLastWeek(_userManager);
@@ -74,7 +76,8 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<DoctorResponse>> Get([FromRoute] int userId)
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        public async Task<ActionResult<DoctorIdResponse>> Get([FromRoute] int userId)
         {
             var doctorEntity = await _doctorService.GetDoctorByUserIdAsync(userId);
             if (doctorEntity == null)
@@ -82,11 +85,21 @@ namespace Healthcare.Api.Controllers
                 return NotFound($"El doctor con el ID usuario {userId} no existe.");
             }
 
-            var doctor = _mapper.Map<DoctorResponse>(doctorEntity);
-            return Ok(doctor);
+            var registeredById = await _userManager.FindByIdAsync(doctorEntity.User.RegisteredById.ToString());
+            var RegisteredByName = $"{registeredById.FirstName}" + " " + $"{registeredById.LastName}";
+
+            var doctorIdResponse = new DoctorIdResponse
+            {
+                RegisteredByName = RegisteredByName,
+            };
+
+            _mapper.Map(doctorEntity, doctorIdResponse);
+            return Ok(doctorIdResponse);
+
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Post([FromBody] DoctorRequest userRequest)
         {
             try
@@ -179,6 +192,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Put(int userId, [FromBody] DoctorRequest userRequest)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -227,6 +241,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpDelete("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Delete(int userId)
         {
             var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
