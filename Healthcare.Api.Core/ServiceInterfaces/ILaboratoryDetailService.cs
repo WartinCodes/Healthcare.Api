@@ -6,6 +6,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
     {
         Task<IEnumerable<LaboratoryDetail>> GetAsync();
         Task<IEnumerable<LaboratoryDetail>> GetLaboratoriesDetailsByUserIdAsync(int userId);
+        Task<IEnumerable<LaboratoryDetail>> GetLaboratoriesDetailsByStudiesIds(int[] studiesIds);
         Task<LaboratoryDetail> GetLaboratoriesDetailsByStudyIdAsync(int studyId);
         Task<LaboratoryDetail> Add(LaboratoryDetail entity);
         void Remove(LaboratoryDetail entity);

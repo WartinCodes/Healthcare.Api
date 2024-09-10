@@ -19,6 +19,7 @@ bld/
 
 *.csproj.user
 .idea/.idea.Healthcare.Api
+.vs/
 /.vs
 /Healthcare.Api/bin/Debug/net6.0
 /Healthcare.Api/obj

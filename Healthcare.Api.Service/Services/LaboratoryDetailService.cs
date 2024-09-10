@@ -28,9 +28,17 @@ namespace Healthcare.Api.Service.Services
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<LaboratoryDetail>> GetAsync()
+        public async Task<IEnumerable<LaboratoryDetail>> GetAsync()
         {
-            return _laboratoryDetailsRepository.GetAsync();
+            return await _laboratoryDetailsRepository.GetAsync();
+        }
+
+        public async Task<IEnumerable<LaboratoryDetail>> GetLaboratoriesDetailsByStudiesIds(int[] studiesIds)
+        {
+            var allLaboratoriesDetails = await GetAsync();
+
+            return allLaboratoriesDetails.Where(x => studiesIds.Contains(x.IdStudy))
+                .AsEnumerable();
         }
 
         public async Task<LaboratoryDetail> GetLaboratoriesDetailsByStudyIdAsync(int studyId)

@@ -1,5 +1,7 @@
 ﻿using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -11,10 +13,12 @@ namespace Healthcare.Api.Service.Services
     public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;
+        private readonly UserManager<User> _userManager;
 
-        public JwtService(IConfiguration configuration)
+        public JwtService(IConfiguration configuration, UserManager<User> userManager)
         {
             _configuration = configuration;
+            _userManager = userManager;
         }
 
         public string GenerateToken(User user, IList<string> roles)
@@ -43,5 +47,28 @@ namespace Healthcare.Api.Service.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public async Task<bool> ValidatePatientToken(User user)
+        {
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            var currentUserId = userClaims.FirstOrDefault(x => x.Type == "Id")?.Value;
+
+            int.TryParse(currentUserId, out int parsedUserId);
+
+            if (parsedUserId == user.Id)
+            {
+                return true;
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            if (userRoles.Contains(RoleEnum.Medico) || userRoles.Contains(RoleEnum.Secretaria))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
     }
 }

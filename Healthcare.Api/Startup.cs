@@ -1,6 +1,7 @@
 ﻿using Amazon.Auth.AccessControlPolicy;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
+using Healthcare.Api.Extensions;
 using Healthcare.Api.Repository;
 using Healthcare.Api.Repository.Context;
 using Healthcare.Api.Service;
@@ -60,6 +61,8 @@ namespace Helthcare.Api
 
             services.AddRepository();
             services.AddService(this.Configuration);
+            // IActionFilter 
+            services.AddScoped<ValidationUserFilter>();
             services.AddMappers();
             services.AddMvc();
 

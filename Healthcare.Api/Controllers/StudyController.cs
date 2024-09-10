@@ -4,19 +4,17 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
-using iText.Kernel.Pdf.Canvas.Parser;
+using Healthcare.Api.Core.Utilities;
 using iText.Kernel.Pdf;
+using iText.Kernel.Pdf.Canvas.Parser;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using System.ComponentModel;
 using System.Globalization;
+using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Identity;
-using MySqlX.XDevAPI.Common;
-using Healthcare.Api.Core.Utilities;
-using static iText.IO.Image.Jpeg2000ImageData;
 
 namespace Healthcare.Api.Controllers
 {
@@ -28,6 +26,7 @@ namespace Healthcare.Api.Controllers
         private readonly IStudyTypeService _studyTypeService;
         private readonly IPatientService _patientService;
         private readonly IFileService _fileService;
+        private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
         private readonly ILaboratoryDetailService _laboratoryDetailService;
         private readonly IUltrasoundImageService _ultrasoundImageService;
@@ -38,6 +37,7 @@ namespace Healthcare.Api.Controllers
             IFileService fileService,
             IPatientService patientService,
             IStudyService studyService,
+            IJwtService jwtService,
             IStudyTypeService studyTypeService,
             IEmailService emailService,
             IMapper mapper,
@@ -49,6 +49,7 @@ namespace Healthcare.Api.Controllers
             _patientService = patientService;
             _studyService = studyService;
             _studyTypeService = studyTypeService;
+            _jwtService = jwtService;
             _emailService = emailService;
             _mapper = mapper;
             _laboratoryDetailService = laboratoryDetailService;
@@ -57,13 +58,42 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("byUser/{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
         public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesByUserId([FromRoute] int userId)
         {
-            var studies = await _studyService.GetStudiesByUserId(userId);
-            return Ok(_mapper.Map<IEnumerable<StudyResponse>>(studies));
+            var studiesEntity = await _studyService.GetStudiesByUserId(userId);
+            var studiesResponse = _mapper.Map<IEnumerable<StudyResponse>>(studiesEntity);
+            foreach (var study in studiesResponse)
+            {
+                study.UltrasoundImages = _mapper.Map<List<UltrasoundImageResponse>>(await _ultrasoundImageService.GetUltrasoundImagesByStudyIdAsync(study.Id));
+            }
+
+            var currentUserId = User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+
+            if (!int.TryParse(currentUserId, out int parsedUserId))
+            {
+                return Unauthorized("Usuario no autorizado.");
+            }
+
+            var currentUser = await _userManager.FindByIdAsync(parsedUserId.ToString());
+
+            if (currentUser == null)
+            {
+                return Unauthorized("Usuario no encontrado.");
+            }
+
+            bool isValid = await _jwtService.ValidatePatientToken(currentUser);
+
+            if (!isValid && parsedUserId != userId)
+            {
+                return Forbid("No tiene permiso para acceder a los datos de este paciente.");
+            }
+
+            return Ok(studiesResponse);
         }
 
         [HttpGet("getUrl/{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
         public async Task<ActionResult<string>> GetUrlByUserId([FromRoute] int userId, string fileName)
         {
             var user = await _userManager.GetUserById(userId);
@@ -71,10 +101,32 @@ namespace Healthcare.Api.Controllers
 
             var studyUrl = _fileService.GetUrl(user.UserName, fileName);
 
+            var currentUserId = User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+
+            if (!int.TryParse(currentUserId, out int parsedUserId))
+            {
+                return Unauthorized("Usuario no autorizado.");
+            }
+
+            var currentUser = await _userManager.FindByIdAsync(parsedUserId.ToString());
+
+            if (currentUser == null)
+            {
+                return Unauthorized("Usuario no encontrado.");
+            }
+
+            bool isValid = await _jwtService.ValidatePatientToken(currentUser);
+
+            if (!isValid && parsedUserId != userId)
+            {
+                return Forbid("No tiene permiso para acceder a los datos de este paciente.");
+            }
+
             return Ok(studyUrl);
         }
 
         [HttpGet("laboratories/byUser/{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria},{RoleEnum.Paciente}")]
         public async Task<ActionResult<IEnumerable<LaboratoryDetailResponse>>> GetLaboratoriesByUser([FromRoute] int userId)
         {
             var laboratoriesDetail = await _laboratoryDetailService.GetLaboratoriesDetailsByUserIdAsync(userId);
@@ -82,14 +134,37 @@ namespace Healthcare.Api.Controllers
             {
                 return NoContent();
             }
+
+            var currentUserId = User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+
+            if (!int.TryParse(currentUserId, out int parsedUserId))
+            {
+                return Unauthorized("Usuario no autorizado.");
+            }
+
+            var currentUser = await _userManager.FindByIdAsync(parsedUserId.ToString());
+
+            if (currentUser == null)
+            {
+                return Unauthorized("Usuario no encontrado.");
+            }
+
+            bool isValid = await _jwtService.ValidatePatientToken(currentUser);
+
+            if (!isValid && parsedUserId != userId)
+            {
+                return Forbid("No tiene permiso para acceder a los datos de este paciente.");
+            }
+
             return Ok(_mapper.Map<IEnumerable<LaboratoryDetailResponse>>(laboratoriesDetail));
         }
 
-        [HttpGet("laboratoryDetails/byStudy/{studyId}")]
-        public async Task<ActionResult<LaboratoryDetail>> GetLaboratoryDetails([FromRoute] int studyId)
+        [HttpGet("laboratoryDetails/byStudies")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        public async Task<ActionResult<IEnumerable<LaboratoryDetail>>> GetLaboratoryDetails([FromQuery] int[] studiesId)
         {
-            var laboratoryDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudyIdAsync(studyId);
-            return Ok(laboratoryDetails);
+            var laboratoriesDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudiesIds(studiesId);
+            return Ok(laboratoriesDetails);
         }
 
         [HttpGet("ultrasoundImages/byStudy/{studyId}")]
@@ -104,6 +179,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<ActionResult<int>> GetStudies([FromQuery] int? studyTypeId)
         {
             var studies = await _studyService.GetAsync();
@@ -122,6 +198,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("lastStudies")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<ActionResult<int>> GetLastStudies([FromQuery] int? studyTypeId)
         {
             var oneWeekAgo = DateTime.UtcNow.AddDays(-7);
@@ -142,48 +219,8 @@ namespace Healthcare.Api.Controllers
             return Ok(countStudies);
         }
 
-
-        [HttpPost("create/laboratoryDetails")]
-        public async Task<ActionResult<LaboratoryDetail>> CreateLaboratoryDetails([FromForm] TempCreateLaboratoryDetailRequest laboratoryDetailRequest)
-        {
-            if (laboratoryDetailRequest.StudyFile == null || laboratoryDetailRequest.StudyFile.Length <= 0)
-            {
-                return BadRequest("Es necesario el estudio.");
-            }
-
-            var mergedLaboratoryDetails = new LaboratoryDetailRequest();
-            using (var memoryStream = new MemoryStream())
-            {
-                laboratoryDetailRequest.StudyFile.CopyTo(memoryStream);
-                memoryStream.Position = 0;
-                using (var pdfReader = new PdfReader(memoryStream))
-                {
-                    using (var pdfDocument = new PdfDocument(pdfReader))
-                    {
-                        for (int i = 1; i <= pdfDocument.GetNumberOfPages(); i++)
-                        {
-                            var properties = typeof(LaboratoryDetailRequest)
-                                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
-                                .Where(property => property.GetValue(mergedLaboratoryDetails) == null)
-                                .ToList();
-
-                            var page = pdfDocument.GetPage(i);
-                            string text = PdfTextExtractor.GetTextFromPage(page);
-
-                            var pageLaboratoryDetails = ParsePdfText(text, properties);
-                            MergeLaboratoryDetails(mergedLaboratoryDetails, pageLaboratoryDetails);
-                        }
-                    }
-                }
-            }
-            mergedLaboratoryDetails.IdStudy = laboratoryDetailRequest.StudyId;
-            var newLaboratoryDetail = await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
-
-            return newLaboratoryDetail;
-        }
-
-
         [HttpPost("upload-study")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)
         {
             if (study.StudyFiles == null || study.StudyFiles.Count == 0)
@@ -301,6 +338,7 @@ namespace Healthcare.Api.Controllers
                             index++;
                         }
                         studyResponse.UltrasoundImages = ultrasoundImageResponse;
+                        studyResponse.StudyType = _mapper.Map<StudyTypeResponse>(studyType);
                         break;
 
                     default:
@@ -314,6 +352,66 @@ namespace Healthcare.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Ocurrió un error: {ex.Message}");
+            }
+        }
+
+        [HttpPut("update/ultrasoundImages")]
+        public async Task<IActionResult> UpdateStudyWithUltrasoundImage([FromForm] PutUltrasoundImageRequest study)
+        {
+            try
+            {
+                StudyResponse studyResponse = new StudyResponse();
+
+                var getStudy = await _studyService.GetStudyByIdAsync(study.StudyId);
+                if (getStudy == null) 
+                {
+                    return NotFound("Estudio no encontrado.");
+                }
+
+                var studyType = await _studyTypeService.GetStudyTypeByIdAsync(getStudy.StudyTypeId);
+                if (getStudy.StudyTypeId != (int)StudyTypeEnum.Ecografia)
+                {
+                    return NotFound("Tipo de estudio inválido para cargar ecografías.");
+                }
+
+                _mapper.Map(getStudy, studyResponse);
+
+                var imageFiles = study.StudyFiles.Where(f =>
+                    f.FileName.Contains(".jpg", StringComparison.InvariantCultureIgnoreCase) ||
+                    f.FileName.Contains(".png", StringComparison.InvariantCultureIgnoreCase) ||
+                    f.FileName.Contains(".jpeg", StringComparison.InvariantCultureIgnoreCase)
+                ).ToList();
+
+                int index = 1;
+                List<UltrasoundImageResponse> ultrasoundImageResponse = new List<UltrasoundImageResponse>();
+                foreach (var imageFile in imageFiles)
+                {
+                    var imageName = _studyService.GenerateFileName(new FileNameParameters(getStudy.User, studyType, getStudy.Date.ToShortDateString(), getStudy.Note, index, Path.GetExtension(imageFile.FileName)));
+                    UltrasoundImage newUltrasoundImage = new UltrasoundImage()
+                    {
+                        IdStudy = study.StudyId,
+                        LocationS3 = imageName
+                    };
+                    await _ultrasoundImageService.Add(newUltrasoundImage);
+                    ultrasoundImageResponse.Add(_mapper.Map<UltrasoundImageResponse>(newUltrasoundImage));
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        imageFile.CopyTo(memoryStream);
+                        var imageResult = await _fileService.InsertFileStudyAsync(memoryStream, getStudy.User.UserName, imageName);
+                        if (imageResult != HttpStatusCode.OK)
+                        {
+                            return StatusCode((int)imageResult, "Error al cargar las imagenes.");
+                        }
+                    }
+
+                    index++;
+                }
+                studyResponse.UltrasoundImages = ultrasoundImageResponse;
+                return Ok(studyResponse);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 
@@ -466,6 +564,7 @@ namespace Healthcare.Api.Controllers
 
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Delete(int id)
         {
             try

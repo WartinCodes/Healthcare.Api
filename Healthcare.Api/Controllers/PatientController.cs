@@ -4,19 +4,24 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Healthcare.Api.Controllers
 {
     [ApiController]
+    [ServiceFilter(typeof(ValidationUserFilter))]
     [Route("api/[controller]")]
-    //[Authorize(Roles = "Administrador")]
     public class PatientController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
         private readonly IPatientService _patientService;
         private readonly IMapper _mapper;
+        private readonly IJwtService _jwtService;
         private readonly IAddressService _addressService;
         private readonly IHealthPlanService _healthPlanService;
         private readonly IPatientHealthPlanService _patientHealthPlanService;
@@ -27,12 +32,14 @@ namespace Healthcare.Api.Controllers
             IMapper mapper,
             IPatientService patientService,
             IPatientHealthPlanService patientHealthPlanService,
+            IJwtService jwtService,
             IAddressService addressService,
             IHealthPlanService healthPlanService,
             IFileService fileService,
             IEmailService emailService)
         {
             _userManager = userManager;
+            _jwtService = jwtService;
             _patientService = patientService;
             _mapper = mapper;
             _addressService = addressService;
@@ -42,18 +49,19 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public async Task<ActionResult<IEnumerable<PatientResponse>>> Get()
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        public async Task<ActionResult<IEnumerable<PatientAllResponse>>> Get()
         {
             var patientsEntities = (await _patientService.GetAsync())
                 .OrderBy(x => x.User.LastName)
                 .AsEnumerable();
 
-            var patients = _mapper.Map<IEnumerable<PatientResponse>>(patientsEntities);
+            var patients = _mapper.Map<IEnumerable<PatientAllResponse>>(patientsEntities);
             return Ok(patients);
         }
 
-
         [HttpGet("lastPatients")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<ActionResult<int>> GetLastPatient()
         {
             var latestUsers = await UserManagerExtensions.GetUsersRegisteredInLastWeek(_userManager);
@@ -66,18 +74,29 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<PatientResponse>> Get([FromRoute] int userId)
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
+        public async Task<ActionResult<PatientIdResponse>> Get([FromRoute] int userId)
         {
             var patientEntity = await _patientService.GetPatientByUserIdAsync(userId);
             if (patientEntity == null)
             {
                 return NotFound($"El paciente con el ID usuario {userId} no existe.");
             }
-            var patient = _mapper.Map<PatientResponse>(patientEntity);
-            return Ok(patient);
+            var registeredById = await _userManager.FindByIdAsync(patientEntity.User.RegisteredById.ToString());
+            var RegisteredByName = $"{registeredById.FirstName}" + " " + $"{registeredById.LastName}";
+
+            var patientIdResponse = new PatientIdResponse
+            {
+                RegisteredByName = RegisteredByName,
+            };
+
+            _mapper.Map(patientEntity, patientIdResponse);
+            return Ok(patientIdResponse);
         }
 
+
         [HttpPost("create")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Post([FromBody] PatientRequest userRequest)
         {
             try
@@ -152,6 +171,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Put(int userId, [FromBody] PatientRequest userRequest)
         {
             try
@@ -207,6 +227,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpDelete("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Delete(int userId)
         {
             var patient = await _patientService.GetPatientByUserIdAsync(userId);
