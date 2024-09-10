@@ -159,12 +159,12 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<LaboratoryDetailResponse>>(laboratoriesDetail));
         }
 
-        [HttpGet("laboratoryDetails/byStudy/{studyId}")]
+        [HttpGet("laboratoryDetails/byStudies")]
         [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
-        public async Task<ActionResult<LaboratoryDetail>> GetLaboratoryDetails([FromRoute] int studyId)
+        public async Task<ActionResult<IEnumerable<LaboratoryDetail>>> GetLaboratoryDetails([FromQuery] int[] studiesId)
         {
-            var laboratoryDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudyIdAsync(studyId);
-            return Ok(laboratoryDetails);
+            var laboratoriesDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudiesIds(studiesId);
+            return Ok(laboratoriesDetails);
         }
 
         [HttpGet("ultrasoundImages/byStudy/{studyId}")]
