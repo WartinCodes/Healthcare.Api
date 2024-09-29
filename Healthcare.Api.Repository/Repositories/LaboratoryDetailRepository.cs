@@ -32,6 +32,7 @@ namespace Healthcare.Api.Repository.Repositories
         public void Edit(LaboratoryDetail entity)
         {
             _context.LaboratoryDetail.Update(entity);
+            _context.SaveChanges();
         }
 
         public async Task<LaboratoryDetail> AddAsync(LaboratoryDetail entity)
