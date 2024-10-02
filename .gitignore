@@ -21,6 +21,7 @@ bld/
 .idea/.idea.Healthcare.Api
 .vs/
 /.vs
+/Healthcare.Api/.vs
 /Healthcare.Api/bin/Debug/net6.0
 /Healthcare.Api/obj
 /Healthcare.Api.Core/bin/Debug/net6.0
