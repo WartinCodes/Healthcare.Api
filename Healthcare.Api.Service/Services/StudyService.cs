@@ -59,14 +59,19 @@ namespace Healthcare.Api.Service.Services
 
         public string GenerateFileName(FileNameParameters parameters)
         {
+            var dateNow = DateTime.UtcNow.ToArgentinaTime();
             var fileDate = parameters.Date.ToString().Replace("/", "").Trim();
-            if (parameters.Number.HasValue && !string.IsNullOrEmpty(parameters.Note) && !string.IsNullOrEmpty(parameters.Extension))
+
+            var timePart = dateNow.ToString("HHmmss");
+            var combinedDateTime = $"{fileDate}_{timePart}";
+
+            if (parameters.Number.HasValue && !string.IsNullOrEmpty(parameters.Extension))
             {
-                return $"{parameters.Number.Value}-{parameters.User.LastName}{parameters.User.FirstName}{parameters.StudyType.Name}-{parameters.Note}-{fileDate}{parameters.Extension}";
+                return $"{parameters.Number.Value}-{parameters.User.LastName}{parameters.User.FirstName}{parameters.StudyType.Name}-{combinedDateTime}{parameters.Extension}";
             }
             else
             {
-                return $"{parameters.User.LastName}{parameters.User.FirstName}{parameters.StudyType.Name}-{fileDate}{parameters.Extension}";
+                return $"{parameters.User.LastName}{parameters.User.FirstName}{parameters.StudyType.Name}-{combinedDateTime}{parameters.Extension}";
             }
         }
     }
