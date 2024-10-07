@@ -29,8 +29,7 @@ namespace Healthcare.Api.Service.Services
             var claims = new List<Claim>
             {
                 new Claim(nameof(user.Id), user.Id.ToString()),
-                new Claim(nameof(user.Email), user.Email),
-                new Claim(nameof(user.FirstName), user.FirstName)
+                new Claim(nameof(user.Email), user.Email)
             };
 
             foreach (var role in roles)
