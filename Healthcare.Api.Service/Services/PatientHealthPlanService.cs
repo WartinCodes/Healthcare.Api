@@ -20,7 +20,9 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<PatientHealthPlan> Add(PatientHealthPlan entity)
         {
-            return await _unitOfWork.PatientHealthPlanRepository.InsertAsync(entity);
+            var record = await _unitOfWork.PatientHealthPlanRepository.InsertAsync(entity);
+            _unitOfWork.Save();
+            return record;
         }
 
         public async Task Update(Patient entity)

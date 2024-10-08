@@ -75,7 +75,7 @@ namespace Healthcare.Api.Service.Services
 
                 TransferUtilityUploadRequest transferUtilityUploadRequest = new TransferUtilityUploadRequest()
                 {
-                    CannedACL = S3CannedACL.PublicRead,
+                    CannedACL = S3CannedACL.Private,
                     BucketName = _s3Configuration.BucketName,
                     Key = key,
                     InputStream = file
@@ -119,7 +119,7 @@ namespace Healthcare.Api.Service.Services
             {
                 BucketName = _s3Configuration.BucketName,
                 Key = key,
-                Expires = DateTime.Now.AddHours(1) 
+                Expires = DateTime.Now.AddHours(1)
             };
 
             string url = _awsS3Client.GetPreSignedURL(request);
