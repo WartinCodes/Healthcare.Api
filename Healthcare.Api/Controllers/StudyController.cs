@@ -249,7 +249,7 @@ namespace Healthcare.Api.Controllers
                 }
 
                 var pdfFile = study.StudyFiles.SingleOrDefault(f => f.FileName.Contains(".pdf", StringComparison.InvariantCultureIgnoreCase));
-                string pdfFileName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), null, null, Path.GetExtension(pdfFile.FileName)));
+                string pdfFileName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), null, Path.GetExtension(pdfFile.FileName)));
 
                 using (MemoryStream memoryStream = new MemoryStream())
                 {
@@ -317,7 +317,7 @@ namespace Healthcare.Api.Controllers
                         List<UltrasoundImageResponse> ultrasoundImageResponse = new List<UltrasoundImageResponse>();
                         foreach (var imageFile in imageFiles) 
                         {
-                            var imageName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), study.Note, index, Path.GetExtension(imageFile.FileName)));
+                            var imageName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), index, Path.GetExtension(imageFile.FileName)));
                             UltrasoundImage newUltrasoundImage = new UltrasoundImage()
                             {
                                 IdStudy = newStudy.Id,
@@ -386,7 +386,7 @@ namespace Healthcare.Api.Controllers
                 List<UltrasoundImageResponse> ultrasoundImageResponse = new List<UltrasoundImageResponse>();
                 foreach (var imageFile in imageFiles)
                 {
-                    var imageName = _studyService.GenerateFileName(new FileNameParameters(getStudy.User, studyType, getStudy.Date.ToShortDateString(), getStudy.Note, index, Path.GetExtension(imageFile.FileName)));
+                    var imageName = _studyService.GenerateFileName(new FileNameParameters(getStudy.User, studyType, getStudy.Date.ToShortDateString(), index, Path.GetExtension(imageFile.FileName)));
                     UltrasoundImage newUltrasoundImage = new UltrasoundImage()
                     {
                         IdStudy = study.StudyId,
