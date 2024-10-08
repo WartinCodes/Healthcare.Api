@@ -75,7 +75,6 @@ namespace Healthcare.Api.Service.Services
 
                 TransferUtilityUploadRequest transferUtilityUploadRequest = new TransferUtilityUploadRequest()
                 {
-                    CannedACL = S3CannedACL.PublicRead,
                     BucketName = _s3Configuration.BucketName,
                     Key = key,
                     InputStream = file
