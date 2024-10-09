@@ -62,8 +62,8 @@ namespace Healthcare.Api.Service
             var s3Configuration = new S3Configuration();
             configuration.GetSection("S3Configuration").Bind(s3Configuration);
 
-            string awsAccessKey = Environment.GetEnvironmentVariable("S3Configuration.AwsAccessKey") ?? s3Configuration.AwsAccessKey;
-            string awsSecretAccessKey = Environment.GetEnvironmentVariable("S3Configuration.AwsSecretAccessKey") ?? s3Configuration.AwsSecretAccessKey;
+            string awsAccessKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID") ?? s3Configuration.AwsAccessKey;
+            string awsSecretAccessKey = Environment.GetEnvironmentVariable("AWS_SECRET_ACCESS_KEY") ?? s3Configuration.AwsSecretAccessKey;
 
             RegionEndpoint region = RegionEndpoint.GetBySystemName(s3Configuration.AwsRegion);
             services.AddSingleton<IAmazonS3>(new AmazonS3Client(awsAccessKey, awsSecretAccessKey, region));
