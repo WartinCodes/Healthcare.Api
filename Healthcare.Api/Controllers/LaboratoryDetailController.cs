@@ -35,7 +35,7 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
-                var user = await _userManager.GetUserById(Convert.ToInt32(laboratoryDetailRequest.UserId));
+                var user = await _userManager.GetUserById(laboratoryDetailRequest.UserId);
                 if (user == null)
                 {
                     return NotFound("Usuario no encontrado.");
