@@ -3,8 +3,6 @@ using Healthcare.Api.Contracts.Requests.LaboratoryDetail;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -45,7 +43,7 @@ namespace Healthcare.Api.Controllers
 
                 var newStudy = new Study()
                 {
-                    Date = DateTime.Now,
+                    Date = laboratoryDetailRequest.Date,
                     LocationS3 = string.Empty,
                     StudyTypeId = (int)StudyTypeEnum.Laboratorio,
                     UserId = user.Id,
