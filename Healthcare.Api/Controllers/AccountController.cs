@@ -145,10 +145,11 @@ namespace Healthcare.Api.Controllers
                     return Conflict("DNI ya existe.");
                 }
 
+                _mapper.Map(userEdit, user);
                 var newAddress = _mapper.Map<Address>(userEdit.Address);
                 _addressService.Edit(newAddress);
-
                 user.LastActivityDate = DateTime.UtcNow.ToArgentinaTime();
+
                 await _userManager.UpdateAsync(user);
 
                 return Ok($"Usuario con el ID {userId} actualizado exitosamente");

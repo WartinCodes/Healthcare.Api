@@ -8,8 +8,6 @@ using Healthcare.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Healthcare.Api.Controllers
 {
@@ -171,7 +169,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
-        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
         public async Task<IActionResult> Put(int userId, [FromBody] PatientRequest userRequest)
         {
             try

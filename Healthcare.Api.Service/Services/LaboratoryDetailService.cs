@@ -25,7 +25,7 @@ namespace Healthcare.Api.Service.Services
 
         public void Edit(LaboratoryDetail entity)
         {
-            throw new NotImplementedException();
+            _laboratoryDetailsRepository.Edit(entity);
         }
 
         public async Task<IEnumerable<LaboratoryDetail>> GetAsync()
