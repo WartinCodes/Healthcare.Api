@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Requests.LaboratoryDetail;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 
@@ -114,6 +115,8 @@ namespace Helthcare.Api.Mappers
             CreateMap<Country, CountryRequest>().ReverseMap();
             CreateMap<StudyType, StudyTypeRequest>().ReverseMap();
             CreateMap<LaboratoryDetail, LaboratoryDetailRequest>().ReverseMap();
+
+            
             CreateMap<Support, SupportRequest>().ReverseMap();
             CreateMap<PatientHistory, PatientHistoryRequest>().ReverseMap();
 

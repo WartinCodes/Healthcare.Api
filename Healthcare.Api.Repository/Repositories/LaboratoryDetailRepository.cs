@@ -32,6 +32,7 @@ namespace Healthcare.Api.Repository.Repositories
         public void Edit(LaboratoryDetail entity)
         {
             _context.LaboratoryDetail.Update(entity);
+            _context.SaveChanges();
         }
 
         public async Task<LaboratoryDetail> AddAsync(LaboratoryDetail entity)
@@ -45,6 +46,7 @@ namespace Healthcare.Api.Repository.Repositories
                 .Include(x => x.Study)
                 .ThenInclude(x => x.User)
                 .Where(x => x.Study.User.Id == userId)
+                .OrderBy(x => x.Study.Date)
                 .ToListAsync();
         }
 

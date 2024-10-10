@@ -40,6 +40,7 @@ namespace Healthcare.Api.Repository.Repositories
                 .Include(x => x.StudyType)
                 .Include(x => x.User)
                 .Where(x => x.User.Id == userId)
+                .OrderBy(x => x.Date)
                 .ToListAsync();
         }
 
