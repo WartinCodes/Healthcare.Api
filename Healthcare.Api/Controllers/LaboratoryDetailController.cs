@@ -13,6 +13,7 @@ namespace Healthcare.Api.Controllers
     public class LaboratoryDetailController : ControllerBase
     {
         private readonly ILaboratoryDetailService _laboratoryDetailService;
+        private readonly IOtherLaboratoryDetailService _otherLaboratoryDetailService;
         private readonly IStudyService _studyService;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
@@ -20,11 +21,13 @@ namespace Healthcare.Api.Controllers
         public LaboratoryDetailController(
             IStudyService studyService,
             ILaboratoryDetailService laboratoryDetailService,
+            IOtherLaboratoryDetailService otherLaboratoryDetailService,
             IMapper mapper,
             UserManager<User> userManager)
         {
             _studyService = studyService;
             _laboratoryDetailService = laboratoryDetailService;
+            _otherLaboratoryDetailService = otherLaboratoryDetailService;
             _mapper = mapper;
             _userManager = userManager;
         }
@@ -53,7 +56,10 @@ namespace Healthcare.Api.Controllers
 
                 var laboratoryDetail = _mapper.Map<LaboratoryDetail>(laboratoryDetailRequest.LaboratoryDetail);
                 laboratoryDetail.IdStudy = insertedStudy.Id;
-                await _laboratoryDetailService.Add(laboratoryDetail);
+                var insertedLaboratoryDetail = await _laboratoryDetailService.Add(laboratoryDetail);
+
+                await _otherLaboratoryDetailService.AddRange(_mapper.Map<List<OtherLaboratoryDetail>>
+                    (laboratoryDetailRequest.OtherLaboratoryDetails), insertedLaboratoryDetail.Id);
 
                 return Ok();
             }

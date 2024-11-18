@@ -28,6 +28,7 @@ namespace Healthcare.Api.Service
             services.AddTransient<ICityService, CityService>();
             services.AddTransient<ISpecialityService, SpecialityService>();
             services.AddTransient<ILaboratoryDetailService, LaboratoryDetailService>();
+            services.AddTransient<IOtherLaboratoryDetailService, OtherLaboratoryDetailService>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IStudyTypeService, StudyTypeService>();
             services.AddTransient<IStudyService, StudyService>();

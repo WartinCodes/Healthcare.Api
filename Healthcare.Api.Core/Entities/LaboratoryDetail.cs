@@ -66,5 +66,6 @@ namespace Healthcare.Api.Core.Entities
         public string? TiempoSangria { get; set; }
         public string? TiempoProtrombina { get; set; }
         public string? TiempoTromboplastina { get; set; }
+        public ICollection<OtherLaboratoryDetail>? OtherLaboratoryDetails { get; set; }
     }
 }

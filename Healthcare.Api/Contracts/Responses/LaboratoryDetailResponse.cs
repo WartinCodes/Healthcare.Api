@@ -1,4 +1,6 @@
-﻿namespace Healthcare.Api.Contracts.Responses
+﻿using Healthcare.Api.Core.Entities;
+
+namespace Healthcare.Api.Contracts.Responses
 {
     public class LaboratoryDetailResponse
     {
@@ -63,5 +65,6 @@
         public string? TiempoSangria { get; set; }
         public string? TiempoProtrombina { get; set; }
         public string? TiempoTromboplastina { get; set; }
+        public List<OtherLaboratoryDetailResponse> OtherLaboratoryDetails { get; set; }
     }
 }

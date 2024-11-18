@@ -44,7 +44,8 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.LaboratoryDetail
                 .Include(x => x.Study)
-                .ThenInclude(x => x.User)
+                    .ThenInclude(x => x.User)
+                .Include(x => x.OtherLaboratoryDetails)
                 .Where(x => x.Study.User.Id == userId)
                 .OrderBy(x => x.Study.Date)
                 .ToListAsync();
