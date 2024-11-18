@@ -21,7 +21,10 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<IEnumerable<LaboratoryDetail>> GetAsync()
         {
-            return await base.GetAsync().ConfigureAwait(false);
+            return await GetAsync(
+                filter: null,
+                includeProperties: "OtherLaboratoryDetails"
+            ).ConfigureAwait(false);
         }
 
         public void Remove(LaboratoryDetail entity)
