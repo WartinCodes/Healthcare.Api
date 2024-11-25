@@ -186,12 +186,14 @@ namespace Healthcare.Api.Controllers
                     return NotFound($"No se encontró el paciente con el usuario ID: {userId}");
                 }
 
-                var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
-                var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
-                if (existEmail != null && patient.UserId != existEmail.Id)
-                {
-                    return Conflict("Email ya existe.");
+                if (!string.IsNullOrEmpty(userRequest.Email)) { 
+                   var existEmail = await _userManager.FindByEmailAsync(userRequest.Email);
+                   if (existEmail != null && patient.UserId != existEmail.Id)
+                   {
+                       return Conflict("Email ya existe.");
+                   }
                 }
+                var existDocument = await _userManager.FindByNameAsync(userRequest.UserName);
                 if (existDocument != null && patient.UserId != existDocument.Id)
                 {
                     return Conflict("DNI ya existe.");
