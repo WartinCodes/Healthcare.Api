@@ -39,6 +39,7 @@ namespace Healthcare.Api.Repository
             services.AddTransient<ISupportRepository, SupportRepository>();
             services.AddTransient<IPatientHistoryRepository, PatientHistoryRepository>();
             services.AddTransient<IUltrasoundImageRepository, UltrasoundImageRepository>();
+            services.AddTransient<IUnitRepository, UnitRepository>();
 
             return services;
         }

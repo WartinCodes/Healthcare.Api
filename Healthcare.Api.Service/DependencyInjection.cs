@@ -34,6 +34,7 @@ namespace Healthcare.Api.Service
             services.AddTransient<ISupportService, SupportService>();
             services.AddTransient<IPatientHistoryService, PatientHistoryService>();
             services.AddTransient<IUltrasoundImageService, UltrasoundImageService>();
+            services.AddTransient<IUnitService, UnitService>();
 
             services.AddTransient<IFileHelper, FileHelper>();
 

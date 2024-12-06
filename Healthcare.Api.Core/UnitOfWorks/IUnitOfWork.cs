@@ -22,6 +22,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
         IStudyTypeRepository StudyTypeRepository { get; }
         ISupportRepository SupportRepository { get; }
         IUltrasoundImageRepository UltrasoundImageRepository { get; }
+        IUnitRepository UnitRepository { get; }
 
         void Save();
         Task SaveAsync();

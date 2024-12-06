@@ -21,6 +21,7 @@ namespace Helthcare.Api.Mappers
             CreateMap<Country, CountryResponse>();
             CreateMap<State, StateResponse>();
             CreateMap<City, CityResponse>();
+            CreateMap<Unit, UnitResponse>();
             CreateMap<PatientHistory, PatientHistoryResponse>()
                 .ForMember(dest => dest.Doctor, opt => opt.MapFrom(src => string.Concat(src.Doctor.User.FirstName, " ", src.Doctor.User.LastName)));
 

@@ -29,6 +29,7 @@ namespace Healthcare.Api.Repository.Context
         public DbSet<StudyType> StudyType { get; set; }
         public DbSet<Support> Support { get; set; }
         public DbSet<UltrasoundImage> UltrasoundImage { get; set; }
+        public DbSet<Unit> Unit { get; set; }
 
         public HealthcareDbContext(IConfiguration configuration) : base()
         {
