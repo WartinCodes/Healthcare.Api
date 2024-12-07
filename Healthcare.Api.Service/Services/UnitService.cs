@@ -29,9 +29,14 @@ namespace Healthcare.Api.Service.Services
             _unitOfWork.Save();
         }
 
-        public Task<Unit> GetUnitByIdAsync(int id)
+        public async Task<Unit> GetUnitByIdAsync(int id)
         {
-            return _unitRepository.GetUnitByIdAsync(id);
+            return await _unitRepository.GetUnitByIdAsync(id);
+        }
+
+        public async Task<Unit?> GetUnitByNameOrShortNameAsync(string name, string shortName)
+        {
+            return await _unitRepository.GetUnitByNameOrShortNameAsync(name, shortName);
         }
 
         public void Remove(Unit entity)

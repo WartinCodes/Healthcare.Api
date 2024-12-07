@@ -43,5 +43,10 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.Unit.FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<Unit?> GetUnitByNameOrShortNameAsync(string name, string shortName)
+        {
+            return await _context.Unit.FirstOrDefaultAsync(x => x.Name == name || x.ShortName == shortName);
+        }
     }
 }

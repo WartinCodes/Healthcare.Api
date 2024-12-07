@@ -120,6 +120,8 @@ namespace Helthcare.Api.Mappers
             
             CreateMap<Support, SupportRequest>().ReverseMap();
             CreateMap<PatientHistory, PatientHistoryRequest>().ReverseMap();
+            CreateMap<UnitRequest, Unit>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
             #endregion
         }

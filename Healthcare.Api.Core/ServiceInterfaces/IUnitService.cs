@@ -6,6 +6,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
     {
         IQueryable<Unit> GetAsQueryable();
         Task<Unit> GetUnitByIdAsync(int id);
+        Task<Unit?> GetUnitByNameOrShortNameAsync(string name, string shortName);
         Task<Unit> Add(Unit entity);
         void Remove(Unit entity);
         Task Edit(Unit entity);
