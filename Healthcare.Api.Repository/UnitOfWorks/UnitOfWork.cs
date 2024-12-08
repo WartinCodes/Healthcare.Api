@@ -11,6 +11,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         public UnitOfWork(
             HealthcareDbContext context,
             IPatientRepository patientRepository,
+            IBloodTestRepository bloodTestRepository,
             IDoctorRepository doctorRepository,
             ISpecialityRepository specialityRepository,
             IHealthInsuranceRepository healthInsuranceRepository,
@@ -32,6 +33,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         {
             _context = context;
             PatientRepository = patientRepository;
+            BloodTestRepository = bloodTestRepository;
             DoctorRepository = doctorRepository;
             SpecialityRepository = specialityRepository;
             HealthInsuranceRepository = healthInsuranceRepository;
@@ -53,6 +55,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         }
 
         public ISpecialityRepository SpecialityRepository { get; }
+        public IBloodTestRepository BloodTestRepository { get; }
         public IPatientRepository PatientRepository { get; }
         public IDoctorRepository DoctorRepository { get; }
         public IHealthInsuranceRepository HealthInsuranceRepository { get; }

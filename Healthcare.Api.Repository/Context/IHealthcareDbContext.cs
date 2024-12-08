@@ -5,6 +5,7 @@ namespace Healthcare.Api.Repository.Context
 {
     public interface IHealthcareDbContext
     {
+        DbSet<BloodTest> BloodTest { get; set; }
         DbSet<Patient> Patient { get; set; }
         DbSet<Doctor> Doctor { get; set; }
         DbSet<Speciality> Speciality { get; set; }

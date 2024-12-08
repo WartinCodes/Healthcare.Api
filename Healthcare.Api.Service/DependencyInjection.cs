@@ -15,6 +15,7 @@ namespace Healthcare.Api.Service
     {
         public static IServiceCollection AddService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddTransient<IBloodTestService, BloodTestService>();
             services.AddTransient<IDoctorService, DoctorService>();
             services.AddTransient<IDoctorSpecialityService, DoctorSpecialityService>();
             services.AddTransient<IDoctorHealthInsuranceService, DoctorHealthInsuranceService>();
