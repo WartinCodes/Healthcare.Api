@@ -5,6 +5,6 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public string ReferenceValue { get; set; }
-        public UnitRequest Unit { get; set; }
+        public int IdUnit { get; set; }
     }
 }
