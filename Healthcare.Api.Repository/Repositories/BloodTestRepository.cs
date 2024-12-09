@@ -21,21 +21,22 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<IEnumerable<BloodTest>> GetAsync()
         {
-            return await base.GetAsync().ConfigureAwait(false);
+            return await _context.BloodTest.Include(x => x.Unit).ToListAsync();
         }
 
         public async Task<BloodTest> GetBloodTestByIdAsync(int id)
         {
-            return await _context.BloodTest.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.BloodTest.Include(x => x.Unit).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<BloodTest?> GetBloodTestByNameAsync(string name)
         {
-            return await _context.BloodTest.FirstOrDefaultAsync(x => x.Name == name);
+            return await _context.BloodTest.Include(x => x.Unit).FirstOrDefaultAsync(x => x.Name == name);
         }
 
         public async Task<BloodTest> AddAsync(BloodTest entity)
         {
+            _context.Attach(entity.Unit);
             return await base.InsertAsync(entity).ConfigureAwait(false);
         }
 

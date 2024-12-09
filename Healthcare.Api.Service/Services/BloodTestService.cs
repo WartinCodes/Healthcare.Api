@@ -45,9 +45,9 @@ namespace Healthcare.Api.Service.Services
             _unitOfWork.Save();
         }
 
-        public IQueryable<BloodTest> GetAsQueryable()
+        public async Task<IEnumerable<BloodTest>> GetBloodTestsAsync()
         {
-            return _bloodTestRepository.GetAsQueryable();
+            return await _bloodTestRepository.GetAsync();
         }
     }
 }

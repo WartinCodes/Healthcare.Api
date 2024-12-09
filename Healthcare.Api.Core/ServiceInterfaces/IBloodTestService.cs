@@ -4,7 +4,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
 {
     public interface IBloodTestService
     {
-        IQueryable<BloodTest> GetAsQueryable();
+        Task<IEnumerable<BloodTest>> GetBloodTestsAsync();
         Task<BloodTest> GetBloodTestByIdAsync(int id);
         Task<BloodTest?> GetBloodTestByNameAsync(string name);
         Task<BloodTest> Add(BloodTest entity);

@@ -21,10 +21,9 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        public ActionResult<IEnumerable<BloodTestResponse>> Get()
+        public async Task<ActionResult<IEnumerable<BloodTestResponse>>> Get()
         {
-            var bloodTest = _bloodTestService.GetAsQueryable();
-
+            var bloodTest = await _bloodTestService.GetBloodTestsAsync();
             return Ok(_mapper.Map<IEnumerable<BloodTestResponse>>(bloodTest));
         }
 
