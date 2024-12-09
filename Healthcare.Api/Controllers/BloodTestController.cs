@@ -14,59 +14,59 @@ namespace Healthcare.Api.Controllers
         private readonly IBloodTestService _bloodTestService;
         private readonly IMapper _mapper;
 
-        public BloodTestController(IBloodTestService unitService, IMapper mapper)
+        public BloodTestController(IBloodTestService bloodTestService, IMapper mapper)
         {
             _bloodTestService = bloodTestService;
             _mapper = mapper;
         }
 
         [HttpGet("all")]
-        public ActionResult<IEnumerable<UnitResponse>> Get()
+        public ActionResult<IEnumerable<BloodTestResponse>> Get()
         {
-            var units = _unitService.GetAsQueryable();
+            var bloodTest = _bloodTestService.GetAsQueryable();
 
-            return Ok(_mapper.Map<IEnumerable<UnitResponse>>(units));
+            return Ok(_mapper.Map<IEnumerable<BloodTestResponse>>(bloodTest));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UnitResponse>> GetUnitById([FromRoute] int id)
+        public async Task<ActionResult<BloodTestResponse>> GetUnitById([FromRoute] int id)
         {
-            var unit = await _unitService.GetUnitByIdAsync(id);
-            if (unit == null)
+            var bloodTest = await _bloodTestService.GetBloodTestByIdAsync(id);
+            if (bloodTest == null)
             {
-                return NotFound("Unidad no encontrada.");
+                return NotFound("Parametro no encontrado.");
             }
-            return Ok(_mapper.Map<UnitResponse>(unit));
+            return Ok(_mapper.Map<BloodTestResponse>(bloodTest));
         }
 
         [HttpPost]
-        public async Task<ActionResult<UnitResponse>> Create([FromBody] UnitRequest request)
+        public async Task<ActionResult<BloodTestResponse>> Create([FromBody] BloodTestRequest request)
         {
-            var existUnit = await _unitService.GetUnitByNameOrShortNameAsync(request.Name, request.ShortName);
-            if (existUnit != null)
+            var existBloodTest = await _bloodTestService.GetBloodTestByNameAsync(request.Name);
+            if (existBloodTest != null)
             {
-                return Conflict("El nombre o abreviatura de la unidad ya existe.");
+                return Conflict("El parametro ya existe.");
             }
 
-            Unit newUnit = _mapper.Map<Unit>(request);
-            var unit = await _unitService.Add(newUnit);
+            BloodTest newBloodTest = _mapper.Map<BloodTest>(request);
+            var unit = await _bloodTestService.Add(newBloodTest);
             return Ok(unit);
         }
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] UnitRequest unitRequest)
+        public async Task<IActionResult> Put(int id, [FromBody] BloodTestRequest bloodTestRequest)
         {
             try
             {
-                var unit = await _unitService.GetUnitByIdAsync(id);
-                if (unit == null)
+                var bloodTest = await _bloodTestService.GetBloodTestByIdAsync(id);
+                if (bloodTest == null)
                 {
-                    return NotFound("Unidad no encontrada.");
+                    return NotFound("Parametro no encontrado.");
                 }
-                _mapper.Map(unitRequest, unit);
-                await _unitService.Edit(unit);
-                return Ok("Unidad actualizada exitosamente.");
+                _mapper.Map(bloodTestRequest, bloodTest);
+                await _bloodTestService.Edit(bloodTest);
+                return Ok("Parametro actualizado exitosamente.");
             }
             catch (Exception ex)
             {
@@ -79,14 +79,14 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
-                var unit = await _unitService.GetUnitByIdAsync(id);
-                if (unit == null)
+                var bloodTest = await _bloodTestService.GetBloodTestByIdAsync(id);
+                if (bloodTest == null)
                 {
-                    return NotFound("Unidad no encontrada.");
+                    return NotFound("Parametro no encontrado.");
                 }
 
-                _unitService.Remove(unit);
-                return Ok("Unidad eliminada exitosamente.");
+                _bloodTestService.Remove(bloodTest);
+                return Ok("Parametro eliminado exitosamente.");
             }
             catch (Exception ex)
             {

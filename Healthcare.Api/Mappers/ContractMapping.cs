@@ -100,6 +100,7 @@ namespace Helthcare.Api.Mappers
             #endregion
 
             #region Requests
+            CreateMap<BloodTestRequest, BloodTest>();
             CreateMap<User, UserRequest>().ReverseMap();
             CreateMap<User, PatientRequest>().ReverseMap();
             CreateMap<User, DoctorRequest>().ReverseMap();
@@ -119,7 +120,6 @@ namespace Helthcare.Api.Mappers
             CreateMap<StudyType, StudyTypeRequest>().ReverseMap();
             CreateMap<LaboratoryDetail, LaboratoryDetailRequest>().ReverseMap();
 
-            
             CreateMap<Support, SupportRequest>().ReverseMap();
             CreateMap<PatientHistory, PatientHistoryRequest>().ReverseMap();
             CreateMap<UnitRequest, Unit>()

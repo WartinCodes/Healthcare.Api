@@ -1,6 +1,7 @@
 ﻿using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Repository.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Healthcare.Api.Repository.Repositories
 {
@@ -13,50 +14,39 @@ namespace Healthcare.Api.Repository.Repositories
             _context = context;
         }
 
-        public IQueryable<City> GetAsQueryable()
+        public IQueryable<BloodTest> GetAsQueryable()
         {
-            return _context.City.AsQueryable();
+            return _context.BloodTest.AsQueryable();
         }
 
-        public async Task<IEnumerable<City>> GetAsync()
+        public async Task<IEnumerable<BloodTest>> GetAsync()
         {
             return await base.GetAsync().ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<City>> GetAllCitiesAsync()
+        public async Task<BloodTest> GetBloodTestByIdAsync(int id)
         {
-            return await _context.City.AsQueryable()
-                .Include(x => x.State)
-                .ThenInclude(x => x.Country)
-                .ToListAsync();
+            return await _context.BloodTest.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<City> GetCityByIdAsync(int id)
+        public async Task<BloodTest?> GetBloodTestByNameAsync(string name)
         {
-            return await _context.City.Where(x => x.Id == id).AsNoTracking()
-                .FirstOrDefaultAsync();
+            return await _context.BloodTest.FirstOrDefaultAsync(x => x.Name == name);
         }
 
-        public Task<City> AddAsync(City entity)
+        public async Task<BloodTest> AddAsync(BloodTest entity)
         {
-            throw new NotImplementedException();
+            return await base.InsertAsync(entity).ConfigureAwait(false);
         }
 
-        public void Remove(City entity)
+        public void Remove(BloodTest entity)
         {
-            throw new NotImplementedException();
+            base.Delete(entity.Id);
         }
 
-        public void Edit(City entity)
+        public void Edit(BloodTest entity)
         {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<City>> GetCitiesByStateId(int stateId)
-        {
-            return await _context.City
-                .Where(x => x.IdState == stateId)
-                .ToListAsync();
+            _context.BloodTest.Update(entity);
         }
     }
 }
