@@ -40,6 +40,11 @@ namespace Healthcare.Api.Repository.Repositories
             return entityEntry.Entity;
         }
 
+        public virtual async Task InsertRangeAsync(IEnumerable<TEntity> entities)
+        {
+            await DbSet.AddRangeAsync(entities).ConfigureAwait(continueOnCapturedContext: false);
+        }
+
         public virtual async Task<TEntity> InsertAsync(TEntity entity)
         {
             return (await DbSet.AddAsync(entity).ConfigureAwait(continueOnCapturedContext: false)).Entity;

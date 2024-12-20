@@ -49,5 +49,10 @@ namespace Healthcare.Api.Service.Services
         {
             return await _bloodTestRepository.GetAsync();
         }
+
+        public IEnumerable<string> GetAllBloodTestName()
+        {
+            return _bloodTestRepository.GetAsQueryable().Select(x => x.Name).Distinct().ToList();
+        }
     }
 }

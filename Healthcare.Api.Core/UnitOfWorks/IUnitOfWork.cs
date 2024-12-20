@@ -5,6 +5,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
     public interface IUnitOfWork : IDisposable
     {
         IBloodTestRepository BloodTestRepository { get; }
+        IBloodTestDataRepository BloodTestDataRepository { get; }
         IDoctorRepository DoctorRepository { get; }
         IDoctorHealthInsuranceRepository DoctorHealthInsuranceRepository { get; }
         IDoctorSpecialityRepository DoctorSpecialityRepository { get; }

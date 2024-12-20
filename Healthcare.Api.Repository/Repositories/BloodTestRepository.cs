@@ -49,5 +49,10 @@ namespace Healthcare.Api.Repository.Repositories
         {
             _context.BloodTest.Update(entity);
         }
+
+        public async Task<BloodTest> AddRangeAsync(BloodTest entity)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace Healthcare.Api.Repository.Context
 
         public DbSet<Address> Address { get; set; }
         public DbSet<BloodTest> BloodTest { get; set; }
+        public DbSet<BloodTestData> BloodTestData { get; set; }
         public DbSet<City> City { get; set; }
         public DbSet<Patient> Patient { get; set; }
         public DbSet<PatientHealthPlan> PatientHealthPlan { get; set; }

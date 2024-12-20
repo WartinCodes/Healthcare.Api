@@ -12,6 +12,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             HealthcareDbContext context,
             IPatientRepository patientRepository,
             IBloodTestRepository bloodTestRepository,
+            IBloodTestDataRepository bloodTestDataRepository,
             IDoctorRepository doctorRepository,
             ISpecialityRepository specialityRepository,
             IHealthInsuranceRepository healthInsuranceRepository,
@@ -34,6 +35,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             _context = context;
             PatientRepository = patientRepository;
             BloodTestRepository = bloodTestRepository;
+            BloodTestDataRepository = bloodTestDataRepository;
             DoctorRepository = doctorRepository;
             SpecialityRepository = specialityRepository;
             HealthInsuranceRepository = healthInsuranceRepository;
@@ -54,8 +56,8 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             UnitRepository = unitRepository;
         }
 
-        public ISpecialityRepository SpecialityRepository { get; }
         public IBloodTestRepository BloodTestRepository { get; }
+        public IBloodTestDataRepository BloodTestDataRepository { get; }
         public IPatientRepository PatientRepository { get; }
         public IDoctorRepository DoctorRepository { get; }
         public IHealthInsuranceRepository HealthInsuranceRepository { get; }
@@ -68,12 +70,14 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         public IStateRepository StateRepository { get; }
         public IDoctorHealthInsuranceRepository DoctorHealthInsuranceRepository { get; }
         public IPatientHealthPlanRepository PatientHealthPlanRepository { get; }
+        public ISpecialityRepository SpecialityRepository { get; }
         public IStudyRepository StudyRepository { get; }
         public IStudyTypeRepository StudyTypeRepository { get; }
         public ISupportRepository SupportRepository { get; }
         public IPatientHistoryRepository PatientHistoryRepository { get; }
         public IUltrasoundImageRepository UltrasoundImageRepository { get; }
         public IUnitRepository UnitRepository { get; }
+
 
         public void Dispose()
         {

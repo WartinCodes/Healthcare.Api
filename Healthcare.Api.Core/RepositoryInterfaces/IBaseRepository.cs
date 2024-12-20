@@ -9,6 +9,7 @@ namespace Healthcare.Api.Core.RepositoryInterfaces
         Task<TEntity> GetByIdAsync(object id);
         TEntity Insert(TEntity entity);
         Task<TEntity> InsertAsync(TEntity entity);
+        Task InsertRangeAsync(IEnumerable<TEntity> entities);
         void Delete(object id);
         Task DeleteAsync(object id);
         void Delete(TEntity entityToDelete);

@@ -123,6 +123,8 @@ namespace Helthcare.Api.Mappers
             CreateMap<Support, SupportRequest>().ReverseMap();
             CreateMap<PatientHistory, PatientHistoryRequest>().ReverseMap();
             CreateMap<UnitRequest, Unit>().ReverseMap();
+            CreateMap<BloodTestDataRequest, BloodTestData>().ReverseMap();
+
 
             #endregion
         }
