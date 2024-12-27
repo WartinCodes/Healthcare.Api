@@ -9,6 +9,7 @@ using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -28,6 +29,7 @@ namespace Healthcare.Api.Controllers
         private readonly IBloodTestService _bloodTestService;
         private readonly IBloodTestDataService _bloodTestDataService;
         private readonly UserManager<User> _userManager;
+        private List<BloodTestData> _addedBloodTestData = new List<BloodTestData>();
 
         public BloodTestDataController(
             IFileService fileService,
@@ -113,8 +115,13 @@ namespace Healthcare.Api.Controllers
                             var page = pdfDocument.GetPage(i);
                             string text = PdfTextExtractor.GetTextFromPage(page);
 
+                            properties = properties.Where(p => !_addedBloodTestData
+                                .Any(b => b.IdBloodTest == p.Id))
+                                .ToList();
+
                             List<BloodTestData> pageBloodTestData = ParsePdfText(text, insertedStudy.Id, properties);
                             await _bloodTestDataService.AddRangeAsync(pageBloodTestData);
+                            _addedBloodTestData.AddRange(pageBloodTestData);
                         }
                     }
                 }
@@ -134,6 +141,11 @@ namespace Healthcare.Api.Controllers
 
                 foreach (var property in properties)
                 {
+                    if (datas.Any(d => d.IdBloodTest == property.Id))
+                    {
+                        continue;
+                    }
+
                     if (cleanLine.Contains(property.Name, StringComparison.InvariantCultureIgnoreCase))
                     {
                         BloodTestData bloodTestData = new BloodTestData();
@@ -144,11 +156,7 @@ namespace Healthcare.Api.Controllers
 
                         if (timeMatch.Success)
                         {
-                            //var timeValue = Convert.ChangeType(timeMatch.Value, property.PropertyType, CultureInfo.InvariantCulture);
-                            //if (property.GetValue(laboratoryDetail) == null)
-                            //{
-                            //    property.SetValue(laboratoryDetail, timeValue);
-                            //}
+                            bloodTestData.Value = timeMatch.Value;
                         }
                         else
                         {
@@ -178,16 +186,11 @@ namespace Healthcare.Api.Controllers
                                 {
                                     string formattedNumber = string.Join(",", matches.Cast<Match>().Select(m => m.Value));
                                     bloodTestData.Value += formattedNumber;
-                                    //if (property.GetValue(laboratoryDetail) == null)
-                                    //{
-                                    //    property.SetValue(laboratoryDetail, formattedNumber);
-                                    //}
                                 }
                             }
                         }
 
                         datas.Add(bloodTestData);
-
                         break;
                     }
                 }
