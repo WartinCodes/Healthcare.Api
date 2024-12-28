@@ -11,8 +11,13 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.ToTable("BloodTest").HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-            builder.Property(x => x.Name)
-                .HasColumnName("Name")
+            builder.Property(x => x.ParsedName)
+                .HasColumnName("ParsedName")
+                .IsRequired()
+                .IsUnicode(false);
+
+            builder.Property(x => x.OriginalName)
+                .HasColumnName("OriginalName")
                 .IsRequired()
                 .IsUnicode(false);
 

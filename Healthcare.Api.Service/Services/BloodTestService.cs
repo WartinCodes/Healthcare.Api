@@ -52,7 +52,7 @@ namespace Healthcare.Api.Service.Services
 
         public IEnumerable<string> GetAllBloodTestName()
         {
-            return _bloodTestRepository.GetAsQueryable().Select(x => x.Name).Distinct().ToList();
+            return _bloodTestRepository.GetAsQueryable().Select(x => x.ParsedName).Distinct().ToList();
         }
     }
 }

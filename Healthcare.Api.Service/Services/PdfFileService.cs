@@ -27,7 +27,7 @@ namespace Healthcare.Api.Service.Services
                     if (datas.Any(d => d.IdBloodTest == property.Id))
                         continue;
 
-                    if (!cleanLine.Contains(property.Name, StringComparison.InvariantCultureIgnoreCase))
+                    if (!cleanLine.Contains(property.ParsedName, StringComparison.InvariantCultureIgnoreCase))
                         continue;
 
                     var bloodTestData = new BloodTestData

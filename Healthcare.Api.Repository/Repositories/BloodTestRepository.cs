@@ -31,7 +31,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public async Task<BloodTest?> GetBloodTestByNameAsync(string name)
         {
-            return await _context.BloodTest.Include(x => x.Unit).FirstOrDefaultAsync(x => x.Name == name);
+            return await _context.BloodTest.Include(x => x.Unit).FirstOrDefaultAsync(x => x.ParsedName == name);
         }
 
         public async Task<BloodTest> AddAsync(BloodTest entity)
