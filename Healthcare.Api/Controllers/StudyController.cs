@@ -345,8 +345,6 @@ namespace Healthcare.Api.Controllers
                         studyResponse.StudyType = _mapper.Map<StudyTypeResponse>(studyType);
                         break;
 
-                    default:
-                        return NotFound("Tipo de estudio no encontrado.");
                 }
 
                 await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
