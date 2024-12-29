@@ -30,6 +30,16 @@ namespace Healthcare.Api.Service.Services
             await _unitOfWork.SaveAsync();
         }
 
+        public async Task AddRangeAsync(int studyId, List<BloodTestData> entities)
+        {
+            foreach (var item in entities)
+            {
+                item.IdStudy = studyId;
+            }
+            await _unitOfWork.BloodTestDataRepository.InsertRangeAsync(entities);
+            await _unitOfWork.SaveAsync();
+        }
+
         public Task Edit(BloodTestData entity)
         {
             throw new NotImplementedException();

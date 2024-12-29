@@ -5,6 +5,5 @@
         public int Id { get; set; }
         public string Value { get; set; }
         public int IdBloodTest { get; set; }
-        public int IdStudy { get; set; }
     }
 }

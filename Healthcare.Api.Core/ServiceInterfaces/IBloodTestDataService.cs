@@ -9,6 +9,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<IEnumerable<BloodTestData>> GetBloodTestDatasByStudyIdAsync(int studyId);
         Task<BloodTestData> Add(BloodTestData entity);
         Task AddRangeAsync(List<BloodTestData> entities);
+        Task AddRangeAsync(int studyId, List<BloodTestData> entities);
         void Remove(BloodTestData entity);
         Task Edit(BloodTestData entity);
     }

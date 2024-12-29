@@ -54,6 +54,7 @@ namespace Healthcare.Api.Repository.Repositories
         public async Task<IEnumerable<BloodTestData>> GetByStudyIdAsync(int studyId)
         {
             return await _context.BloodTestData
+                .Include(x => x.Study)
                 .Include(x => x.BloodTest)
                 .ThenInclude(x => x.Unit)
                 .Where(x => x.IdStudy == studyId)
