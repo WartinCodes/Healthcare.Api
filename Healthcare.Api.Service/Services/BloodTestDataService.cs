@@ -2,6 +2,7 @@
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
+using System.Xml.Linq;
 
 namespace Healthcare.Api.Service.Services
 {
@@ -39,14 +40,20 @@ namespace Healthcare.Api.Service.Services
             throw new NotImplementedException();
         }
 
-        public Task<BloodTestData> GetBloodTestDataByIdAsync(int id)
+        public async Task<BloodTestData> GetBloodTestDataByIdAsync(int id)
         {
             throw new NotImplementedException();
         }
 
+        public async Task<IEnumerable<BloodTestData>> GetBloodTestDatasByStudyIdAsync(int studyId)
+        {
+            return await _bloodTestDataRepository.GetByStudyIdAsync(studyId);
+        }
+
         public void Remove(BloodTestData entity)
         {
-            throw new NotImplementedException();
+            _unitOfWork.BloodTestDataRepository.Delete(entity);
+            _unitOfWork.Save();
         }
     }
 }

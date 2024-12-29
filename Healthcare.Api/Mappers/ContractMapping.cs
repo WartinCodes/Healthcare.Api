@@ -33,8 +33,8 @@ namespace Helthcare.Api.Mappers
                 .ReverseMap();
             CreateMap<UltrasoundImage, UltrasoundImageResponse>().ReverseMap();
             CreateMap<BloodTest, BloodTestResponse>();
-
-
+            CreateMap<BloodTestData, BloodTestDataResponse>();
+ 
             CreateMap<User, UserResponse>()
                 .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.UserName))
                 .ReverseMap();

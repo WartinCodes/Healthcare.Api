@@ -50,5 +50,14 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.BloodTestData.Include(x => x.BloodTest).ToListAsync();
         }
+
+        public async Task<IEnumerable<BloodTestData>> GetByStudyIdAsync(int studyId)
+        {
+            return await _context.BloodTestData
+                .Include(x => x.BloodTest)
+                .ThenInclude(x => x.Unit)
+                .Where(x => x.IdStudy == studyId)
+                .ToListAsync();
+        }
     }
 }
