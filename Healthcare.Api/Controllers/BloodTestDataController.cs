@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
-using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Requests.LaboratoryDetail;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
@@ -13,22 +14,68 @@ namespace Healthcare.Api.Controllers
     public class BloodTestDataController : ControllerBase
     {
         private readonly IBloodTestDataService _bloodTestDataService;
+        private readonly IStudyService _studyService;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
 
-        public BloodTestDataController(IBloodTestDataService bloodTestDataService, IMapper mapper)
+        public BloodTestDataController(
+            IBloodTestDataService bloodTestDataService,
+            IStudyService studyService,
+            UserManager<User> userManager,
+            IMapper mapper)
         {
             _bloodTestDataService = bloodTestDataService;
+            _studyService = studyService;
+            _userManager = userManager;
             _mapper = mapper;
         }
 
-        [HttpGet("byStudy/{studyId}")]
-        public async Task<ActionResult<IEnumerable<BloodTestDataResponse>>> GetByStudyId([FromRoute] int studyId)
+        [HttpPost("create")]
+        public async Task<IActionResult> Create([FromBody] BloodTestDataCreateRequest bloodTestDataRequest)
         {
-            var bloodDataTests = await _bloodTestDataService.GetBloodTestDatasByStudyIdAsync(studyId);
+            try
+            {
+                var user = await _userManager.GetUserById(bloodTestDataRequest.UserId);
+                if (user == null)
+                {
+                    return NotFound("Usuario no encontrado.");
+                }
+
+                var newStudy = new Study()
+                {
+                    Date = bloodTestDataRequest.Date,
+                    LocationS3 = string.Empty,
+                    StudyTypeId = (int)StudyTypeEnum.Laboratorio,
+                    UserId = user.Id,
+                    Note = bloodTestDataRequest.Note
+                };
+                Study insertedStudy = await _studyService.Add(newStudy);
+
+                var dataLaboratories = _mapper.Map<List<BloodTestData>>(bloodTestDataRequest.BloodTestDatas);
+                await _bloodTestDataService.AddRangeAsync(newStudy.Id, dataLaboratories);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [HttpGet("byStudies")]
+        public async Task<ActionResult<IEnumerable<BloodTestDataResponse>>> GetByStudiesIds([FromQuery] int[] studiesIds)
+        {
+            if (studiesIds == null || studiesIds.Length == 0)
+            {
+                return BadRequest("Debe proporcionar al menos un ID de estudio.");
+            }
+
+            var bloodDataTests = await _bloodTestDataService.GetBloodTestDatasByStudyIdsAsync(studiesIds);
             if (!bloodDataTests.Any())
             {
                 return NoContent();
             }
+
             return Ok(_mapper.Map<IEnumerable<BloodTestDataResponse>>(bloodDataTests));
         }
 

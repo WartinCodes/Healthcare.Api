@@ -52,12 +52,17 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<BloodTestData> GetBloodTestDataByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _bloodTestDataRepository.GetByIdAsync(id);
         }
 
         public async Task<IEnumerable<BloodTestData>> GetBloodTestDatasByStudyIdAsync(int studyId)
         {
             return await _bloodTestDataRepository.GetByStudyIdAsync(studyId);
+        }
+
+        public async Task<IEnumerable<BloodTestData>> GetBloodTestDatasByStudyIdsAsync(int[] studiesIds)
+        {
+            return await _bloodTestDataRepository.GetBloodTestDatasByStudyIdsAsync(studiesIds);
         }
 
         public void Remove(BloodTestData entity)
