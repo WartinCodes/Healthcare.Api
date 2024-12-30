@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Requests.LaboratoryDetail;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
@@ -77,6 +78,21 @@ namespace Healthcare.Api.Controllers
             }
 
             return Ok(_mapper.Map<IEnumerable<BloodTestDataResponse>>(bloodDataTests));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] BloodTestDataEditRequest bloodTestDataRequest)
+        {
+            var bloodTestData = await _bloodTestDataService.GetBloodTestDataByIdAsync(id);
+            if (bloodTestData == null)
+            {
+                return NotFound("Registro no encontrado.");
+            }
+
+            bloodTestData.Value = bloodTestDataRequest.Value;
+            await _bloodTestDataService.Edit(bloodTestData);
+
+            return Ok();
         }
 
         [HttpDelete("{id}")]

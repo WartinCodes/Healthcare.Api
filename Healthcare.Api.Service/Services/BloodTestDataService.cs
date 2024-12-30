@@ -40,9 +40,10 @@ namespace Healthcare.Api.Service.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public Task Edit(BloodTestData entity)
+        public async Task Edit(BloodTestData entity)
         {
-            throw new NotImplementedException();
+            _unitOfWork.BloodTestDataRepository.Update(entity);
+            _unitOfWork.Save();
         }
 
         public Task<IEnumerable<BloodTestData>> GetBloodTestDataAsync()
