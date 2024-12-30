@@ -1,4 +1,5 @@
-﻿using Healthcare.Api.Core.Entities;
+﻿using Google.Protobuf.Reflection;
+using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
@@ -29,14 +30,15 @@ namespace Healthcare.Api.Repository.Repositories
             return await _context.BloodTest.Include(x => x.Unit).FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<BloodTest?> GetBloodTestByNameAsync(string name)
+        public async Task<BloodTest?> GetBloodTestByNamesAsync(string originalName, string parsedName)
         {
-            return await _context.BloodTest.Include(x => x.Unit).FirstOrDefaultAsync(x => x.ParsedName == name);
+            return await _context.BloodTest
+                .Include(x => x.Unit)
+                .FirstOrDefaultAsync(x => x.OriginalName == originalName || x.ParsedName == parsedName);
         }
 
         public async Task<BloodTest> AddAsync(BloodTest entity)
         {
-            _context.Attach(entity.Unit);
             return await base.InsertAsync(entity).ConfigureAwait(false);
         }
 

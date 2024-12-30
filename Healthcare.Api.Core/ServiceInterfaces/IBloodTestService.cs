@@ -6,7 +6,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
     {
         Task<IEnumerable<BloodTest>> GetBloodTestsAsync();
         Task<BloodTest> GetBloodTestByIdAsync(int id);
-        Task<BloodTest?> GetBloodTestByNameAsync(string name);
+        Task<BloodTest?> GetBloodTestByNamesAsync(string originalName, string parsedName);
         IEnumerable<string> GetAllBloodTestName();
         Task<BloodTest> Add(BloodTest entity);
         void Remove(BloodTest entity);

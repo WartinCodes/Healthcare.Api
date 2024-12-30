@@ -41,7 +41,7 @@ namespace Healthcare.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<BloodTestResponse>> Create([FromBody] BloodTestRequest request)
         {
-            var existBloodTest = await _bloodTestService.GetBloodTestByNameAsync(request.Name);
+            var existBloodTest = await _bloodTestService.GetBloodTestByNamesAsync(request.OriginalName, request.ParsedName);
             if (existBloodTest != null)
             {
                 return Conflict("El parametro ya existe.");

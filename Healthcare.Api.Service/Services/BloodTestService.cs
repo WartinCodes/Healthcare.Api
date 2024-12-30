@@ -34,9 +34,9 @@ namespace Healthcare.Api.Service.Services
             return await _bloodTestRepository.GetBloodTestByIdAsync(id);
         }
 
-        public async Task<BloodTest?> GetBloodTestByNameAsync(string name)
+        public async Task<BloodTest?> GetBloodTestByNamesAsync(string originalName, string parsedName)
         {
-            return await _bloodTestRepository.GetBloodTestByNameAsync(name);
+            return await _bloodTestRepository.GetBloodTestByNamesAsync(originalName, parsedName);
         }
 
         public void Remove(BloodTest entity)
