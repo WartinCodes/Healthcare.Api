@@ -31,11 +31,28 @@ namespace Healthcare.Api.Service.Services
 
         public async Task AddRangeAsync(int studyId, List<BloodTestData> entities)
         {
+            var newDataLaboratories = new List<BloodTestData>();
+
             foreach (var item in entities)
             {
-                item.IdStudy = studyId;
+                var bloodTestData = await GetBloodTestDataByBloodTestIdAsync(item.IdBloodTest, studyId);
+
+                if (bloodTestData != null)
+                {
+                    bloodTestData.Value = item.Value;
+                    _unitOfWork.BloodTestDataRepository.Update(bloodTestData);
+                }
+                else
+                {
+                    item.IdStudy = studyId;
+                    newDataLaboratories.Add(item);
+                }
             }
-            await _unitOfWork.BloodTestDataRepository.InsertRangeAsync(entities);
+            if (newDataLaboratories.Any())
+            {
+                await _unitOfWork.BloodTestDataRepository.InsertRangeAsync(newDataLaboratories);
+            }
+
             await _unitOfWork.SaveAsync();
         }
 

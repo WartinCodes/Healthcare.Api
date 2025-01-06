@@ -88,6 +88,7 @@ namespace Healthcare.Api.Controllers
             {
                 return NotFound("Estudio no encontrado.");
             }
+            
             var dataLaboratories = _mapper.Map<List<BloodTestData>>(bloodTestDataRequests);
             await _bloodTestDataService.AddRangeAsync(idStudy, dataLaboratories);
 
