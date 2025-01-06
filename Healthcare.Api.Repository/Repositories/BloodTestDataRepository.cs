@@ -20,7 +20,6 @@ namespace Healthcare.Api.Repository.Repositories
             return await base.InsertAsync(entity).ConfigureAwait(false);
         }
 
-
         public async Task AddRangeAsync(List<BloodTestData> entities)
         {
             if (entities == null || entities.Count == 0)

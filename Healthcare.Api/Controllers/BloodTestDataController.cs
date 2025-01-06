@@ -80,21 +80,6 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<BloodTestDataResponse>>(bloodDataTests));
         }
 
-        [HttpPut("value/{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] BloodTestDataEditRequest bloodTestDataRequest)
-        {
-            var bloodTestData = await _bloodTestDataService.GetBloodTestDataByIdAsync(id);
-            if (bloodTestData == null)
-            {
-                return NotFound("Registro no encontrado.");
-            }
-
-            bloodTestData.Value = bloodTestDataRequest.Value;
-            await _bloodTestDataService.Edit(bloodTestData);
-
-            return Ok();
-        }
-
         [HttpPut("{idStudy}")]
         public async Task<IActionResult> Put(int idStudy, [FromBody] List<BloodTestDataRequest> bloodTestDataRequests)
         {

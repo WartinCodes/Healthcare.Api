@@ -2,7 +2,6 @@
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
-using System.Xml.Linq;
 
 namespace Healthcare.Api.Service.Services
 {
@@ -49,6 +48,12 @@ namespace Healthcare.Api.Service.Services
         public Task<IEnumerable<BloodTestData>> GetBloodTestDataAsync()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<BloodTestData?> GetBloodTestDataByBloodTestIdAsync(int bloodTestId, int studyId)
+        {
+            return (await _bloodTestDataRepository.GetByStudyIdAsync(studyId))
+                .FirstOrDefault(x => x.IdBloodTest == bloodTestId);
         }
 
         public async Task<BloodTestData> GetBloodTestDataByIdAsync(int id)
