@@ -10,11 +10,7 @@ using iText.Kernel.Pdf.Canvas.Parser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel;
-using System.Globalization;
 using System.Net;
-using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace Healthcare.Api.Controllers
 {
@@ -26,15 +22,20 @@ namespace Healthcare.Api.Controllers
         private readonly IStudyTypeService _studyTypeService;
         private readonly IPatientService _patientService;
         private readonly IFileService _fileService;
+        private readonly IPdfFileService _pdfFileService;
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
         private readonly ILaboratoryDetailService _laboratoryDetailService;
         private readonly IUltrasoundImageService _ultrasoundImageService;
         private readonly IMapper _mapper;
+        private readonly IBloodTestService _bloodTestService;
+        private readonly IBloodTestDataService _bloodTestDataService;
         private readonly UserManager<User> _userManager;
+        private List<BloodTestData> _addedBloodTestData = new List<BloodTestData>();
 
         public StudyController(
             IFileService fileService,
+            IPdfFileService pdfFileService,
             IPatientService patientService,
             IStudyService studyService,
             IJwtService jwtService,
@@ -43,9 +44,12 @@ namespace Healthcare.Api.Controllers
             IMapper mapper,
             ILaboratoryDetailService laboratoryDetailService,
             IUltrasoundImageService ultrasoundImageService,
+            IBloodTestService bloodTestService,
+            IBloodTestDataService bloodTestDataService,
             UserManager<User> userManager)
         {
             _fileService = fileService;
+            _pdfFileService = pdfFileService;
             _patientService = patientService;
             _studyService = studyService;
             _studyTypeService = studyTypeService;
@@ -54,6 +58,8 @@ namespace Healthcare.Api.Controllers
             _mapper = mapper;
             _laboratoryDetailService = laboratoryDetailService;
             _ultrasoundImageService = ultrasoundImageService;
+            _bloodTestService = bloodTestService;
+            _bloodTestDataService = bloodTestDataService;
             _userManager = userManager;
         }
 
@@ -270,13 +276,13 @@ namespace Healthcare.Api.Controllers
                     StudyTypeId = study.StudyTypeId,
                 };
 
-                await _studyService.Add(newStudy);
+                var insertedStudy = await _studyService.Add(newStudy);
                 _mapper.Map(newStudy, studyResponse);
 
                 switch (study.StudyTypeId)
                 {
                     case (int)StudyTypeEnum.Laboratorio:
-                        var mergedLaboratoryDetails = new LaboratoryDetailRequest();
+                        var properties = await _bloodTestService.GetBloodTestsAsync();
                         using (var memoryStream = new MemoryStream())
                         {
                             pdfFile.CopyTo(memoryStream);
@@ -287,22 +293,20 @@ namespace Healthcare.Api.Controllers
                                 {
                                     for (int i = 1; i <= pdfDocument.GetNumberOfPages(); i++)
                                     {
-                                        var properties = typeof(LaboratoryDetailRequest)
-                                            .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)
-                                            .Where(property => property.GetValue(mergedLaboratoryDetails) == null)
-                                            .ToList();
-
                                         var page = pdfDocument.GetPage(i);
                                         string text = PdfTextExtractor.GetTextFromPage(page);
 
-                                        var pageLaboratoryDetails = ParsePdfText(text, properties);
-                                        MergeLaboratoryDetails(mergedLaboratoryDetails, pageLaboratoryDetails);
+                                        properties = properties.Where(p => !_addedBloodTestData
+                                            .Any(b => b.IdBloodTest == p.Id))
+                                            .ToList();
+
+                                        List<BloodTestData> pageBloodTestData = _pdfFileService.ParsePdfText(text, insertedStudy.Id, properties);
+                                        await _bloodTestDataService.AddRangeAsync(pageBloodTestData);
+                                        _addedBloodTestData.AddRange(pageBloodTestData);
                                     }
                                 }
                             }
                         }
-                        mergedLaboratoryDetails.IdStudy = newStudy.Id;
-                        await _laboratoryDetailService.Add(_mapper.Map<LaboratoryDetail>(mergedLaboratoryDetails));
                         break;
 
                     case (int)StudyTypeEnum.Ecografia:
@@ -412,154 +416,6 @@ namespace Healthcare.Api.Controllers
                 throw ex;
             }
         }
-
-        private void MergeLaboratoryDetails(LaboratoryDetailRequest mergedDetails, LaboratoryDetailRequest pageDetails)
-        {
-            mergedDetails.GlobulosRojos = MergeProperty(mergedDetails.GlobulosRojos, pageDetails.GlobulosRojos);
-            mergedDetails.GlobulosBlancos = MergeProperty(mergedDetails.GlobulosBlancos, pageDetails.GlobulosBlancos);
-            mergedDetails.Hemoglobina = MergeProperty(mergedDetails.Hemoglobina, pageDetails.Hemoglobina);
-            mergedDetails.Hematocrito = MergeProperty(mergedDetails.Hematocrito, pageDetails.Hematocrito);
-            mergedDetails.VCM = MergeProperty(mergedDetails.VCM, pageDetails.VCM);
-            mergedDetails.HCM = MergeProperty(mergedDetails.HCM, pageDetails.HCM);
-            mergedDetails.CHCM = MergeProperty(mergedDetails.CHCM, pageDetails.CHCM);
-            mergedDetails.NeutrofilosCayados = MergeProperty(mergedDetails.NeutrofilosCayados, pageDetails.NeutrofilosCayados);
-            mergedDetails.NeutrofilosSegmentados = MergeProperty(mergedDetails.NeutrofilosSegmentados, pageDetails.NeutrofilosSegmentados);
-            mergedDetails.Eosinofilos = MergeProperty(mergedDetails.Eosinofilos, pageDetails.Eosinofilos);
-            mergedDetails.Basofilos = MergeProperty(mergedDetails.Basofilos, pageDetails.Basofilos);
-            mergedDetails.Linfocitos = MergeProperty(mergedDetails.Linfocitos, pageDetails.Linfocitos);
-            mergedDetails.Monocitos = MergeProperty(mergedDetails.Monocitos, pageDetails.Monocitos);
-            mergedDetails.Eritrosedimentacion1 = MergeProperty(mergedDetails.Eritrosedimentacion1, pageDetails.Eritrosedimentacion1);
-            mergedDetails.Eritrosedimentacion2 = MergeProperty(mergedDetails.Eritrosedimentacion2, pageDetails.Eritrosedimentacion2);
-            mergedDetails.Plaquetas = MergeProperty(mergedDetails.Plaquetas, pageDetails.Plaquetas);
-            mergedDetails.Glucemia = MergeProperty(mergedDetails.Glucemia, pageDetails.Glucemia);
-            mergedDetails.Uremia = MergeProperty(mergedDetails.Uremia, pageDetails.Uremia);
-            mergedDetails.Creatininemia = MergeProperty(mergedDetails.Creatininemia, pageDetails.Creatininemia);
-            mergedDetails.Creatinfosfoquinasa = MergeProperty(mergedDetails.Creatinfosfoquinasa, pageDetails.Creatinfosfoquinasa);
-            mergedDetails.ColesterolTotal = MergeProperty(mergedDetails.ColesterolTotal, pageDetails.ColesterolTotal);
-            mergedDetails.ColesterolHdl = MergeProperty(mergedDetails.ColesterolHdl, pageDetails.ColesterolHdl);
-            mergedDetails.ColesterolLdl = MergeProperty(mergedDetails.ColesterolLdl, pageDetails.ColesterolLdl);
-            mergedDetails.Trigliceridos = MergeProperty(mergedDetails.Trigliceridos, pageDetails.Trigliceridos);
-            mergedDetails.Uricemia = MergeProperty(mergedDetails.Uricemia, pageDetails.Uricemia);
-            mergedDetails.BilirrubinaDirecta = MergeProperty(mergedDetails.BilirrubinaDirecta, pageDetails.BilirrubinaDirecta);
-            mergedDetails.BilirrubinaIndirecta = MergeProperty(mergedDetails.BilirrubinaIndirecta, pageDetails.BilirrubinaIndirecta);
-            mergedDetails.BilirrubinaTotal = MergeProperty(mergedDetails.BilirrubinaTotal, pageDetails.BilirrubinaTotal);
-            mergedDetails.Amilasemia = MergeProperty(mergedDetails.Amilasemia, pageDetails.Amilasemia);
-            mergedDetails.TransaminasaGlutamicoOxalac = MergeProperty(mergedDetails.TransaminasaGlutamicoOxalac, pageDetails.TransaminasaGlutamicoOxalac);
-            mergedDetails.TransaminasaGlutamicoPiruvic = MergeProperty(mergedDetails.TransaminasaGlutamicoPiruvic, pageDetails.TransaminasaGlutamicoPiruvic);
-            mergedDetails.FosfatasaAlcalina = MergeProperty(mergedDetails.FosfatasaAlcalina, pageDetails.FosfatasaAlcalina);
-            mergedDetails.TirotrofinaPlamatica = MergeProperty(mergedDetails.TirotrofinaPlamatica, pageDetails.TirotrofinaPlamatica);
-            mergedDetails.Sodio = MergeProperty(mergedDetails.Sodio, pageDetails.Sodio);
-            mergedDetails.Potasio = MergeProperty(mergedDetails.Potasio, pageDetails.Potasio);
-            mergedDetails.CloroPlasmatico = MergeProperty(mergedDetails.CloroPlasmatico, pageDetails.CloroPlasmatico);
-            mergedDetails.CalcemiaTotal = MergeProperty(mergedDetails.CalcemiaTotal, pageDetails.CalcemiaTotal);
-            mergedDetails.MagnesioSangre = MergeProperty(mergedDetails.MagnesioSangre, pageDetails.MagnesioSangre);
-            mergedDetails.ProteinasTotales = MergeProperty(mergedDetails.ProteinasTotales, pageDetails.ProteinasTotales);
-            mergedDetails.Albumina = MergeProperty(mergedDetails.Albumina, pageDetails.Albumina);
-            mergedDetails.Pseudocolinesterasa = MergeProperty(mergedDetails.Pseudocolinesterasa, pageDetails.Pseudocolinesterasa);
-            mergedDetails.Ferremia = MergeProperty(mergedDetails.Ferremia, pageDetails.Ferremia);
-            mergedDetails.Transferrina = MergeProperty(mergedDetails.Transferrina, pageDetails.Transferrina);
-            mergedDetails.SaturacionTransferrina = MergeProperty(mergedDetails.SaturacionTransferrina, pageDetails.SaturacionTransferrina);
-            mergedDetails.Ferritina = MergeProperty(mergedDetails.Ferritina, pageDetails.Ferritina);
-            mergedDetails.TiroxinaEfectiva = MergeProperty(mergedDetails.TiroxinaEfectiva, pageDetails.TiroxinaEfectiva);
-            mergedDetails.TiroxinaTotal = MergeProperty(mergedDetails.TiroxinaTotal, pageDetails.TiroxinaTotal);
-            mergedDetails.HemoglobinaGlicosilada = MergeProperty(mergedDetails.HemoglobinaGlicosilada, pageDetails.HemoglobinaGlicosilada);
-            mergedDetails.GlutamilTranspeptidasa = MergeProperty(mergedDetails.GlutamilTranspeptidasa, pageDetails.GlutamilTranspeptidasa);
-            mergedDetails.TiempoCoagulacion = MergeProperty(mergedDetails.TiempoCoagulacion, pageDetails.TiempoCoagulacion);
-            mergedDetails.TiempoProtrombina = MergeProperty(mergedDetails.TiempoProtrombina, pageDetails.TiempoProtrombina);
-            mergedDetails.TiempoSangria = MergeProperty(mergedDetails.TiempoSangria, pageDetails.TiempoSangria);
-            mergedDetails.TiempoTromboplastina = MergeProperty(mergedDetails.TiempoTromboplastina, pageDetails.TiempoTromboplastina);
-            mergedDetails.AntigenoProstaticoEspecifico = MergeProperty(mergedDetails.AntigenoProstaticoEspecifico, pageDetails.AntigenoProstaticoEspecifico);
-            mergedDetails.PsaLibre = MergeProperty(mergedDetails.PsaLibre, pageDetails.PsaLibre);
-            mergedDetails.RelacionPsaLibre = MergeProperty(mergedDetails.RelacionPsaLibre, pageDetails.RelacionPsaLibre);
-            mergedDetails.VitaminaD3 = MergeProperty(mergedDetails.VitaminaD3, pageDetails.VitaminaD3);
-            mergedDetails.CocienteAlbumina = MergeProperty(mergedDetails.CocienteAlbumina, pageDetails.CocienteAlbumina);
-            mergedDetails.Nucleotidasa = MergeProperty(mergedDetails.Nucleotidasa, pageDetails.Nucleotidasa);
-        }
-
-        private string MergeProperty(string existingValue, string newValue)
-        {
-            if (existingValue == null)
-                return newValue;
-
-            if (newValue == null)
-                return existingValue;
-
-            return existingValue + newValue;
-        }
-
-        private static LaboratoryDetailRequest ParsePdfText(string text, List<PropertyInfo> properties)
-        {
-            var laboratoryDetail = new LaboratoryDetailRequest();
-
-            string[] lines = text.Split('\n').Skip(1).ToArray();
-
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string cleanLine = lines[i].Trim();
-
-                foreach (var property in properties.Where(property => property.GetValue(laboratoryDetail) == null))
-                {
-                    var displayNameAttribute = (DisplayNameAttribute)property.GetCustomAttribute(typeof(DisplayNameAttribute));
-                    string propertyNameToShow = displayNameAttribute != null ? displayNameAttribute.DisplayName : property.Name;
-
-                    if (cleanLine.Contains(propertyNameToShow, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        Match timeMatch = Regex.Match(cleanLine, @"\b\d{1,2}:\d{2}\b");
-
-                        if (timeMatch.Success)
-                        {
-                            var timeValue = Convert.ChangeType(timeMatch.Value, property.PropertyType, CultureInfo.InvariantCulture);
-                            if (property.GetValue(laboratoryDetail) == null)
-                            {
-                                property.SetValue(laboratoryDetail, timeValue);
-                            }
-                        }
-                        else
-                        {
-                            cleanLine = Regex.Replace(cleanLine, @"^\d+\s*-\s*", "").Trim();
-                            cleanLine = Regex.Replace(cleanLine, @"\s*[-(]\s*\d+.*$", "").Trim();
-                            MatchCollection matches = Regex.Matches(cleanLine, @"(?<![a-zA-Z])\d{1,3}(?:\.\d{3})*(?:,\d+)?(?![a-zA-Z])");
-
-                            if (matches.Count > 0)
-                            {
-                                string formattedNumber = string.Join(".", matches.Cast<Match>().Select(m => m.Value));
-                                if (cleanLine.Contains("eritrosedimentacion", StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    formattedNumber = matches.Last().Value.Split(',').Last();
-                                }
-
-                                if (property.GetValue(laboratoryDetail) == null)
-                                {
-                                    property.SetValue(laboratoryDetail, formattedNumber);
-                                }
-                            }
-                            else if (i + 2 < lines.Length)
-                            {
-                                cleanLine = lines[i + 2].Trim();
-                                matches = Regex.Matches(cleanLine, @"(?<![a-zA-Z])\d{1,3}(?:\.\d{3})*(?:,\d+)?(?![a-zA-Z])");
-                                if (matches.Count == 0 && i + 3 < lines.Length)
-                                {
-                                    cleanLine = lines[i + 3].Trim();
-                                    matches = Regex.Matches(cleanLine, @"(?<![a-zA-Z])\d{1,3}(?:\.\d{3})*(?:,\d+)?(?![a-zA-Z])");
-                                }
-                                if (matches.Count > 0)
-                                {
-                                    string formattedNumber = string.Join(",", matches.Cast<Match>().Select(m => m.Value));
-                                    if (property.GetValue(laboratoryDetail) == null)
-                                    {
-                                        property.SetValue(laboratoryDetail, formattedNumber);
-                                    }
-                                }
-                            }
-                        }
-
-                        break;
-                    }
-                }
-            }
-            return laboratoryDetail;
-        }
-
 
         [HttpDelete("{id}")]
         [Authorize(Roles = $"{RoleEnum.Secretaria}")]

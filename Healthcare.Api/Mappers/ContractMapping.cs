@@ -21,6 +21,7 @@ namespace Helthcare.Api.Mappers
             CreateMap<Country, CountryResponse>();
             CreateMap<State, StateResponse>();
             CreateMap<City, CityResponse>();
+            CreateMap<Unit, UnitResponse>();
             CreateMap<PatientHistory, PatientHistoryResponse>()
                 .ForMember(dest => dest.Doctor, opt => opt.MapFrom(src => string.Concat(src.Doctor.User.FirstName, " ", src.Doctor.User.LastName)));
 
@@ -31,7 +32,9 @@ namespace Helthcare.Api.Mappers
                 .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Study.Date))
                 .ReverseMap();
             CreateMap<UltrasoundImage, UltrasoundImageResponse>().ReverseMap();
-
+            CreateMap<BloodTest, BloodTestResponse>();
+            CreateMap<BloodTestData, BloodTestDataResponse>();
+ 
             CreateMap<User, UserResponse>()
                 .ForMember(dest => dest.DNI, opt => opt.MapFrom(src => src.UserName))
                 .ReverseMap();
@@ -97,6 +100,7 @@ namespace Helthcare.Api.Mappers
             #endregion
 
             #region Requests
+            CreateMap<BloodTestRequest, BloodTest>().ReverseMap();
             CreateMap<User, UserRequest>().ReverseMap();
             CreateMap<User, PatientRequest>().ReverseMap();
             CreateMap<User, DoctorRequest>().ReverseMap();
@@ -116,9 +120,11 @@ namespace Helthcare.Api.Mappers
             CreateMap<StudyType, StudyTypeRequest>().ReverseMap();
             CreateMap<LaboratoryDetail, LaboratoryDetailRequest>().ReverseMap();
 
-            
             CreateMap<Support, SupportRequest>().ReverseMap();
             CreateMap<PatientHistory, PatientHistoryRequest>().ReverseMap();
+            CreateMap<UnitRequest, Unit>().ReverseMap();
+            CreateMap<BloodTestDataRequest, BloodTestData>().ReverseMap();
+
 
             #endregion
         }

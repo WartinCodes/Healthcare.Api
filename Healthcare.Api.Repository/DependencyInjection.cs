@@ -22,6 +22,8 @@ namespace Healthcare.Api.Repository
         private static IServiceCollection AddReppositories(this IServiceCollection services)
         {
             services.AddTransient<IAddressRepository, AddressRepository>();
+            services.AddTransient<IBloodTestRepository, BloodTestRepository>();
+            services.AddTransient<IBloodTestDataRepository, BloodTestDataRepository>();
             services.AddTransient<ICityRepository, CityRepository>();
             services.AddTransient<IDoctorRepository, DoctorRepository>();
             services.AddTransient<IDoctorSpecialityRepository, DoctorSpecialityRepository>();
@@ -39,6 +41,7 @@ namespace Healthcare.Api.Repository
             services.AddTransient<ISupportRepository, SupportRepository>();
             services.AddTransient<IPatientHistoryRepository, PatientHistoryRepository>();
             services.AddTransient<IUltrasoundImageRepository, UltrasoundImageRepository>();
+            services.AddTransient<IUnitRepository, UnitRepository>();
 
             return services;
         }

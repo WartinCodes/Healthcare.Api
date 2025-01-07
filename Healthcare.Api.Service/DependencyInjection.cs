@@ -15,6 +15,8 @@ namespace Healthcare.Api.Service
     {
         public static IServiceCollection AddService(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddTransient<IBloodTestService, BloodTestService>();
+            services.AddTransient<IBloodTestDataService, BloodTestDataService>();
             services.AddTransient<IDoctorService, DoctorService>();
             services.AddTransient<IDoctorSpecialityService, DoctorSpecialityService>();
             services.AddTransient<IDoctorHealthInsuranceService, DoctorHealthInsuranceService>();
@@ -29,11 +31,13 @@ namespace Healthcare.Api.Service
             services.AddTransient<ISpecialityService, SpecialityService>();
             services.AddTransient<ILaboratoryDetailService, LaboratoryDetailService>();
             services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IPdfFileService, PdfFileService>();
             services.AddTransient<IStudyTypeService, StudyTypeService>();
             services.AddTransient<IStudyService, StudyService>();
             services.AddTransient<ISupportService, SupportService>();
             services.AddTransient<IPatientHistoryService, PatientHistoryService>();
             services.AddTransient<IUltrasoundImageService, UltrasoundImageService>();
+            services.AddTransient<IUnitService, UnitService>();
 
             services.AddTransient<IFileHelper, FileHelper>();
 

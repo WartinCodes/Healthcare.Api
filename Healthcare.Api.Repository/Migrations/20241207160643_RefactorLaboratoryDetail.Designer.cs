@@ -3,6 +3,7 @@ using System;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Healthcare.Api.Repository.Migrations
 {
     [DbContext(typeof(HealthcareDbContext))]
-    partial class HealthcareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241207160643_RefactorLaboratoryDetail")]
+    partial class RefactorLaboratoryDetail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,17 +71,11 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<int>("IdUnit")
                         .HasColumnType("int");
 
-                    b.Property<string>("OriginalName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .IsUnicode(false)
                         .HasColumnType("longtext")
-                        .HasColumnName("OriginalName");
-
-                    b.Property<string>("ParsedName")
-                        .IsRequired()
-                        .IsUnicode(false)
-                        .HasColumnType("longtext")
-                        .HasColumnName("ParsedName");
+                        .HasColumnName("Name");
 
                     b.Property<string>("ReferenceValue")
                         .IsUnicode(false)
@@ -990,7 +986,7 @@ namespace Healthcare.Api.Repository.Migrations
                     b.HasOne("Healthcare.Api.Core.Entities.Study", "Study")
                         .WithMany()
                         .HasForeignKey("IdStudy")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("BloodTest");

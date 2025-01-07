@@ -12,6 +12,8 @@ namespace Healthcare.Api.Repository.Context
         public const string _Schema = "Healthcare";
 
         public DbSet<Address> Address { get; set; }
+        public DbSet<BloodTest> BloodTest { get; set; }
+        public DbSet<BloodTestData> BloodTestData { get; set; }
         public DbSet<City> City { get; set; }
         public DbSet<Patient> Patient { get; set; }
         public DbSet<PatientHealthPlan> PatientHealthPlan { get; set; }
@@ -29,6 +31,7 @@ namespace Healthcare.Api.Repository.Context
         public DbSet<StudyType> StudyType { get; set; }
         public DbSet<Support> Support { get; set; }
         public DbSet<UltrasoundImage> UltrasoundImage { get; set; }
+        public DbSet<Unit> Unit { get; set; }
 
         public HealthcareDbContext(IConfiguration configuration) : base()
         {
