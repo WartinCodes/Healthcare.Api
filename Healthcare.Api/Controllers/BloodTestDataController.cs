@@ -120,54 +120,5 @@ namespace Healthcare.Api.Controllers
                 return StatusCode(500, $"An error occurred while processing your request: {ex}");
             }
         }
-
-        /// <summary>
-        /// Endpoint para importar archivo CSV de LaboratoryDetail.
-        /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
-        [HttpPost("upload-csv")]
-        public async Task<IActionResult> UploadCsv(IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-                return BadRequest("No file uploaded.");
-
-            using (var stream = file.OpenReadStream())
-            using (var reader = new StreamReader(stream))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                var records = csv.GetRecords<dynamic>().ToList();
-                foreach (var record in records)
-                {
-                    int idStudy = int.Parse(record.IdStudy);
-
-                    foreach (var property in ((IDictionary<string, object>)record))
-                    {
-                        string columnName = property.Key;
-                        string value = property.Value?.ToString();
-
-                        if (columnName != "Id" && columnName != "IdStudy" && !string.IsNullOrEmpty(value))
-                        {
-                            var bloodTest = (await _bloodTestService.GetBloodTestsAsync())
-                                .FirstOrDefault(bt => bt.ParsedName == columnName);
-
-                            if (bloodTest != null)
-                            {
-                                var bloodTestData = new BloodTestData
-                                {
-                                    IdBloodTest = bloodTest.Id,
-                                    IdStudy = idStudy,
-                                    Value = value
-                                };
-
-                                await _bloodTestDataService.Add(bloodTestData);
-                            }
-                        }
-                    }
-                }
-
-                return Ok("File parsed and data saved successfully.");
-            }
-        }
     }
 }
