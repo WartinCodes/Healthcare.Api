@@ -3,10 +3,12 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
 {
+    [Authorize(Roles = RoleEnum.Administrador)]
     [Route("api/[controller]")]
     [ApiController]
     public class BloodTestController : ControllerBase
