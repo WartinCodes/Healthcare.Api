@@ -21,7 +21,7 @@ namespace Healthcare.Api.Controllers
             _mapper = mapper;
         }
 
-        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria},{RoleEnum.Administrador}")]
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<StudyTypeResponse>>> Get()
         {
@@ -29,7 +29,7 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<StudyTypeResponse>>(studyTypes));
         }
 
-        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria},{RoleEnum.Administrador}")]
         [HttpGet("{id}")]
         public async Task<ActionResult<StudyTypeResponse>> Get([FromRoute] int id)
         {
