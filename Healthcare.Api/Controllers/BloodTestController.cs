@@ -3,6 +3,7 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
@@ -20,6 +21,7 @@ namespace Healthcare.Api.Controllers
             _mapper = mapper;
         }
 
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria},{RoleEnum.Administrador}")]
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<BloodTestResponse>>> Get()
         {
@@ -27,8 +29,9 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<BloodTestResponse>>(bloodTest));
         }
 
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria},{RoleEnum.Administrador}")]
         [HttpGet("{id}")]
-        public async Task<ActionResult<BloodTestResponse>> GetUnitById([FromRoute] int id)
+        public async Task<ActionResult<BloodTestResponse>> GetBloodTestById([FromRoute] int id)
         {
             var bloodTest = await _bloodTestService.GetBloodTestByIdAsync(id);
             if (bloodTest == null)
@@ -38,6 +41,7 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<BloodTestResponse>(bloodTest));
         }
 
+        [Authorize(Roles = $"{RoleEnum.Administrador}")]
         [HttpPost]
         public async Task<ActionResult<BloodTestResponse>> Create([FromBody] BloodTestRequest request)
         {
@@ -52,7 +56,7 @@ namespace Healthcare.Api.Controllers
             return Ok(unit);
         }
 
-
+        [Authorize(Roles = $"{RoleEnum.Administrador}")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] BloodTestRequest bloodTestRequest)
         {
@@ -73,6 +77,7 @@ namespace Healthcare.Api.Controllers
             }
         }
 
+        [Authorize(Roles = $"{RoleEnum.Administrador}")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

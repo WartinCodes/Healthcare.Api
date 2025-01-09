@@ -3,8 +3,7 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
-using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
@@ -22,6 +21,7 @@ namespace Healthcare.Api.Controllers
             _mapper = mapper;
         }
 
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria},{RoleEnum.Administrador}")]
         [HttpGet("all")]
         public async Task<ActionResult<IEnumerable<StudyTypeResponse>>> Get()
         {
@@ -29,6 +29,7 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<StudyTypeResponse>>(studyTypes));
         }
 
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria},{RoleEnum.Administrador}")]
         [HttpGet("{id}")]
         public async Task<ActionResult<StudyTypeResponse>> Get([FromRoute] int id)
         {
@@ -36,6 +37,7 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<StudyTypeResponse>(studyTypeEntity));
         }
 
+        [Authorize(Roles = $"{RoleEnum.Administrador}")]
         [HttpPost("create")]
         public async Task<IActionResult> Post([FromBody] StudyTypeRequest studyTypeRequest)
         {
@@ -52,6 +54,7 @@ namespace Healthcare.Api.Controllers
             }
         }
 
+        [Authorize(Roles = $"{RoleEnum.Administrador}")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] StudyTypeRequest studyTypeRequest)
         {
@@ -74,6 +77,7 @@ namespace Healthcare.Api.Controllers
             }
         }
 
+        [Authorize(Roles = $"{RoleEnum.Administrador}")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
