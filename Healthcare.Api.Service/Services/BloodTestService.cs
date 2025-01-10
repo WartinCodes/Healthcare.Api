@@ -2,6 +2,7 @@
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
+using Healthcare.Api.Service.Helper;
 
 namespace Healthcare.Api.Service.Services
 {
@@ -47,7 +48,23 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<IEnumerable<BloodTest>> GetBloodTestsAsync()
         {
-            return await _bloodTestRepository.GetAsync();
+            var bloodTests = await _bloodTestRepository.GetAsync();
+            if (!bloodTests.Any())
+            {
+                return Enumerable.Empty<BloodTest>();
+            }
+
+            var ordenDict = BloodTestOrder.Order
+                .Select((nombre, indice) => new { nombre, indice })
+                .ToDictionary(x => x.nombre, x => x.indice);
+
+            var datosOrdenados = bloodTests
+                .OrderBy(b => ordenDict.ContainsKey(b.OriginalName)
+                    ? ordenDict[b.OriginalName]
+                    : int.MaxValue)
+                .ToList();
+
+            return datosOrdenados;
         }
 
         public IEnumerable<string> GetAllBloodTestName()

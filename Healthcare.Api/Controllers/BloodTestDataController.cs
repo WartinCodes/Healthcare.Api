@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CsvHelper;
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Requests.LaboratoryDetail;
 using Healthcare.Api.Contracts.Responses;
@@ -8,8 +7,6 @@ using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Formats.Asn1;
-using System.Globalization;
 
 namespace Healthcare.Api.Controllers
 {
