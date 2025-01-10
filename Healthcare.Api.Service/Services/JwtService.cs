@@ -42,7 +42,6 @@ namespace Healthcare.Api.Service.Services
                 _configuration["JWT:Issuer"],
                 _configuration["JWT:Audience"],
                 claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["JWT:DurationInMinutes"])),
                 signingCredentials: credentials
             );
 
@@ -54,15 +53,12 @@ namespace Healthcare.Api.Service.Services
             var userClaims = await _userManager.GetClaimsAsync(user);
             var currentUserId = userClaims.FirstOrDefault(x => x.Type == "Id")?.Value;
 
-            int.TryParse(currentUserId, out int parsedUserId);
-
-            if (parsedUserId == user.Id)
+            if (int.TryParse(currentUserId, out int parsedUserId) && parsedUserId == user.Id)
             {
                 return true;
             }
 
             var userRoles = await _userManager.GetRolesAsync(user);
-
             if (userRoles.Contains(RoleEnum.Medico) || userRoles.Contains(RoleEnum.Secretaria))
             {
                 return true;
