@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-
+jobs:
   deploy-master:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
