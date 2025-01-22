@@ -45,6 +45,7 @@ namespace Healthcare.Api.Controllers
                 {
                     Date = laboratoryDetailRequest.Date,
                     LocationS3 = string.Empty,
+                    Created = DateTime.UtcNow.ToArgentinaTime(),
                     StudyTypeId = (int)StudyTypeEnum.Laboratorio,
                     UserId = user.Id,
                     Note = laboratoryDetailRequest.Note

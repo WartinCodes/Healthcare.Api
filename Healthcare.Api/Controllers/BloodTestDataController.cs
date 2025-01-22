@@ -48,6 +48,7 @@ namespace Healthcare.Api.Controllers
                 var newStudy = new Study()
                 {
                     Date = bloodTestDataRequest.Date,
+                    Created = DateTime.UtcNow.ToArgentinaTime(),
                     LocationS3 = string.Empty,
                     StudyTypeId = (int)StudyTypeEnum.Laboratorio,
                     UserId = user.Id,

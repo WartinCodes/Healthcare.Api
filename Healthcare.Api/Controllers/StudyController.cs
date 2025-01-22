@@ -271,6 +271,7 @@ namespace Healthcare.Api.Controllers
                 {
                     LocationS3 = pdfFileName,
                     Date = study.Date,
+                    Created = DateTime.UtcNow.ToArgentinaTime(),
                     Note = study.Note,
                     UserId = user.Id,
                     StudyTypeId = study.StudyTypeId,
@@ -338,7 +339,6 @@ namespace Healthcare.Api.Controllers
                                     return StatusCode((int)imageResult, "Error al cargar las imagenes.");
                                 }
                             }
-
                             index++;
                         }
                         studyResponse.UltrasoundImages = ultrasoundImageResponse;
