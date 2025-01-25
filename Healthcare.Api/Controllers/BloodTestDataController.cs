@@ -68,7 +68,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("byStudies")]
-        public async Task<ActionResult<IEnumerable<BloodTestDataResponse>>> GetByStudiesIds([FromQuery] int[] studiesIds)
+        public async Task<ActionResult<IEnumerable<BloodTestDataStudyResponse>>> GetByStudiesIds([FromQuery] int[] studiesIds)
         {
             if (studiesIds == null || studiesIds.Length == 0)
             {
@@ -81,7 +81,9 @@ namespace Healthcare.Api.Controllers
                 return NoContent();
             }
 
-            return Ok(_mapper.Map<IEnumerable<BloodTestDataResponse>>(bloodDataTests));
+            var response = _mapper.Map<IEnumerable<BloodTestDataStudyResponse>>(bloodDataTests);
+
+            return Ok(response);
         }
 
         [HttpPut("{idStudy}")]

@@ -3,6 +3,7 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Requests.LaboratoryDetail;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Entities.DTO;
 
 namespace Helthcare.Api.Mappers
 {
@@ -97,6 +98,20 @@ namespace Helthcare.Api.Mappers
               .ForMember(dest => dest.CUIT, opt => opt.MapFrom(src => src.User.CUIT))
               .ForMember(dest => dest.MaritalStatus, opt => opt.MapFrom(src => src.User.MaritalStatus))
               .ReverseMap();
+            #endregion
+
+            #region Response DTO
+            CreateMap<BloodTestDataStudyDto, BloodTestDataStudyResponse>()
+                       .ForMember(dest => dest.Study, opt => opt.MapFrom(src => src.Study))
+                       .ForMember(dest => dest.BloodTestData, opt => opt.MapFrom(src => src.BloodTestData));
+
+            CreateMap<BloodTestDataStudyDto, BloodTestDataStudyResponse>()
+                .ForMember(dest => dest.BloodTestData, opt => opt.MapFrom(src => src.BloodTestData))
+                .ForMember(dest => dest.Study, opt => opt.MapFrom(src => src.Study));
+            CreateMap<BloodTestDataDto, BloodTestDataResponse>();
+            CreateMap<BloodTestDto, BloodTestResponse>();
+            CreateMap<UnitDto, UnitResponse>();
+            CreateMap<StudyDto, StudyResponse>();
             #endregion
 
             #region Requests

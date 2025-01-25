@@ -1,4 +1,5 @@
 ﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Entities.DTO;
 
 namespace Healthcare.Api.Core.ServiceInterfaces
 {
@@ -8,7 +9,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<BloodTestData> GetBloodTestDataByIdAsync(int id);
         Task<BloodTestData?> GetBloodTestDataByBloodTestIdAsync(int bloodTestId, int studyId);
         Task<IEnumerable<BloodTestData>> GetBloodTestDatasByStudyIdAsync(int studyId);
-        Task<IEnumerable<BloodTestData>> GetBloodTestDatasByStudyIdsAsync(int[] studiesIds);
+        Task<IEnumerable<BloodTestDataStudyDto>> GetBloodTestDatasByStudyIdsAsync(int[] studiesIds);
         Task<BloodTestData> Add(BloodTestData entity);
         Task AddRangeAsync(List<BloodTestData> entities);
         Task AddRangeAsync(int studyId, List<BloodTestData> entities);

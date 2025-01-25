@@ -1,4 +1,5 @@
 ﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Entities.DTO;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
@@ -84,25 +85,56 @@ namespace Healthcare.Api.Service.Services
             return await _bloodTestDataRepository.GetByStudyIdAsync(studyId);
         }
 
-        public async Task<IEnumerable<BloodTestData>> GetBloodTestDatasByStudyIdsAsync(int[] studiesIds)
+        public async Task<IEnumerable<BloodTestDataStudyDto>> GetBloodTestDatasByStudyIdsAsync(int[] studiesIds)
         {
             var bloodDataTests = await _bloodTestDataRepository.GetBloodTestDatasByStudyIdsAsync(studiesIds);
+
             if (!bloodDataTests.Any())
             {
-                return Enumerable.Empty<BloodTestData>();
+                return Enumerable.Empty<BloodTestDataStudyDto>();
             }
 
             var orderDict = BloodTestOrder.Order
                 .Select((nombre, indice) => new { nombre, indice })
                 .ToDictionary(x => x.nombre, x => x.indice);
 
-            var orderData = bloodDataTests
+            var orderedData = bloodDataTests
                 .OrderBy(b => orderDict.ContainsKey(b.BloodTest.OriginalName)
                     ? orderDict[b.BloodTest.OriginalName]
                     : int.MaxValue)
                 .ToList();
 
-            return orderData;
+            var groupedResponse = orderedData
+                .GroupBy(b => b.Study)
+                .Select(group => new BloodTestDataStudyDto
+                {
+                    Study = new StudyDto
+                    {
+                        Id = group.Key.Id,
+                        Created = group.Key.Created,
+                        Date = group.Key.Date
+                    },
+                    BloodTestData = group.Select(b => new BloodTestDataDto
+                    {
+                        Id = b.Id,
+                        Value = b.Value,
+                        BloodTest = b.BloodTest != null ? new BloodTestDto
+                        {
+                            Id = b.IdBloodTest,
+                            ReferenceValue = b.BloodTest.ReferenceValue,
+                            ParsedName = b.BloodTest.ParsedName,
+                            OriginalName = b.BloodTest.OriginalName,
+                            Unit = b.BloodTest.Unit != null ? new UnitDto
+                            {
+                                Id = b.BloodTest.Unit.Id,
+                                Name = b.BloodTest.Unit.Name,
+                                ShortName = b.BloodTest.Unit.ShortName
+                            } : null
+                        } : null
+                    }).ToList()
+                }).ToList();
+
+            return groupedResponse;
         }
 
 
