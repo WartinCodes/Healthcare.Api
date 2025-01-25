@@ -1,4 +1,4 @@
-﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Entities.DTO;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
@@ -132,7 +132,9 @@ namespace Healthcare.Api.Service.Services
                             } : null
                         } : null
                     }).ToList()
-                }).ToList();
+                })
+                .OrderBy(g => g.Study.Date) 
+                .ToList();
 
             return groupedResponse;
         }
