@@ -14,6 +14,7 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.Property(s => s.Date).IsRequired();
             builder.Property(s => s.LocationS3).IsRequired();
             builder.Property(s => s.Note).IsRequired(false);
+            builder.Property(s => s.Created).IsRequired(false);
 
             builder.HasOne(s => s.StudyType)
                 .WithMany(st => st.Studies)

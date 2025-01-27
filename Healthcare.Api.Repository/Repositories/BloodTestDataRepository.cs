@@ -67,6 +67,7 @@ namespace Healthcare.Api.Repository.Repositories
                 .Include(x => x.BloodTest)
                 .ThenInclude(x => x.Unit)
                 .Where(b => studiesIds.Contains(b.IdStudy))
+                .OrderBy(b => b.Study.Date)
                 .ToListAsync();
         }
     }

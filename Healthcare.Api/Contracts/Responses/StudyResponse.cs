@@ -1,6 +1,4 @@
-﻿using Healthcare.Api.Core.Entities;
-
-namespace Healthcare.Api.Contracts.Responses
+﻿namespace Healthcare.Api.Contracts.Responses
 {
     public class StudyResponse
     {
@@ -10,6 +8,7 @@ namespace Healthcare.Api.Contracts.Responses
         public StudyTypeResponse StudyType { get; set; }
         public DateTime Date { get; set; }
         public string Note { get; set; }
+        public DateTime? Created { get; set; }
         public List<UltrasoundImageResponse> UltrasoundImages { get; set; }
     }
 }
