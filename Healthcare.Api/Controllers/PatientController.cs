@@ -8,6 +8,8 @@ using Healthcare.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
@@ -56,6 +58,29 @@ namespace Healthcare.Api.Controllers
 
             var patients = _mapper.Map<IEnumerable<PatientAllResponse>>(patientsEntities);
             return Ok(patients);
+        }
+
+        [HttpGet()]
+        [Authorize(AuthenticationSchemes = "DashboardTeam")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<ActionResult<ODataResponse<PatientAllResponse>>> Get(ODataQueryOptions<Patient> options)
+        {
+            var query = (await _patientService.GetAsync())
+                .OrderBy(x => x.User.LastName)
+                .AsEnumerable();
+
+            var filteredQuery = _mapper.Map<IEnumerable<PatientAllResponse>>(options.ApplyTo(query) as IQueryable<Patient>);
+            int allCount = filteredQuery.Count();
+            //SetUpBidAccount(filteredQuery);
+
+            var response = new ODataResponse<PatientAllResponse>
+            {
+                Total = allCount,
+                Values = filteredQuery.ToList()
+            };
+
+            return Ok(response);
         }
 
         [HttpGet("lastPatients")]
