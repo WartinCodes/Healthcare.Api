@@ -68,11 +68,10 @@ namespace Healthcare.Api.Controllers
         {
             var query = (await _patientService.GetAsync())
                 .OrderBy(x => x.User.LastName)
-                .AsEnumerable();
+                .AsQueryable();
 
             var filteredQuery = _mapper.Map<IEnumerable<PatientAllResponse>>(options.ApplyTo(query) as IQueryable<Patient>);
             int allCount = filteredQuery.Count();
-            //SetUpBidAccount(filteredQuery);
 
             var response = new ODataResponse<PatientAllResponse>
             {
