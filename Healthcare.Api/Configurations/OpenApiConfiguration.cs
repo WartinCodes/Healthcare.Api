@@ -40,19 +40,20 @@ namespace Helthcare.Api.Configurations
                 c.AddSecurityDefinition(Scheme, securitySchema);
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                    {
-                        new OpenApiSecurityScheme
+                {
                         {
-                            Reference = new OpenApiReference
+                            new OpenApiSecurityScheme
                             {
-                                Type = ReferenceType.SecurityScheme,
-                                Id =  Scheme
-                            }
-                        },
-                        new string[] {}
-                    }
-            });
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id =  Scheme
+                                }
+                            },
+                            new string[] {}
+                        }
+                });
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
         }
 

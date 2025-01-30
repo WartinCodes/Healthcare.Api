@@ -63,7 +63,6 @@ namespace Healthcare.Api.Controllers
 
         [HttpGet()]
         [EnableQuery]
-        [Authorize(AuthenticationSchemes = "DashboardTeam")]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<ODataResponse<PatientAllResponse>>> Get(ODataQueryOptions<Patient> options)
