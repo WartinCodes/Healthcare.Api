@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using System.Net;
 
 namespace Healthcare.Api.Controllers
@@ -16,7 +17,7 @@ namespace Healthcare.Api.Controllers
     [ApiController]
     [ServiceFilter(typeof(ValidationUserFilter))]
     [Route("api/[controller]")]
-    public class PatientController : ControllerBase
+    public class PatientController : ODataController
     {
         private readonly UserManager<User> _userManager;
         private readonly IPatientService _patientService;
@@ -61,7 +62,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet()]
-        [Authorize(AuthenticationSchemes = "DashboardTeam")]
+        [EnableQuery]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult<ODataResponse<PatientAllResponse>>> Get(ODataQueryOptions<Patient> options)

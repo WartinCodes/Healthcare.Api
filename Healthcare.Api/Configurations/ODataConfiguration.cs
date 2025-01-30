@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
+using System.Text.Json.Serialization;
 
 namespace Healthcare.Api.Configurations
 {
@@ -15,7 +16,8 @@ namespace Healthcare.Api.Configurations
             {
                 option.Select().Filter().OrderBy().Expand().Count().SetMaxTop(null);
                 option.AddRouteComponents("odata", GetEdmModel());
-            });
+            })
+            .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
             services.AddODataQueryFilter();
 
