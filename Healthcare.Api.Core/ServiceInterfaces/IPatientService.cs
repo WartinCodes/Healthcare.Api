@@ -1,4 +1,5 @@
 ﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Utilities;
 
 namespace Healthcare.Api.Core.ServiceInterfaces
 {
@@ -11,5 +12,6 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<Patient> Add(Patient entity);
         void Remove(Patient entity);
         Task Edit(Patient entity);
+        Task<PagedResult<Patient>> GetPagedPatientsAsync(PaginationParams paginationParams);
     }
 }

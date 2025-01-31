@@ -1,5 +1,4 @@
-﻿using Healthcare.Api.Configurations;
-using Healthcare.Api.Core.Entities;
+﻿using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Extensions;
 using Healthcare.Api.Repository;
@@ -12,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.Text;
-using System.Text.Json.Serialization;
 
 namespace Helthcare.Api
 {
@@ -61,8 +59,6 @@ namespace Helthcare.Api
             services.AddMvc();
 
             services.AddCors();
-
-            services.AddODataConfiguration();
 
             var jwtIssuer = Configuration.GetSection("JWT:Issuer").Get<string>();
             var jwtKey = Configuration.GetSection("JWT:SecretKey").Get<string>();

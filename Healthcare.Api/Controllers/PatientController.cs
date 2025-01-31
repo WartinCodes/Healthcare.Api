@@ -4,12 +4,11 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Core.Utilities;
 using Healthcare.Api.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Query;
-using Microsoft.AspNetCore.OData.Routing.Controllers;
 using System.Net;
 
 namespace Healthcare.Api.Controllers
@@ -17,7 +16,7 @@ namespace Healthcare.Api.Controllers
     [ApiController]
     [ServiceFilter(typeof(ValidationUserFilter))]
     [Route("api/[controller]")]
-    public class PatientController : ODataController
+    public class PatientController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
         private readonly IPatientService _patientService;
@@ -61,26 +60,13 @@ namespace Healthcare.Api.Controllers
             return Ok(patients);
         }
 
-        [HttpGet()]
-        [EnableQuery]
+        [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<ActionResult<ODataResponse<PatientAllResponse>>> Get(ODataQueryOptions<Patient> options)
+        public async Task<ActionResult<PagedResult<PatientAllResponse>>> Get([FromQuery] PaginationParams paginationParams)
         {
-            var query = (await _patientService.GetAsync())
-                .OrderBy(x => x.User.LastName)
-                .AsQueryable();
-
-            var filteredQuery = _mapper.Map<IEnumerable<PatientAllResponse>>(options.ApplyTo(query) as IQueryable<Patient>);
-            int allCount = filteredQuery.Count();
-
-            var response = new ODataResponse<PatientAllResponse>
-            {
-                Total = allCount,
-                Values = filteredQuery.ToList()
-            };
-
-            return Ok(response);
+            var result = await _patientService.GetPagedPatientsAsync(paginationParams);
+            return Ok(result);
         }
 
         [HttpGet("lastPatients")]
