@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Helthcare.Api
 {
@@ -79,6 +80,7 @@ namespace Helthcare.Api
                     ValidateAudience = false
                 };
             });
+            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

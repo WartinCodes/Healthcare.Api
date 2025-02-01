@@ -103,7 +103,6 @@ namespace Healthcare.Api.Controllers
             return Ok(patientIdResponse);
         }
 
-
         [HttpPost("create")]
         [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Post([FromBody] PatientRequest userRequest)
