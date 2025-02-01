@@ -53,7 +53,6 @@ namespace Helthcare.Api.Configurations
                             new string[] {}
                         }
                 });
-                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
         }
 

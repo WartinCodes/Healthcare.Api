@@ -1,5 +1,4 @@
-﻿using Healthcare.Api.Configurations;
-using Healthcare.Api.Core.Entities;
+﻿using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Extensions;
 using Healthcare.Api.Repository;
@@ -62,8 +61,6 @@ namespace Helthcare.Api
 
             services.AddCors();
 
-            services.AddODataConfiguration();
-
             var jwtIssuer = Configuration.GetSection("JWT:Issuer").Get<string>();
             var jwtKey = Configuration.GetSection("JWT:SecretKey").Get<string>();
 
@@ -83,6 +80,7 @@ namespace Helthcare.Api
                     ValidateAudience = false
                 };
             });
+            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

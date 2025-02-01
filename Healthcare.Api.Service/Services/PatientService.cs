@@ -2,6 +2,8 @@
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
+using Healthcare.Api.Core.Utilities;
+using System.Linq.Expressions;
 
 namespace Healthcare.Api.Service.Services
 {
@@ -65,6 +67,21 @@ namespace Healthcare.Api.Service.Services
         public IQueryable<Patient> GetAsQueryable()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<PagedResult<Patient>> GetPagedPatientsAsync(PaginationParams paginationParams)
+        {
+            return await _patientRepository.GetPagedAsync(
+                filter: p => string.IsNullOrEmpty(paginationParams.Search) ||
+                p.User.FirstName.Contains(paginationParams.Search) ||
+                p.User.LastName.Contains(paginationParams.Search) ||
+                p.User.UserName.Contains(paginationParams.Search),
+                paginationParams: paginationParams,
+                includes: new Expression<Func<Patient, object>>[]
+                {
+                    p => p.User,
+                    p => p.HealthPlans     
+                });
         }
     }
 }
