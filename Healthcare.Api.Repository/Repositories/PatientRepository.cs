@@ -18,7 +18,7 @@ namespace Healthcare.Api.Repository.Repositories
 
         public IQueryable<Patient> GetAsQueryable()
         {
-            return _context.Patient.AsQueryable();
+            return _context.Patient.Include(p => p.User).Include(p => p.HealthPlans).AsQueryable();
         }
 
         public async Task<Patient> GetPatientByUserIdAsync(int userId)
@@ -48,7 +48,10 @@ namespace Healthcare.Api.Repository.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<PagedResult<Patient>> GetPagedAsync(Expression<Func<Patient, bool>> filter, PaginationParams paginationParams, params Expression<Func<Patient, object>>[] includes)
+        public async Task<PagedResult<Patient>> GetPagedAsync(
+            Expression<Func<Patient, bool>> filter,
+            PaginationParams paginationParams,
+            params Expression<Func<Patient, object>>[] includes)
         {
             var query = _context.Patient.AsQueryable();
 
@@ -64,7 +67,6 @@ namespace Healthcare.Api.Repository.Repositories
 
             var totalRecords = await query.CountAsync();
 
-            // Aplicar paginación
             var data = await query
                 .Skip((paginationParams.Page - 1) * paginationParams.PageSize)
                 .Take(paginationParams.PageSize)
