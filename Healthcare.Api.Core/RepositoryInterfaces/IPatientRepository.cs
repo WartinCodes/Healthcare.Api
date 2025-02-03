@@ -8,6 +8,7 @@ namespace Healthcare.Api.Core.RepositoryInterfaces
     {
         Task<Patient> GetPatientByUserIdAsync(int id);
         Task<Patient> GetPatientByIdAsync(int id);
+        IQueryable<Patient> GetAsQueryable();
         Task<PagedResult<Patient>> GetPagedAsync(Expression<Func<Patient, bool>> filter, PaginationParams paginationParams, params Expression<Func<Patient, object>>[] includes);
     }
 }

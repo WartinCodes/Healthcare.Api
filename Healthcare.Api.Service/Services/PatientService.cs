@@ -3,7 +3,9 @@ using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
 using Healthcare.Api.Core.Utilities;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using static Amazon.S3.Util.S3EventNotification;
 
 namespace Healthcare.Api.Service.Services
 {
@@ -66,22 +68,37 @@ namespace Healthcare.Api.Service.Services
 
         public IQueryable<Patient> GetAsQueryable()
         {
-            throw new NotImplementedException();
+            return _patientRepository.GetAsQueryable();
         }
 
         public async Task<PagedResult<Patient>> GetPagedPatientsAsync(PaginationParams paginationParams)
         {
-            return await _patientRepository.GetPagedAsync(
-                filter: p => string.IsNullOrEmpty(paginationParams.Search) ||
-                p.User.FirstName.Contains(paginationParams.Search) ||
-                p.User.LastName.Contains(paginationParams.Search) ||
-                p.User.UserName.Contains(paginationParams.Search),
-                paginationParams: paginationParams,
-                includes: new Expression<Func<Patient, object>>[]
+            var searchTerms = paginationParams.Search?
+                .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                .ToList() ?? new List<string>();
+
+            var query = GetAsQueryable();
+
+            if (searchTerms.Any())
+            {
+                foreach (var term in searchTerms)
                 {
-                    p => p.User,
-                    p => p.HealthPlans     
-                });
+                    var tempTerm = term;
+                    query = query.Where(p =>
+                        EF.Functions.Like(p.User.FirstName, $"%{tempTerm}%") ||
+                        EF.Functions.Like(p.User.LastName, $"%{tempTerm}%") ||
+                        EF.Functions.Like(p.User.UserName, $"%{tempTerm}%"));
+                }
+            }
+
+            int totalRecords = await query.CountAsync();
+
+            var data = await query
+                .Skip((paginationParams.Page - 1) * paginationParams.PageSize)
+                .Take(paginationParams.PageSize)
+                .ToListAsync();
+
+            return new PagedResult<Patient>(data, totalRecords, paginationParams.Page, paginationParams.PageSize);
         }
     }
 }
