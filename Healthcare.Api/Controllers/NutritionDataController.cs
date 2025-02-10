@@ -29,20 +29,16 @@ namespace Healthcare.Api.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("patientId")]
-        public async Task<ActionResult<IEnumerable<NutritionDataResponse>>> GetByPatientId(int patientId)
+        [HttpGet("userId")]
+        public async Task<ActionResult<IEnumerable<NutritionDataResponse>>> GetByPatientId(int userId)
         {
-            var patient = await _patientService.GetPatientByIdAsync(patientId);
+            var patient = await _patientService.GetPatientByUserIdAsync(userId);
             if (patient == null) return BadRequest("Paciente no encontrado.");
 
-            IEnumerable<NutritionData> nutritionDatas = await _nutritionDataService.GetNutritionDatasByPatient(patientId);
-            if (!nutritionDatas.Any())
-            {
-                return NoContent();
-            }
+            IEnumerable<NutritionData> nutritionDatas = await _nutritionDataService.GetNutritionDatasByPatient(patient.Id);
+            if (!nutritionDatas.Any()) return NoContent();
 
             IEnumerable<NutritionDataResponse> response = _mapper.Map<IEnumerable<NutritionDataResponse>>(nutritionDatas);
-
             return Ok(response);
         }
 
@@ -51,10 +47,11 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
-                var patient = await _patientService.GetPatientByIdAsync(nutritionDataCreateRequest.PatientId);
+                var patient = await _patientService.GetPatientByUserIdAsync(nutritionDataCreateRequest.UserId);
                 if (patient == null) return BadRequest("Paciente no encontrado.");
 
                 NutritionData newNutritionData = _mapper.Map<NutritionData>(nutritionDataCreateRequest);
+                newNutritionData.PatientId = patient.Id;
                 NutritionData savedNutritionData = await _nutritionDataService.Add(newNutritionData);
                 return Ok(savedNutritionData);
             }
@@ -84,7 +81,7 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
-                var nutritionData = await _nutritionDataService.GetByIdAsync(id);
+                NutritionData? nutritionData = await _nutritionDataService.GetByIdAsync(id);
                 if (nutritionData == null)
                 {
                     return NotFound("Registro no encontrado.");

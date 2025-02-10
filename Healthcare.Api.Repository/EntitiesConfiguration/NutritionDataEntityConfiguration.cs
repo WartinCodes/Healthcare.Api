@@ -12,13 +12,13 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.Property(x => x.Date).IsRequired();
-            builder.Property(x => x.Weight).IsRequired();
-            builder.Property(x => x.Difference).IsRequired();
-            builder.Property(x => x.FatPercentage).IsRequired();
-            builder.Property(x => x.MusclePercentage).IsRequired();
-            builder.Property(x => x.VisceralFat).IsRequired();
-            builder.Property(x => x.IMC).IsRequired();
-            builder.Property(x => x.TargetWeight).IsRequired();
+            builder.Property(x => x.Weight).IsRequired(false);
+            builder.Property(x => x.Difference).IsRequired(false);
+            builder.Property(x => x.FatPercentage).IsRequired(false);
+            builder.Property(x => x.MusclePercentage).IsRequired(false);
+            builder.Property(x => x.VisceralFat).IsRequired(false);
+            builder.Property(x => x.IMC).IsRequired(false);
+            builder.Property(x => x.TargetWeight).IsRequired(false);
             builder.Property(x => x.Observations).HasMaxLength(500).IsRequired(false);
 
             builder.HasOne(nd => nd.Patient)
