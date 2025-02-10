@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
+using Healthcare.Api.Contracts.Requests.NutritionData;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Entities.DTO;
@@ -135,7 +136,8 @@ namespace Helthcare.Api.Mappers
             CreateMap<UnitRequest, Unit>().ReverseMap();
             CreateMap<BloodTestDataRequest, BloodTestData>().ReverseMap();
 
-
+            CreateMap<NutritionDataCreateRequest, NutritionData>();
+            CreateMap<NutritionDataEditRequest, NutritionData>();
             #endregion
         }
     }

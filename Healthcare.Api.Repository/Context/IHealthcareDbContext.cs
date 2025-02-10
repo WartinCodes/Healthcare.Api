@@ -24,5 +24,6 @@ namespace Healthcare.Api.Repository.Context
         DbSet<Support> Support { get; set; }
         DbSet<PatientHistory> PatientHistory { get; set; }
         DbSet<UltrasoundImage> UltrasoundImage { get; set; }
+        DbSet<NutritionData> NutritionData { get; set; }
     }
 }

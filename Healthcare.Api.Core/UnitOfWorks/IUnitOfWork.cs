@@ -24,6 +24,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
         ISupportRepository SupportRepository { get; }
         IUltrasoundImageRepository UltrasoundImageRepository { get; }
         IUnitRepository UnitRepository { get; }
+        INutritionDataRepository NutritionDataRepository { get; }
 
         void Save();
         Task SaveAsync();

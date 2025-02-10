@@ -30,6 +30,6 @@
         public double VisceralFat { get; set; }
         public double IMC { get; set; }
         public double TargetWeight { get; set; }
-        public string Observations { get; set; }
+        public string? Observations { get; set; }
     }
 }

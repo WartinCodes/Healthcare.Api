@@ -29,7 +29,8 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             ISupportRepository supportRepository,
             IPatientHistoryRepository patientHistoryRepository,
             IUltrasoundImageRepository ultrasoundImageRepository,
-            IUnitRepository unitRepository)
+            IUnitRepository unitRepository,
+            INutritionDataRepository nutritionDataRepository)
         {
             _context = context;
             PatientRepository = patientRepository;
@@ -52,6 +53,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             PatientHistoryRepository = patientHistoryRepository;
             UltrasoundImageRepository = ultrasoundImageRepository;
             UnitRepository = unitRepository;
+            NutritionDataRepository = nutritionDataRepository;
         }
 
         public IBloodTestRepository BloodTestRepository { get; }
@@ -74,7 +76,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         public IPatientHistoryRepository PatientHistoryRepository { get; }
         public IUltrasoundImageRepository UltrasoundImageRepository { get; }
         public IUnitRepository UnitRepository { get; }
-
+        public INutritionDataRepository NutritionDataRepository { get; }
 
         public void Dispose()
         {
