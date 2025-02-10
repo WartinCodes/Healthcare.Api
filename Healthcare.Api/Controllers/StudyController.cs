@@ -25,7 +25,6 @@ namespace Healthcare.Api.Controllers
         private readonly IPdfFileService _pdfFileService;
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
-        private readonly ILaboratoryDetailService _laboratoryDetailService;
         private readonly IUltrasoundImageService _ultrasoundImageService;
         private readonly IMapper _mapper;
         private readonly IBloodTestService _bloodTestService;
@@ -42,7 +41,6 @@ namespace Healthcare.Api.Controllers
             IStudyTypeService studyTypeService,
             IEmailService emailService,
             IMapper mapper,
-            ILaboratoryDetailService laboratoryDetailService,
             IUltrasoundImageService ultrasoundImageService,
             IBloodTestService bloodTestService,
             IBloodTestDataService bloodTestDataService,
@@ -56,7 +54,6 @@ namespace Healthcare.Api.Controllers
             _jwtService = jwtService;
             _emailService = emailService;
             _mapper = mapper;
-            _laboratoryDetailService = laboratoryDetailService;
             _ultrasoundImageService = ultrasoundImageService;
             _bloodTestService = bloodTestService;
             _bloodTestDataService = bloodTestDataService;
@@ -129,48 +126,6 @@ namespace Healthcare.Api.Controllers
             }
 
             return Ok(studyUrl);
-        }
-
-        [HttpGet("laboratories/byUser/{userId}")]
-        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria},{RoleEnum.Paciente}")]
-        public async Task<ActionResult<IEnumerable<LaboratoryDetailResponse>>> GetLaboratoriesByUser([FromRoute] int userId)
-        {
-            var laboratoriesDetail = await _laboratoryDetailService.GetLaboratoriesDetailsByUserIdAsync(userId);
-            if (!laboratoriesDetail.Any())
-            {
-                return NoContent();
-            }
-
-            var currentUserId = User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
-
-            if (!int.TryParse(currentUserId, out int parsedUserId))
-            {
-                return Unauthorized("Usuario no autorizado.");
-            }
-
-            var currentUser = await _userManager.FindByIdAsync(parsedUserId.ToString());
-
-            if (currentUser == null)
-            {
-                return Unauthorized("Usuario no encontrado.");
-            }
-
-            bool isValid = await _jwtService.ValidatePatientToken(currentUser);
-
-            if (!isValid && parsedUserId != userId)
-            {
-                return Forbid("No tiene permiso para acceder a los datos de este paciente.");
-            }
-
-            return Ok(_mapper.Map<IEnumerable<LaboratoryDetailResponse>>(laboratoriesDetail));
-        }
-
-        [HttpGet("laboratoryDetails/byStudies")]
-        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
-        public async Task<ActionResult<IEnumerable<LaboratoryDetail>>> GetLaboratoryDetails([FromQuery] int[] studiesId)
-        {
-            var laboratoriesDetails = await _laboratoryDetailService.GetLaboratoriesDetailsByStudiesIds(studiesId);
-            return Ok(laboratoriesDetails);
         }
 
         [HttpGet("ultrasoundImages/byStudy/{studyId}")]

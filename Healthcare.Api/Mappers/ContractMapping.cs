@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Healthcare.Api.Contracts.Requests;
-using Healthcare.Api.Contracts.Requests.LaboratoryDetail;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Entities.DTO;
@@ -29,9 +28,6 @@ namespace Helthcare.Api.Mappers
             CreateMap<Study, StudyResponse>().ReverseMap();
             CreateMap<StudyType, StudyTypeResponse>().ReverseMap();
             CreateMap<HealthInsurance, HealthInsuranceByHealthPlanResponse>().ReverseMap();
-            CreateMap<LaboratoryDetail, LaboratoryDetailResponse>()
-                .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Study.Date))
-                .ReverseMap();
             CreateMap<UltrasoundImage, UltrasoundImageResponse>().ReverseMap();
             CreateMap<BloodTest, BloodTestResponse>();
             CreateMap<BloodTestData, BloodTestDataResponse>();
@@ -133,7 +129,6 @@ namespace Helthcare.Api.Mappers
             CreateMap<State, StateRequest>().ReverseMap();
             CreateMap<Country, CountryRequest>().ReverseMap();
             CreateMap<StudyType, StudyTypeRequest>().ReverseMap();
-            CreateMap<LaboratoryDetail, LaboratoryDetailRequest>().ReverseMap();
 
             CreateMap<Support, SupportRequest>().ReverseMap();
             CreateMap<PatientHistory, PatientHistoryRequest>().ReverseMap();
