@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Requests.NutritionData;
+using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Healthcare.Api.Controllers
 {
@@ -29,6 +27,23 @@ namespace Healthcare.Api.Controllers
             _patientService = patientService;
             _userManager = userManager;
             _mapper = mapper;
+        }
+
+        [HttpGet("patientId")]
+        public async Task<ActionResult<IEnumerable<NutritionDataResponse>>> GetByPatientId(int patientId)
+        {
+            var patient = await _patientService.GetPatientByIdAsync(patientId);
+            if (patient == null) return BadRequest("Paciente no encontrado.");
+
+            IEnumerable<NutritionData> nutritionDatas = await _nutritionDataService.GetNutritionDatasByPatient(patientId);
+            if (!nutritionDatas.Any())
+            {
+                return NoContent();
+            }
+
+            IEnumerable<NutritionDataResponse> response = _mapper.Map<IEnumerable<NutritionDataResponse>>(nutritionDatas);
+
+            return Ok(response);
         }
 
         [HttpPost("create")]

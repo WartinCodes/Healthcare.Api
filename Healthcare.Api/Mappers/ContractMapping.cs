@@ -109,6 +109,7 @@ namespace Helthcare.Api.Mappers
             CreateMap<BloodTestDto, BloodTestResponse>();
             CreateMap<UnitDto, UnitResponse>();
             CreateMap<StudyDto, StudyResponse>();
+            CreateMap<NutritionData, NutritionDataResponse>();
             #endregion
 
             #region Requests

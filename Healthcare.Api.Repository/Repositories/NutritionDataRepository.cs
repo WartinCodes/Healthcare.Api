@@ -2,7 +2,6 @@
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace Healthcare.Api.Repository.Repositories
 {
@@ -39,6 +38,15 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.NutritionData.FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<IEnumerable<NutritionData>> GetNutritionDatasByPatient(int patientId)
+        {
+            return await _context.NutritionData
+                .Where(x => x.PatientId == patientId)
+                .ToListAsync()
+                .ConfigureAwait(false);
+        }
+
 
         public void Remove(NutritionData entity)
         {

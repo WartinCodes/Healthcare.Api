@@ -34,6 +34,11 @@ namespace Healthcare.Api.Service.Services
             return await _nutritionDataRepository.GetByIdAsync(id);
         }
 
+        public async Task<IEnumerable<NutritionData>> GetNutritionDatasByPatient(int patientId)
+        {
+            return await _nutritionDataRepository.GetNutritionDatasByPatient(patientId);
+        }
+
         public void Remove(NutritionData entity)
         {
             _unitOfWork.NutritionDataRepository.Remove(entity);
