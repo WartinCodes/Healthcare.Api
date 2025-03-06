@@ -19,7 +19,6 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             IHealthPlanRepository healthPlanRepository,
             IDoctorSpecialityRepository doctorSpecialityRepository,
             IAddressRepository addressRepository,
-            ILaboratoryDetailsRepository laboratoryDetailRepository,
             ICountryRepository countryRepository,
             IStateRepository stateRepository,
             ICityRepository cityRepository,
@@ -30,7 +29,8 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             ISupportRepository supportRepository,
             IPatientHistoryRepository patientHistoryRepository,
             IUltrasoundImageRepository ultrasoundImageRepository,
-            IUnitRepository unitRepository)
+            IUnitRepository unitRepository,
+            INutritionDataRepository nutritionDataRepository)
         {
             _context = context;
             PatientRepository = patientRepository;
@@ -42,7 +42,6 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             HealthPlanRepository = healthPlanRepository;
             DoctorSpecialityRepository = doctorSpecialityRepository;
             AddressRepository = addressRepository;
-            LaboratoryDetailsRepository = laboratoryDetailRepository;
             CountryRepository = countryRepository;
             StateRepository = stateRepository;
             CityRepository = cityRepository;
@@ -54,6 +53,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
             PatientHistoryRepository = patientHistoryRepository;
             UltrasoundImageRepository = ultrasoundImageRepository;
             UnitRepository = unitRepository;
+            NutritionDataRepository = nutritionDataRepository;
         }
 
         public IBloodTestRepository BloodTestRepository { get; }
@@ -64,7 +64,6 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         public IHealthPlanRepository HealthPlanRepository { get; }
         public IDoctorSpecialityRepository DoctorSpecialityRepository { get; }
         public IAddressRepository AddressRepository { get; }
-        public ILaboratoryDetailsRepository LaboratoryDetailsRepository { get; }
         public ICityRepository CityRepository { get; }
         public ICountryRepository CountryRepository { get; }
         public IStateRepository StateRepository { get; }
@@ -77,7 +76,7 @@ namespace Healthcare.Api.Repository.UnitOfWorks
         public IPatientHistoryRepository PatientHistoryRepository { get; }
         public IUltrasoundImageRepository UltrasoundImageRepository { get; }
         public IUnitRepository UnitRepository { get; }
-
+        public INutritionDataRepository NutritionDataRepository { get; }
 
         public void Dispose()
         {

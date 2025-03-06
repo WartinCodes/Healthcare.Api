@@ -13,7 +13,6 @@ namespace Healthcare.Api.Core.UnitOfWorks
         IHealthInsuranceRepository HealthInsuranceRepository { get; }
         IHealthPlanRepository HealthPlanRepository { get; }
         IAddressRepository AddressRepository { get; }
-        ILaboratoryDetailsRepository LaboratoryDetailsRepository { get; }
         ICityRepository CityRepository { get; }
         ICountryRepository CountryRepository { get; }
         IStateRepository StateRepository { get; }
@@ -25,6 +24,7 @@ namespace Healthcare.Api.Core.UnitOfWorks
         ISupportRepository SupportRepository { get; }
         IUltrasoundImageRepository UltrasoundImageRepository { get; }
         IUnitRepository UnitRepository { get; }
+        INutritionDataRepository NutritionDataRepository { get; }
 
         void Save();
         Task SaveAsync();

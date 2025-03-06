@@ -32,7 +32,6 @@ namespace Healthcare.Api.Repository
             services.AddTransient<IHealthPlanRepository, HealthPlanRepository>();
             services.AddTransient<IPatientRepository, PatientRepository>();
             services.AddTransient<IPatientHealthPlanRepository, PatientHealthPlanRepository>();
-            services.AddTransient<ILaboratoryDetailsRepository, LaboratoryDetailRepository>();
             services.AddTransient<ICountryRepository, CountryRepository>();
             services.AddTransient<IStateRepository, StateRepository>();
             services.AddTransient<ISpecialityRepository, SpecialityRepository>();
@@ -42,6 +41,7 @@ namespace Healthcare.Api.Repository
             services.AddTransient<IPatientHistoryRepository, PatientHistoryRepository>();
             services.AddTransient<IUltrasoundImageRepository, UltrasoundImageRepository>();
             services.AddTransient<IUnitRepository, UnitRepository>();
+            services.AddTransient<INutritionDataRepository, NutritionDataRepository>();
 
             return services;
         }

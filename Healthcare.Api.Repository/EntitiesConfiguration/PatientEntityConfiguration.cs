@@ -21,6 +21,12 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.HasMany(p => p.NutritionData)
+                .WithOne(nd => nd.Patient)
+                .HasForeignKey(nd => nd.PatientId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasMany(p => p.HealthPlans)
                 .WithMany(hp => hp.Patients)
                 .UsingEntity<PatientHealthPlan>(

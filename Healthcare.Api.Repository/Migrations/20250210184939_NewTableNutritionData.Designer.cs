@@ -3,6 +3,7 @@ using System;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Healthcare.Api.Repository.Migrations
 {
     [DbContext(typeof(HealthcareDbContext))]
-    partial class HealthcareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250210184939_NewTableNutritionData")]
+    partial class NewTableNutritionData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -269,16 +271,16 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<double?>("Difference")
+                    b.Property<double>("Difference")
                         .HasColumnType("double");
 
-                    b.Property<double?>("FatPercentage")
+                    b.Property<double>("FatPercentage")
                         .HasColumnType("double");
 
-                    b.Property<double?>("IMC")
+                    b.Property<double>("IMC")
                         .HasColumnType("double");
 
-                    b.Property<double?>("MusclePercentage")
+                    b.Property<double>("MusclePercentage")
                         .HasColumnType("double");
 
                     b.Property<string>("Observations")
@@ -288,13 +290,13 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Property<int>("PatientId")
                         .HasColumnType("int");
 
-                    b.Property<double?>("TargetWeight")
+                    b.Property<double>("TargetWeight")
                         .HasColumnType("double");
 
-                    b.Property<double?>("VisceralFat")
+                    b.Property<double>("VisceralFat")
                         .HasColumnType("double");
 
-                    b.Property<double?>("Weight")
+                    b.Property<double>("Weight")
                         .HasColumnType("double");
 
                     b.HasKey("Id");

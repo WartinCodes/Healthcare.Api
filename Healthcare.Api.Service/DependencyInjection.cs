@@ -29,7 +29,6 @@ namespace Healthcare.Api.Service
             services.AddTransient<IStateService, StateService>();
             services.AddTransient<ICityService, CityService>();
             services.AddTransient<ISpecialityService, SpecialityService>();
-            services.AddTransient<ILaboratoryDetailService, LaboratoryDetailService>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IPdfFileService, PdfFileService>();
             services.AddTransient<IStudyTypeService, StudyTypeService>();
@@ -38,6 +37,7 @@ namespace Healthcare.Api.Service
             services.AddTransient<IPatientHistoryService, PatientHistoryService>();
             services.AddTransient<IUltrasoundImageService, UltrasoundImageService>();
             services.AddTransient<IUnitService, UnitService>();
+            services.AddTransient<INutritionDataService, NutritionDataService>();
 
             services.AddTransient<IFileHelper, FileHelper>();
 

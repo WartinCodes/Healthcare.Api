@@ -25,13 +25,13 @@ namespace Healthcare.Api.Repository.Context
         public DbSet<HealthPlan> HealthPlan { get ; set; }
         public DbSet<State> State { get; set; }
         public DbSet<Country> Country { get; set; }
-        public DbSet<LaboratoryDetail> LaboratoryDetail { get; set; }
         public DbSet<Speciality> Speciality { get; set; }
         public DbSet<Study> Study { get; set; }
         public DbSet<StudyType> StudyType { get; set; }
         public DbSet<Support> Support { get; set; }
         public DbSet<UltrasoundImage> UltrasoundImage { get; set; }
         public DbSet<Unit> Unit { get; set; }
+        public DbSet<NutritionData> NutritionData { get; set; }
 
         public HealthcareDbContext(IConfiguration configuration) : base()
         {

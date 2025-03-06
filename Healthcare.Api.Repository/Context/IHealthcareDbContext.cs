@@ -17,7 +17,6 @@ namespace Healthcare.Api.Repository.Context
         DbSet<City> City { get; set; }
         DbSet<State> State { get; set; }
         DbSet<Country> Country { get; set; }
-        DbSet<LaboratoryDetail> LaboratoryDetail { get; set; }
         DbSet<DoctorHealthInsurance> DoctorHealthInsurance { get; set; }
         DbSet<PatientHealthPlan> PatientHealthPlan { get; set; }
         DbSet<Study> Study { get; set; }
@@ -25,5 +24,6 @@ namespace Healthcare.Api.Repository.Context
         DbSet<Support> Support { get; set; }
         DbSet<PatientHistory> PatientHistory { get; set; }
         DbSet<UltrasoundImage> UltrasoundImage { get; set; }
+        DbSet<NutritionData> NutritionData { get; set; }
     }
 }
