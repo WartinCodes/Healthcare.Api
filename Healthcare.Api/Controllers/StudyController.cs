@@ -234,11 +234,12 @@ namespace Healthcare.Api.Controllers
 
                 var insertedStudy = await _studyService.Add(newStudy);
                 _mapper.Map(newStudy, studyResponse);
+                studyResponse.SignedUrl = _fileService.GetSignedUrl(user.UserName, pdfFileName);
 
                 switch (study.StudyTypeId)
                 {
                     case (int)StudyTypeEnum.Laboratorio:
-                        var properties = await _bloodTestService.GetBloodTestsAsync();
+                        IEnumerable<BloodTest> properties = await _bloodTestService.GetBloodTestsAsync();
                         using (var memoryStream = new MemoryStream())
                         {
                             pdfFile.CopyTo(memoryStream);
