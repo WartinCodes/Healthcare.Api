@@ -1,5 +1,4 @@
-﻿using Healthcare.Api.Core.ServiceInterfaces;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Healthcare.Api.Service.Helper
 {

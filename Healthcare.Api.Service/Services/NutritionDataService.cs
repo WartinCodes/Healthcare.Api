@@ -2,6 +2,7 @@
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.UnitOfWorks;
+using static Amazon.S3.Util.S3EventNotification;
 
 namespace Healthcare.Api.Service.Services
 {
@@ -18,14 +19,20 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<NutritionData> Add(NutritionData entity)
         {
-            var record = await _unitOfWork.NutritionDataRepository.AddAsync(entity);
+            var record = await _unitOfWork.NutritionDataRepository.InsertAsync(entity);
             await _unitOfWork.SaveAsync();
             return record;
         }
 
+        public async Task AddRange(List<NutritionData> entities)
+        {
+            await _unitOfWork.NutritionDataRepository.InsertRangeAsync(entities);
+            await _unitOfWork.SaveAsync();
+        }
+
         public void Edit(NutritionData entity)
         {
-            _unitOfWork.NutritionDataRepository.Edit(entity);
+            _unitOfWork.NutritionDataRepository.Update(entity);
             _unitOfWork.Save();
         }
 
@@ -41,7 +48,7 @@ namespace Healthcare.Api.Service.Services
 
         public void Remove(NutritionData entity)
         {
-            _unitOfWork.NutritionDataRepository.Remove(entity);
+            _unitOfWork.NutritionDataRepository.Delete(entity);
             _unitOfWork.Save();
         }
     }
