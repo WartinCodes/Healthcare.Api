@@ -15,6 +15,7 @@ namespace Healthcare.Api.Service
     {
         public static IServiceCollection AddService(this IServiceCollection services, IConfiguration configuration)
         {
+            // Services
             services.AddTransient<IBloodTestService, BloodTestService>();
             services.AddTransient<IBloodTestDataService, BloodTestDataService>();
             services.AddTransient<IDoctorService, DoctorService>();
@@ -39,7 +40,9 @@ namespace Healthcare.Api.Service
             services.AddTransient<IUnitService, UnitService>();
             services.AddTransient<INutritionDataService, NutritionDataService>();
 
+            // Helpers
             services.AddTransient<IFileHelper, FileHelper>();
+            services.AddTransient<IExcelHelper, ExcelHelper>();
 
             services.AddTransient<IJwtService>(provider =>
             {
@@ -47,7 +50,6 @@ namespace Healthcare.Api.Service
                 var userManager = provider.GetRequiredService<UserManager<User>>();
                 return new JwtService(configuration, userManager);
             });
-
 
             services.Configure<SmtpSettings>(configuration.GetSection(nameof(SmtpSettings)));
             services.AddTransient<IEmailService, EmailService>();

@@ -7,6 +7,7 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<NutritionData?> GetByIdAsync(int id);
         Task<IEnumerable<NutritionData>> GetNutritionDatasByPatient(int patientId);
         Task<NutritionData> Add(NutritionData entity);
+        Task AddRange(List<NutritionData> entities);
         void Edit(NutritionData entity);
         void Remove(NutritionData entity);
     }
