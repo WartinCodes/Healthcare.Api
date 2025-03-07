@@ -3,9 +3,6 @@ using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
@@ -23,11 +20,40 @@ namespace Healthcare.Api.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<AddressResponse>> GetById(int idAddress)
+        {
+            Address? address = await _addressService.GetById(idAddress);
+            if (address == null) return NotFound("Dirección no encontrada");
+            return Ok(address);
+        }
+
         [HttpPost]
-        public async Task<ActionResult<BloodTestResponse>> Create([FromBody] AddressRequest request)
+        public async Task<ActionResult<AddressResponse>> Create([FromBody] AddressRequest request)
         {
             Address newAddress = await _addressService.Add(_mapper.Map<Address>(request));
             return Ok(newAddress);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Put(int idAddress, [FromBody] AddressRequest request)
+        {
+            Address? address = await _addressService.GetById(idAddress);
+            if (address == null) return NotFound("Dirección no encontrada.");
+
+            _mapper.Map(request, address);
+            _addressService.Edit(address);
+            return Ok();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int idAddress)
+        {
+            Address? address = await _addressService.GetById(idAddress);
+            if (address == null) return NotFound("Dirección no encontrada.");
+
+            _addressService.Remove(address);            
+            return Ok();
         }
     }
 }
