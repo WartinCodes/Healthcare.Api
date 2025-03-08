@@ -90,6 +90,29 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
+        public async Task<HttpStatusCode> InsertDoctorFileAsync(Stream file, string subFolder, string fileName)
+        {
+            try
+            {
+                string key = $"{_photosFolder}/{subFolder}/{fileName}";
+
+                TransferUtilityUploadRequest transferUtilityUploadRequest = new TransferUtilityUploadRequest()
+                {
+                    BucketName = _s3Configuration.BucketName,
+                    Key = key,
+                    InputStream = file
+                };
+
+                await _awsS3TransferUtility.UploadAsync(transferUtilityUploadRequest);
+
+                return HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<HttpStatusCode> DeleteStudyAsync(string fileName)
         {
             try

@@ -5,6 +5,7 @@ using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
+using iText.Layout.Element;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
@@ -238,6 +239,69 @@ namespace Healthcare.Api.Controllers
             }
 
             return Ok($"Usuario con el ID {userId} actualizado exitosamente");
+        }
+
+        // CAMBIAR LA LOC: DENTRO DE PHOTOS / DNI Y ACA DENTRO EL ARCHIV
+        // 
+        [HttpPut("{userId}/sello")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        public async Task<IActionResult> UpdateSello(int userId, IFormFile sello)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return NotFound($"No se encontró el usuario con el ID: {userId}");
+            }
+
+            var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
+            if (doctor == null)
+            {
+                return NotFound($"No se encontró el doctor con el ID: {userId}");
+            }
+
+            if (sello == null || sello.Length == 0) 
+                return BadRequest("No se ha enviado ninguna imagen para el sello.");
+
+            string fileName = $"{userId}_sello{Path.GetExtension(sello.FileName)}";
+            using (var stream = sello.OpenReadStream())
+            {
+                await _fileService.InsertDoctorFileAsync(stream, "sellos", fileName);
+            }
+
+            doctor.Sello = fileName;
+            await _doctorService.Edit(doctor);
+            // EL OK DEBE DEVOLVER EL SIGNED URL DE LA FIRMA/SELLO
+            return Ok();
+        }
+
+        [HttpPut("{userId}/firma")]
+        public async Task<IActionResult> UpdateFirma(int userId, IFormFile firma)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return NotFound($"No se encontró el usuario con el ID: {userId}");
+            }
+
+            var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
+            if (doctor == null)
+            {
+                return NotFound($"No se encontró el doctor con el ID: {userId}");
+            }
+
+            if (firma == null || firma.Length == 0)
+                return BadRequest("No se ha enviado ninguna imagen para la firma.");
+
+            var fileName = $"{userId}_firma{Path.GetExtension(firma.FileName)}";
+
+            using (var stream = firma.OpenReadStream())
+            {
+                await _fileService.InsertDoctorFileAsync(stream, "firmas", fileName);
+            }
+
+            doctor.Firma = fileName;
+            await _doctorService.Edit(doctor);
+            return Ok();
         }
 
         [HttpDelete("{userId}")]
