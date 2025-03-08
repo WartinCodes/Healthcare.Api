@@ -126,7 +126,11 @@ namespace Helthcare.Api.Mappers
             CreateMap<HealthPlan, HealthInsuranceRequest>().ReverseMap();
             CreateMap<HealthPlan, HealthPlanRequest>().ReverseMap();
 
-            CreateMap<Address, AddressRequest>().ReverseMap();
+            CreateMap<AddressRequest, Address>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.City, opt => opt.Ignore())
+                .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.City.Id))
+                .ReverseMap();
             CreateMap<City, CityRequest>().ReverseMap();
             CreateMap<State, StateRequest>().ReverseMap();
             CreateMap<Country, CountryRequest>().ReverseMap();
