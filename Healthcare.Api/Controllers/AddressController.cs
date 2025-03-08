@@ -25,14 +25,16 @@ namespace Healthcare.Api.Controllers
         {
             Address? address = await _addressService.GetById(idAddress);
             if (address == null) return NotFound("Dirección no encontrada");
-            return Ok(address);
+            return Ok(_mapper.Map<AddressResponse>(address));
         }
 
         [HttpPost]
         public async Task<ActionResult<AddressResponse>> Create([FromBody] AddressRequest request)
         {
-            Address newAddress = await _addressService.Add(_mapper.Map<Address>(request));
-            return Ok(newAddress);
+            Address addressEntity = _mapper.Map<Address>(request);
+            Address newAddress = await _addressService.Add(addressEntity);
+            AddressResponse response = _mapper.Map<AddressResponse>(newAddress);
+            return Ok(response);
         }
 
         [HttpPut]
