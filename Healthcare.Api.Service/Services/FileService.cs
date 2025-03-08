@@ -2,7 +2,6 @@
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Net;
 
@@ -125,6 +124,23 @@ namespace Healthcare.Api.Service.Services
             string url = _awsS3Client.GetPreSignedURL(request);
 
             return url;
+        }
+
+        public string GetSignedUrl(string userNameFolder, string fileName)
+        {
+            string key = _studiesFolder + "/" + userNameFolder + "/" + fileName;
+
+            var request = new GetPreSignedUrlRequest
+            {
+                BucketName = _s3Configuration.BucketName,
+                Key = key,
+                Expires = DateTime.UtcNow.AddHours(1),
+                Verb = HttpVerb.GET
+            };
+
+            string signedUrl = _awsS3Client.GetPreSignedURL(request);
+
+            return signedUrl;
         }
     }
 }

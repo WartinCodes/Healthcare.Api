@@ -31,6 +31,13 @@ namespace Healthcare.Api.Controllers
             return Ok(_mapper.Map<IEnumerable<HealthInsuranceResponse>>(healthInsurances));
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<HealthInsuranceResponse>> GetById(int id)
+        {
+            HealthInsurance healthInsurance = await _healthInsuranceService.GetHealthInsuranceByIdAsync(id);
+            return Ok(_mapper.Map<HealthInsuranceResponse>(healthInsurance));
+        }
+
         [HttpPost("create")]
         public async Task<IActionResult> Post([FromBody] HealthInsuranceRequest healthInsuranceRequest)
         {

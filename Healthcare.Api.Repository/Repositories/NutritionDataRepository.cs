@@ -43,10 +43,10 @@ namespace Healthcare.Api.Repository.Repositories
         {
             return await _context.NutritionData
                 .Where(x => x.PatientId == patientId)
+                .OrderBy(x => x.Date)
                 .ToListAsync()
                 .ConfigureAwait(false);
         }
-
 
         public void Remove(NutritionData entity)
         {

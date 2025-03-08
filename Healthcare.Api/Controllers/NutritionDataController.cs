@@ -3,6 +3,7 @@ using Healthcare.Api.Contracts.Requests.NutritionData;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Helper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,18 +15,21 @@ namespace Healthcare.Api.Controllers
     { 
         private readonly INutritionDataService _nutritionDataService;
         private readonly IPatientService _patientService;
+        private readonly IExcelHelper _excelHelper;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
 
         public NutritionDataController(
             INutritionDataService nutritionDataService,
             IPatientService patientService,
+            IExcelHelper excelHelper,
             UserManager<User> userManager,
             IMapper mapper)
         {
             _nutritionDataService = nutritionDataService;
             _patientService = patientService;
             _userManager = userManager;
+            _excelHelper = excelHelper;
             _mapper = mapper;
         }
 
@@ -93,6 +97,31 @@ namespace Healthcare.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred while processing your request: {ex}");
+            }
+        }
+
+        [HttpPost("upload-excel")]
+        public async Task<IActionResult> UploadExcel(IFormFile file, int userId)
+        {
+            if (file == null || file.Length == 0) return BadRequest("Archivo no válido.");
+
+            if (!file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)) 
+                return BadRequest("El archivo debe tener la extensión .xlsx.");
+
+            var patient = await _patientService.GetPatientByUserIdAsync(userId);
+            if (patient == null) return BadRequest("Paciente no encontrado.");
+
+            try
+            {
+                List<NutritionData> nutritionDataList = await _excelHelper.ParseNutritionDataExcel(file, patient.Id);
+                if (!nutritionDataList.Any()) return NoContent();
+
+                await _nutritionDataService.AddRange(nutritionDataList);
+                return Ok("Datos nutricionales importados exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Ocurrió un error: {ex.Message}");
             }
         }
     }
