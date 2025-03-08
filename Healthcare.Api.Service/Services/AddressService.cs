@@ -39,6 +39,11 @@ namespace Healthcare.Api.Service.Services
             return _addressRepository.GetAsync();
         }
 
+        public async Task<Address?> GetById(int addressId)
+        {
+            return await _addressRepository.GetByIdAsync(addressId);
+        }
+
         public void Remove(Address entity)
         {
             _unitOfWork.AddressRepository.Remove(entity);
