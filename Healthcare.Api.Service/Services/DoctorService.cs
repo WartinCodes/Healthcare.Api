@@ -76,7 +76,7 @@ namespace Healthcare.Api.Service.Services
                 await _doctorSpecialityService.Add(doctorSpeciality);
             }
 
-            //_unitOfWork.DoctorRepository.Edit(entity);
+            _unitOfWork.DoctorRepository.Edit(entity);
             _unitOfWork.Save();
         }
 

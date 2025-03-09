@@ -92,6 +92,12 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<HttpStatusCode> InsertDoctorFileAsync(Stream file, string subFolder, string fileName)
         {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("No se ha enviado ningún archivo o el archivo está vacío.");
+
+            if (!IsValidImageExtension(fileName))
+                throw new ArgumentException("Formato de imagen no válido. Solo se permiten archivos .png, .jpg o .jpeg.");
+
             try
             {
                 string key = $"{_photosFolder}/{subFolder}/{fileName}";
@@ -164,6 +170,14 @@ namespace Healthcare.Api.Service.Services
             string signedUrl = _awsS3Client.GetPreSignedURL(request);
 
             return signedUrl;
+        }
+
+        private bool IsValidImageExtension(string fileName)
+        {
+            var permittedExtensions = new[] { ".png", ".jpg", ".jpeg" };
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            return !string.IsNullOrEmpty(extension) && permittedExtensions.Contains(extension);
         }
     }
 }

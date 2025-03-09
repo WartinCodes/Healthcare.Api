@@ -245,25 +245,16 @@ namespace Healthcare.Api.Controllers
         [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<IActionResult> UpdateSello(int userId, IFormFile sello)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-            {
-                return NotFound($"No se encontró el usuario con el ID: {userId}");
-            }
-
             var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
             if (doctor == null)
             {
                 return NotFound($"No se encontró el doctor con el ID: {userId}");
             }
 
-            if (sello == null || sello.Length == 0) 
-                return BadRequest("No se ha enviado ninguna imagen para el sello.");
-
             string fileName = $"{userId}_sello{Path.GetExtension(sello.FileName)}";
             using (var stream = sello.OpenReadStream())
             {
-                await _fileService.InsertDoctorFileAsync(stream, user.UserName, fileName);
+                await _fileService.InsertDoctorFileAsync(stream, doctor.User.UserName, fileName);
             }
 
             doctor.Sello = fileName;
@@ -274,26 +265,16 @@ namespace Healthcare.Api.Controllers
         [HttpPut("{userId}/firma")]
         public async Task<IActionResult> UpdateFirma(int userId, IFormFile firma)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-            {
-                return NotFound($"No se encontró el usuario con el ID: {userId}");
-            }
-
             var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
             if (doctor == null)
             {
                 return NotFound($"No se encontró el doctor con el ID: {userId}");
             }
 
-            if (firma == null || firma.Length == 0)
-                return BadRequest("No se ha enviado ninguna imagen para la firma.");
-
             var fileName = $"{userId}_firma{Path.GetExtension(firma.FileName)}";
-
             using (var stream = firma.OpenReadStream())
             {
-                await _fileService.InsertDoctorFileAsync(stream, user.UserName, fileName);
+                await _fileService.InsertDoctorFileAsync(stream, doctor.User.UserName, fileName);
             }
 
             doctor.Firma = fileName;
