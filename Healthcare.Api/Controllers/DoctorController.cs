@@ -88,11 +88,12 @@ namespace Healthcare.Api.Controllers
             var doctorIdResponse = new DoctorIdResponse
             {
                 RegisteredByName = RegisteredByName,
+                Sello = _fileService.GetSignedUrl(_photosFolder, doctorEntity.User.UserName, doctorEntity.Sello),
+                Firma = _fileService.GetSignedUrl(_photosFolder, doctorEntity.User.UserName, doctorEntity.Firma),
             };
 
             _mapper.Map(doctorEntity, doctorIdResponse);
             return Ok(doctorIdResponse);
-
         }
 
         [HttpPost("create")]
