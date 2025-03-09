@@ -55,8 +55,8 @@ namespace Healthcare.Api.Repository.Repositories
 
         public void Edit(Doctor entity)
         {
-            _context.Entry(entity.User).State = EntityState.Detached;
-            _context.Doctor.Update(entity);
+            //_context.Entry(entity.User).State = EntityState.Detached;
+            //_context.Doctor.Update(entity);
         }
 
         public async Task<Doctor> AddAsync(Doctor entity)

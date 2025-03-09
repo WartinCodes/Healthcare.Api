@@ -241,8 +241,6 @@ namespace Healthcare.Api.Controllers
             return Ok($"Usuario con el ID {userId} actualizado exitosamente");
         }
 
-        // CAMBIAR LA LOC: DENTRO DE PHOTOS / DNI Y ACA DENTRO EL ARCHIV
-        // 
         [HttpPut("{userId}/sello")]
         [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<IActionResult> UpdateSello(int userId, IFormFile sello)
@@ -265,12 +263,11 @@ namespace Healthcare.Api.Controllers
             string fileName = $"{userId}_sello{Path.GetExtension(sello.FileName)}";
             using (var stream = sello.OpenReadStream())
             {
-                await _fileService.InsertDoctorFileAsync(stream, "sellos", fileName);
+                await _fileService.InsertDoctorFileAsync(stream, user.UserName, fileName);
             }
 
             doctor.Sello = fileName;
             await _doctorService.Edit(doctor);
-            // EL OK DEBE DEVOLVER EL SIGNED URL DE LA FIRMA/SELLO
             return Ok();
         }
 
@@ -296,7 +293,7 @@ namespace Healthcare.Api.Controllers
 
             using (var stream = firma.OpenReadStream())
             {
-                await _fileService.InsertDoctorFileAsync(stream, "firmas", fileName);
+                await _fileService.InsertDoctorFileAsync(stream, user.UserName, fileName);
             }
 
             doctor.Firma = fileName;
