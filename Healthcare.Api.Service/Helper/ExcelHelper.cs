@@ -8,8 +8,11 @@ namespace Healthcare.Api.Service.Helper
 {
     public class ExcelHelper : IExcelHelper
     {
-        public async Task<List<NutritionData>> ParseNutritionDataExcel(IFormFile file, int patientId)
+        public async Task<List<NutritionData>> ParseNutritionDataExcel(IFormFile file, int userId)
         {
+            if (file == null || file.Length == 0)
+                throw new Exception("El archivo está vacío.");
+
             if (!file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
                 throw new Exception("El archivo debe tener la extensión .xlsx.");
 
@@ -33,11 +36,11 @@ namespace Healthcare.Api.Service.Helper
                     cells[col] = worksheet.Cells[row, col + 1].Text;
 
                 if (!DateTime.TryParseExact(cells[0], formatosFecha, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
-                    throw new Exception($"Formato de fecha inválido en la fila {row}. Use dd/MM/yyyy.");
+                    throw new Exception($"Formato de fecha inválido en la fila {row}. Use d/M/yyyy o dd/MM/yyyy.");
 
                 nutritionDataList.Add(new NutritionData
                 {
-                    PatientId = patientId,
+                    UserId = userId,
                     Date = date,
                     Weight = ParseOrNull(cells[1]),
                     Difference = ParseOrNull(cells[2]),

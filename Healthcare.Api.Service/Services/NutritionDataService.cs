@@ -43,7 +43,7 @@ namespace Healthcare.Api.Service.Services
 
         public async Task<IEnumerable<NutritionData>> GetNutritionDatasByPatient(int patientId)
         {
-            return await _nutritionDataRepository.GetNutritionDatasByPatient(patientId);
+            return await _nutritionDataRepository.GetNutritionDatasByUser(patientId);
         }
 
         public void Remove(NutritionData entity)

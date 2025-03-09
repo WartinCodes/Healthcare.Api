@@ -2,6 +2,7 @@
 using Healthcare.Api.Contracts.Requests.NutritionData;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Helper;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,6 @@ namespace Healthcare.Api.Controllers
     public class NutritionDataController : ControllerBase
     { 
         private readonly INutritionDataService _nutritionDataService;
-        private readonly IPatientService _patientService;
         private readonly IExcelHelper _excelHelper;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
@@ -27,19 +27,18 @@ namespace Healthcare.Api.Controllers
             IMapper mapper)
         {
             _nutritionDataService = nutritionDataService;
-            _patientService = patientService;
             _userManager = userManager;
             _excelHelper = excelHelper;
             _mapper = mapper;
         }
 
         [HttpGet("userId")]
-        public async Task<ActionResult<IEnumerable<NutritionDataResponse>>> GetByPatientId(int userId)
+        public async Task<ActionResult<IEnumerable<NutritionDataResponse>>> GetByUserId(int userId)
         {
-            var patient = await _patientService.GetPatientByUserIdAsync(userId);
-            if (patient == null) return BadRequest("Paciente no encontrado.");
+            var user = await _userManager.GetUserById(userId);
+            if (user == null) return BadRequest("Usuario no encontrado.");
 
-            IEnumerable<NutritionData> nutritionDatas = await _nutritionDataService.GetNutritionDatasByPatient(patient.Id);
+            IEnumerable<NutritionData> nutritionDatas = await _nutritionDataService.GetNutritionDatasByPatient(userId);
             if (!nutritionDatas.Any()) return NoContent();
 
             IEnumerable<NutritionDataResponse> response = _mapper.Map<IEnumerable<NutritionDataResponse>>(nutritionDatas);
@@ -51,11 +50,10 @@ namespace Healthcare.Api.Controllers
         {
             try
             {
-                var patient = await _patientService.GetPatientByUserIdAsync(nutritionDataCreateRequest.UserId);
-                if (patient == null) return BadRequest("Paciente no encontrado.");
+                var user = await _userManager.GetUserById(nutritionDataCreateRequest.UserId);
+                if (user == null) return BadRequest("Usuario no encontrado.");
 
                 NutritionData newNutritionData = _mapper.Map<NutritionData>(nutritionDataCreateRequest);
-                newNutritionData.PatientId = patient.Id;
                 NutritionData savedNutritionData = await _nutritionDataService.Add(newNutritionData);
                 return Ok(savedNutritionData);
             }
@@ -70,13 +68,10 @@ namespace Healthcare.Api.Controllers
         {
             var nutritionData = await _nutritionDataService.GetByIdAsync(id);
             if (nutritionData == null)
-            {
                 return NotFound("Registro no encontrado.");
-            }
 
             _mapper.Map(nutritionDataEditRequest, nutritionData);
             _nutritionDataService.Edit(nutritionData);
-
             return Ok();
         }
 
@@ -96,24 +91,19 @@ namespace Healthcare.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"An error occurred while processing your request: {ex}");
+                return StatusCode(500, $"Ocurrió un error al eliminar el registro: {ex}");
             }
         }
 
         [HttpPost("upload-excel")]
         public async Task<IActionResult> UploadExcel(IFormFile file, int userId)
         {
-            if (file == null || file.Length == 0) return BadRequest("Archivo no válido.");
-
-            if (!file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase)) 
-                return BadRequest("El archivo debe tener la extensión .xlsx.");
-
-            var patient = await _patientService.GetPatientByUserIdAsync(userId);
-            if (patient == null) return BadRequest("Paciente no encontrado.");
+            var user = await _userManager.GetUserById(userId);
+            if (user == null) return BadRequest("Usuario no encontrado.");
 
             try
             {
-                List<NutritionData> nutritionDataList = await _excelHelper.ParseNutritionDataExcel(file, patient.Id);
+                List<NutritionData> nutritionDataList = await _excelHelper.ParseNutritionDataExcel(file, userId);
                 if (!nutritionDataList.Any()) return NoContent();
 
                 await _nutritionDataService.AddRange(nutritionDataList);

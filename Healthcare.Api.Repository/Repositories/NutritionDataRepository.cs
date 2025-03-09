@@ -39,10 +39,10 @@ namespace Healthcare.Api.Repository.Repositories
             return await _context.NutritionData.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<IEnumerable<NutritionData>> GetNutritionDatasByPatient(int patientId)
+        public async Task<IEnumerable<NutritionData>> GetNutritionDatasByUser(int userId)
         {
             return await _context.NutritionData
-                .Where(x => x.PatientId == patientId)
+                .Where(x => x.UserId == userId)
                 .OrderBy(x => x.Date)
                 .ToListAsync()
                 .ConfigureAwait(false);

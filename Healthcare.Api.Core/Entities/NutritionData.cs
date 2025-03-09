@@ -6,9 +6,9 @@
         {
         }
 
-        public NutritionData(int patientId, DateTime date, double weight, double fatPercentage, double musclePercentage, double visceralFat, double imc, double targetWeight, string observations)
+        public NutritionData(int userId, DateTime date, double weight, double fatPercentage, double musclePercentage, double visceralFat, double imc, double targetWeight, string observations)
         {
-            PatientId = patientId;
+            UserId = userId;
             Date = date;
             Weight = weight;
             FatPercentage = fatPercentage;
@@ -20,8 +20,8 @@
         }
 
         public int Id { get; set; }
-        public int PatientId { get; set; }
-        public virtual Patient Patient { get; set; }
+        public int UserId { get; set; }
+        public virtual User User { get; set; }
         public DateTime Date { get; set; }
         public double? Weight { get; set; }
         public double? Difference { get; set; }
