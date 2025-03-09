@@ -139,37 +139,19 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
-        public string GetUrl(string userNameFolder, string fileName)
+        public string GetSignedUrl(string rootFolder, string userNameFolder, string fileName, double expiryHours = 1)
         {
-            string key = _studiesFolder + "/" + userNameFolder + "/" + fileName;
-
-            GetPreSignedUrlRequest request = new GetPreSignedUrlRequest
-            {
-                BucketName = _s3Configuration.BucketName,
-                Key = key,
-                Expires = DateTime.Now.AddHours(1)
-            };
-
-            string url = _awsS3Client.GetPreSignedURL(request);
-
-            return url;
-        }
-
-        public string GetSignedUrl(string userNameFolder, string fileName)
-        {
-            string key = _studiesFolder + "/" + userNameFolder + "/" + fileName;
+            string key = $"{rootFolder}/{userNameFolder}/{fileName}";
 
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _s3Configuration.BucketName,
                 Key = key,
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(expiryHours),
                 Verb = HttpVerb.GET
             };
 
-            string signedUrl = _awsS3Client.GetPreSignedURL(request);
-
-            return signedUrl;
+            return _awsS3Client.GetPreSignedURL(request);
         }
 
         private bool IsValidImageExtension(string fileName)

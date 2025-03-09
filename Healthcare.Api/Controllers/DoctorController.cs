@@ -4,13 +4,9 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
-using iText.Layout.Element;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
@@ -27,8 +23,8 @@ namespace Healthcare.Api.Controllers
         private readonly IHealthPlanService _healthPlanService;
         private readonly IDoctorHealthInsuranceService _doctorHealthInsuranceService;
         private readonly IFileService _fileService;
-
         private readonly IMapper _mapper;
+        private readonly string _photosFolder = "photos";
 
         public DoctorController(
             UserManager<User> userManager, 
@@ -259,7 +255,8 @@ namespace Healthcare.Api.Controllers
 
             doctor.Sello = fileName;
             await _doctorService.Edit(doctor);
-            return Ok();
+            var signedUrl = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, fileName);
+            return Ok(signedUrl);
         }
 
         [HttpPut("{userId}/firma")]
@@ -279,7 +276,8 @@ namespace Healthcare.Api.Controllers
 
             doctor.Firma = fileName;
             await _doctorService.Edit(doctor);
-            return Ok();
+            var signedUrl = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, fileName);
+            return Ok(signedUrl);
         }
 
         [HttpDelete("{userId}")]
