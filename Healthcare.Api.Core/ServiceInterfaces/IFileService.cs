@@ -9,6 +9,6 @@ namespace Healthcare.Api.Core.ServiceInterfaces
         Task<HttpStatusCode> InsertFileStudyAsync(Stream file, string dni, string fileName);
         Task<HttpStatusCode> InsertDoctorFileAsync(Stream file, string subFolder, string fileName);
         Task<HttpStatusCode> DeleteStudyAsync(string fileName);
-        string GetSignedUrl(string rootFolder, string userNameFolder, string fileName, double expiryHours = 1);
+        string? GetSignedUrl(string rootFolder, string userNameFolder, string fileName, double expiryHours = 1);
     }
 }

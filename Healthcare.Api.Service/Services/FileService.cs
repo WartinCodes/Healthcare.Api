@@ -139,8 +139,11 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
-        public string GetSignedUrl(string rootFolder, string userNameFolder, string fileName, double expiryHours = 1)
+        public string? GetSignedUrl(string rootFolder, string userNameFolder, string fileName, double expiryHours = 1)
         {
+            if (string.IsNullOrEmpty(fileName))
+                return null;
+
             string key = $"{rootFolder}/{userNameFolder}/{fileName}";
 
             var request = new GetPreSignedUrlRequest
