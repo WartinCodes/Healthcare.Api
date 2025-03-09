@@ -5,6 +5,7 @@ using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,6 +33,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<ActionResult<UserResponse>> GetUserById(string userId)
         {
             var recepcionist = await UserManagerExtensions.GetUserById(_userManager, Convert.ToInt32(userId));
@@ -43,7 +45,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("all")]
-        //[Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<ActionResult<IEnumerable<UserResponse>>> Get()
         {
             var usersEntities = await _userManager.GetUsersInRoleAsync(RoleEnum.Secretaria);
@@ -52,6 +54,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Post([FromBody] UserRequest userRequest)
         {
             try
@@ -92,6 +95,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Put(int userId, [FromBody] UserRequest userEdit)
         {
             try
@@ -126,7 +130,25 @@ namespace Healthcare.Api.Controllers
             {
                 return StatusCode(500, $"Hubo un error al crearse el nuevo Secretario/a: {ex}");
             }
+        }
 
+        [HttpDelete("{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
+        public async Task<IActionResult> Delete(int userId)
+        {
+            var recepcionist = await _userManager.GetUserById(userId);
+            if (recepcionist == null)
+            {
+                return NotFound($"No se encontró el doctor con el usuario ID: {userId}");
+            }
+
+            var result = await _userManager.DeleteAsync(recepcionist);
+            if (!result.Succeeded)
+            {
+                return BadRequest($"Error al eliminar Secretario/a con el ID: {userId}");
+            }
+
+            return Ok($"Secretario/a DNI {recepcionist.UserName} eliminado exitosamente");
         }
     }
 }
