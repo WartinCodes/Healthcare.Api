@@ -105,9 +105,6 @@ namespace Healthcare.Api.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(newUser, RoleEnum.Secretaria);
-
-
-
                     return Ok("Administrador creado exitosamente.");
                 }
                 else
