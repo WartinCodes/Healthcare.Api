@@ -190,7 +190,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
-        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Put(int userId, [FromBody] DoctorRequest userRequest)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
