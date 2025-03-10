@@ -3,6 +3,7 @@ using System;
 using Healthcare.Api.Repository.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Healthcare.Api.Repository.Migrations
 {
     [DbContext(typeof(HealthcareDbContext))]
-    partial class HealthcareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250308141141_AddFirmaSelloToDoctor")]
+    partial class AddFirmaSelloToDoctor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -291,11 +293,11 @@ namespace Healthcare.Api.Repository.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
 
+                    b.Property<int>("PatientId")
+                        .HasColumnType("int");
+
                     b.Property<double?>("TargetWeight")
                         .HasColumnType("double");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
 
                     b.Property<double?>("VisceralFat")
                         .HasColumnType("double");
@@ -305,7 +307,7 @@ namespace Healthcare.Api.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("PatientId");
 
                     b.ToTable("NutritionData", "Healthcare");
                 });
@@ -931,13 +933,13 @@ namespace Healthcare.Api.Repository.Migrations
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.NutritionData", b =>
                 {
-                    b.HasOne("Healthcare.Api.Core.Entities.User", "User")
+                    b.HasOne("Healthcare.Api.Core.Entities.Patient", "Patient")
                         .WithMany("NutritionData")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
@@ -1106,6 +1108,11 @@ namespace Healthcare.Api.Repository.Migrations
                     b.Navigation("HealthPlans");
                 });
 
+            modelBuilder.Entity("Healthcare.Api.Core.Entities.Patient", b =>
+                {
+                    b.Navigation("NutritionData");
+                });
+
             modelBuilder.Entity("Healthcare.Api.Core.Entities.State", b =>
                 {
                     b.Navigation("Cities");
@@ -1118,8 +1125,6 @@ namespace Healthcare.Api.Repository.Migrations
 
             modelBuilder.Entity("Healthcare.Api.Core.Entities.User", b =>
                 {
-                    b.Navigation("NutritionData");
-
                     b.Navigation("Studies");
                 });
 #pragma warning restore 612, 618

@@ -12,6 +12,8 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
             builder.Property(x => x.Matricula).IsRequired(false);
+            builder.Property(x => x.Firma).IsRequired(false);
+            builder.Property(x => x.Sello).IsRequired(false);
 
             builder.HasOne(p => p.User)
                .WithOne()

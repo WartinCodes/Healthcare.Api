@@ -94,6 +94,8 @@ namespace Helthcare.Api.Mappers
               .ForMember(dest => dest.CUIL, opt => opt.MapFrom(src => src.User.CUIL))
               .ForMember(dest => dest.CUIT, opt => opt.MapFrom(src => src.User.CUIT))
               .ForMember(dest => dest.MaritalStatus, opt => opt.MapFrom(src => src.User.MaritalStatus))
+              .ForMember(dest => dest.Sello, opt => opt.Ignore())
+              .ForMember(dest => dest.Firma, opt => opt.Ignore())
               .ReverseMap();
             #endregion
 

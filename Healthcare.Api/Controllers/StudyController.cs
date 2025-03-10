@@ -31,6 +31,7 @@ namespace Healthcare.Api.Controllers
         private readonly IBloodTestDataService _bloodTestDataService;
         private readonly UserManager<User> _userManager;
         private List<BloodTestData> _addedBloodTestData = new List<BloodTestData>();
+        private readonly string _studiesFolder = "studies";
 
         public StudyController(
             IFileService fileService,
@@ -102,8 +103,7 @@ namespace Healthcare.Api.Controllers
             var user = await _userManager.GetUserById(userId);
             if (user == null) return NoContent();
 
-            var studyUrl = _fileService.GetUrl(user.UserName, fileName);
-
+            var studyUrl = _fileService.GetSignedUrl(_studiesFolder, user.UserName, fileName);
             var currentUserId = User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
 
             if (!int.TryParse(currentUserId, out int parsedUserId))
@@ -234,7 +234,7 @@ namespace Healthcare.Api.Controllers
 
                 var insertedStudy = await _studyService.Add(newStudy);
                 _mapper.Map(newStudy, studyResponse);
-                studyResponse.SignedUrl = _fileService.GetSignedUrl(user.UserName, pdfFileName);
+                studyResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, user.UserName, pdfFileName);
 
                 switch (study.StudyTypeId)
                 {

@@ -4,12 +4,9 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace Healthcare.Api.Controllers
 {
@@ -26,8 +23,8 @@ namespace Healthcare.Api.Controllers
         private readonly IHealthPlanService _healthPlanService;
         private readonly IDoctorHealthInsuranceService _doctorHealthInsuranceService;
         private readonly IFileService _fileService;
-
         private readonly IMapper _mapper;
+        private readonly string _photosFolder = "photos";
 
         public DoctorController(
             UserManager<User> userManager, 
@@ -91,11 +88,12 @@ namespace Healthcare.Api.Controllers
             var doctorIdResponse = new DoctorIdResponse
             {
                 RegisteredByName = RegisteredByName,
+                Sello = _fileService.GetSignedUrl(_photosFolder, doctorEntity.User.UserName, doctorEntity.Sello),
+                Firma = _fileService.GetSignedUrl(_photosFolder, doctorEntity.User.UserName, doctorEntity.Firma),
             };
 
             _mapper.Map(doctorEntity, doctorIdResponse);
             return Ok(doctorIdResponse);
-
         }
 
         [HttpPost("create")]
@@ -192,7 +190,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPut("{userId}")]
-        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Put(int userId, [FromBody] DoctorRequest userRequest)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -238,6 +236,49 @@ namespace Healthcare.Api.Controllers
             }
 
             return Ok($"Usuario con el ID {userId} actualizado exitosamente");
+        }
+
+        [HttpPut("{userId}/sello")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        public async Task<IActionResult> UpdateSello(int userId, IFormFile sello)
+        {
+            var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
+            if (doctor == null)
+            {
+                return NotFound($"No se encontró el doctor con el ID: {userId}");
+            }
+
+            string fileName = $"{userId}_sello{Path.GetExtension(sello.FileName)}";
+            using (var stream = sello.OpenReadStream())
+            {
+                await _fileService.InsertDoctorFileAsync(stream, doctor.User.UserName, fileName);
+            }
+
+            doctor.Sello = fileName;
+            await _doctorService.Edit(doctor);
+            var signedUrl = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, fileName);
+            return Ok(signedUrl);
+        }
+
+        [HttpPut("{userId}/firma")]
+        public async Task<IActionResult> UpdateFirma(int userId, IFormFile firma)
+        {
+            var doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
+            if (doctor == null)
+            {
+                return NotFound($"No se encontró el doctor con el ID: {userId}");
+            }
+
+            var fileName = $"{userId}_firma{Path.GetExtension(firma.FileName)}";
+            using (var stream = firma.OpenReadStream())
+            {
+                await _fileService.InsertDoctorFileAsync(stream, doctor.User.UserName, fileName);
+            }
+
+            doctor.Firma = fileName;
+            await _doctorService.Edit(doctor);
+            var signedUrl = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, fileName);
+            return Ok(signedUrl);
         }
 
         [HttpDelete("{userId}")]

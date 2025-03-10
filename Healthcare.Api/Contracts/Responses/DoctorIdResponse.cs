@@ -26,5 +26,7 @@
         public string? RhFactor { get; set; }
         public string? MaritalStatus { get; set; }
         public string? Gender { get; set; }
+        public string? Firma { get; set; }
+        public string? Sello { get; set; }
     }
 }

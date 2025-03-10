@@ -18,6 +18,8 @@
         public int UserId { get; set; }
         public virtual User User { get; set; }
         public string Matricula { get; set; }
+        public string? Firma { get; set; }
+        public string? Sello { get; set; }
         public virtual ICollection<Speciality> Specialities { get; set; }
         public virtual ICollection<HealthInsurance> HealthInsurances { get; set; }
     }
