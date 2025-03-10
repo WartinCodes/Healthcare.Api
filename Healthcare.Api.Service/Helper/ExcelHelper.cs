@@ -35,6 +35,9 @@ namespace Healthcare.Api.Service.Helper
                 for (int col = 0; col < 9; col++)
                     cells[col] = worksheet.Cells[row, col + 1].Text;
 
+                if (cells.All(cell => string.IsNullOrWhiteSpace(cell)))
+                    continue;
+
                 if (!DateTime.TryParseExact(cells[0], formatosFecha, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
                     throw new Exception($"Formato de fecha inválido en la fila {row}. Use d/M/yyyy o dd/MM/yyyy.");
 
