@@ -90,6 +90,35 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
+        public async Task<HttpStatusCode> InsertDoctorFileAsync(Stream file, string subFolder, string fileName)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("No se ha enviado ningún archivo o el archivo está vacío.");
+
+            if (!IsValidImageExtension(fileName))
+                throw new ArgumentException("Formato de imagen no válido. Solo se permiten archivos .png, .jpg o .jpeg.");
+
+            try
+            {
+                string key = $"{_photosFolder}/{subFolder}/{fileName}";
+
+                TransferUtilityUploadRequest transferUtilityUploadRequest = new TransferUtilityUploadRequest()
+                {
+                    BucketName = _s3Configuration.BucketName,
+                    Key = key,
+                    InputStream = file
+                };
+
+                await _awsS3TransferUtility.UploadAsync(transferUtilityUploadRequest);
+
+                return HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<HttpStatusCode> DeleteStudyAsync(string fileName)
         {
             try
@@ -110,37 +139,30 @@ namespace Healthcare.Api.Service.Services
             }
         }
 
-        public string GetUrl(string userNameFolder, string fileName)
+        public string? GetSignedUrl(string rootFolder, string userNameFolder, string fileName, double expiryHours = 1)
         {
-            string key = _studiesFolder + "/" + userNameFolder + "/" + fileName;
+            if (string.IsNullOrEmpty(fileName))
+                return null;
 
-            GetPreSignedUrlRequest request = new GetPreSignedUrlRequest
-            {
-                BucketName = _s3Configuration.BucketName,
-                Key = key,
-                Expires = DateTime.Now.AddHours(1)
-            };
-
-            string url = _awsS3Client.GetPreSignedURL(request);
-
-            return url;
-        }
-
-        public string GetSignedUrl(string userNameFolder, string fileName)
-        {
-            string key = _studiesFolder + "/" + userNameFolder + "/" + fileName;
+            string key = $"{rootFolder}/{userNameFolder}/{fileName}";
 
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _s3Configuration.BucketName,
                 Key = key,
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddHours(expiryHours),
                 Verb = HttpVerb.GET
             };
 
-            string signedUrl = _awsS3Client.GetPreSignedURL(request);
+            return _awsS3Client.GetPreSignedURL(request);
+        }
 
-            return signedUrl;
+        private bool IsValidImageExtension(string fileName)
+        {
+            var permittedExtensions = new[] { ".png", ".jpg", ".jpeg" };
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            return !string.IsNullOrEmpty(extension) && permittedExtensions.Contains(extension);
         }
     }
 }

@@ -24,5 +24,6 @@ namespace Healthcare.Api.Core.Entities
         public string? MaritalStatus { get; set; }
         public string? Gender { get; set; }
         public virtual ICollection<Study> Studies { get; set; }
+        public virtual ICollection<NutritionData> NutritionData { get; set; }
     }
 }

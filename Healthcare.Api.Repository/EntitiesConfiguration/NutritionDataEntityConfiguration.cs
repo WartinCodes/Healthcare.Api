@@ -21,9 +21,9 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.Property(x => x.TargetWeight).IsRequired(false);
             builder.Property(x => x.Observations).HasMaxLength(500).IsRequired(false);
 
-            builder.HasOne(nd => nd.Patient)
+            builder.HasOne(nd => nd.User)
                 .WithMany(p => p.NutritionData)
-                .HasForeignKey(nd => nd.PatientId) 
+                .HasForeignKey(nd => nd.UserId) 
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
         }

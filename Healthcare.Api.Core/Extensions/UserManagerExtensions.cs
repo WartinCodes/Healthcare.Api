@@ -18,7 +18,7 @@ namespace Healthcare.Api.Core.Extensions
                 .ThenInclude(x => x.City)
                 .ThenInclude(x => x.State)
                 .ThenInclude(x => x.Country)
-                .SingleOrDefaultAsync(x => x.Id == userId);
+                .FirstOrDefaultAsync(x => x.Id == userId);
         }
 
 

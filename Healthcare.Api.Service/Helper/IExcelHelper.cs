@@ -5,6 +5,6 @@ namespace Healthcare.Api.Service.Helper
 {
     public interface IExcelHelper
     {
-        Task<List<NutritionData>> ParseNutritionDataExcel(IFormFile file, int patientId);
+        Task<List<NutritionData>> ParseNutritionDataExcel(IFormFile file, int userId);
     }
 }
