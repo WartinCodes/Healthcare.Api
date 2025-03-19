@@ -94,7 +94,10 @@ namespace Healthcare.Api.Controllers
             {
                 return NotFound("Estudio no encontrado.");
             }
-            
+            if (study.Created.HasValue && (DateTime.UtcNow.ToArgentinaTime() - study.Created.Value).TotalHours > 24)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, "No se puede modificar el estudio después de 24 horas de su creación.");
+            }
             var dataLaboratories = _mapper.Map<List<BloodTestData>>(bloodTestDataRequests);
             await _bloodTestDataService.AddRangeAsync(idStudy, dataLaboratories);
 
