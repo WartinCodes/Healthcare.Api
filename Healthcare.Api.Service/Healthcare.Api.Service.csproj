@@ -39,9 +39,10 @@
     <None Update="HtmlTemplate\WelcomeTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="PdfTemplate\MedicalReport.pdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="PdfTemplate\" />
   </ItemGroup>
 
 </Project>
