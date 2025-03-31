@@ -2,16 +2,16 @@
 {
     public class GenerateMedicalReportPdf
     {
-        public GenerateMedicalReportPdf(int? doctorId, byte[] studyFileBytes, string pdfFileName, string userName, int studyType)
+        public GenerateMedicalReportPdf(string? doctorUserId, byte[] studyFileBytes, string pdfFileName, string userName, int studyType)
         {
-            DoctorId = doctorId;
+            DoctorUserId = doctorUserId;
             StudyFileBytes = studyFileBytes;
             PdfFileName = pdfFileName;
             UserName = userName;
             StudyType = studyType;
         }
 
-        public int? DoctorId { get; set; }
+        public string? DoctorUserId { get; set; }
         public byte[] StudyFileBytes { get; set; }
         public string PdfFileName { get; set; }
         public string UserName { get; set; }

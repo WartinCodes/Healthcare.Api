@@ -170,101 +170,118 @@ namespace Healthcare.Api.Service.Services
 
         public async Task BuildMedicalReport(GenerateMedicalReportPdf medicalReport)
         {
-            byte[] finalPdfBytes;
-            if (medicalReport.DoctorId == null)
+            if (string.IsNullOrEmpty(medicalReport.DoctorUserId))
             {
-                finalPdfBytes = medicalReport.StudyFileBytes;
-                using (MemoryStream memoryStream = new MemoryStream(finalPdfBytes))
-                {
-                    var pdfResult = await _fileService.InsertFileStudyAsync(memoryStream, medicalReport.UserName, medicalReport.PdfFileName);
-                }
+                await SavePdfAsync(medicalReport.StudyFileBytes, medicalReport.UserName, medicalReport.PdfFileName);
                 return;
             }
 
-            Doctor? doctor = await _doctorRepository.GetDoctorByIdAsync(medicalReport.DoctorId.Value);
-            string fullNameText = StringExtensions.Gender(doctor.User.Gender) + doctor.User.FirstName + " " + doctor.User.LastName;
-            string matriculaFormatted = "Mt. " + int.Parse(doctor.Matricula).ToString("N0").Replace(",", ".");
+            var doctor = await _doctorRepository.GetDoctorByUserIdAsync(Convert.ToInt32(medicalReport.DoctorUserId));
+            if (string.IsNullOrEmpty(doctor.Firma))
+                throw new InvalidOperationException("Archivo subido. Doctor sin firma asociada.");
+
+            string fullNameText = $"{StringExtensions.Gender(doctor.User.Gender)}{doctor.User.FirstName} {doctor.User.LastName}";
+            string matriculaFormatted = $"Mt. {int.Parse(doctor.Matricula).ToString("N0").Replace(",", ".")}";
             string coverTemplatePath = Path.Combine(_fileHelper.GetExecutingDirectory(), _templateConfiguration.MedicalReport);
 
             try
             {
-                string signatureUrl = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, doctor.Firma, expiryHours: 1);
-                byte[] signatureBytes = await _httpClient.GetByteArrayAsync(signatureUrl);
-                byte[] studyBytes = medicalReport.StudyFileBytes;
+                var signatureUrl = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, doctor.Firma, expiryHours: 1);
+                var signatureBytes = await _httpClient.GetByteArrayAsync(signatureUrl);
 
-                using (MemoryStream outputStream = new MemoryStream())
-                {
-                    using (var writer = new PdfWriter(outputStream))
-                    using (var finalPdfDoc = new PdfDocument(writer))
-                    {
-                        using (var coverReader = new PdfReader(coverTemplatePath))
-                        using (var coverPdfDoc = new PdfDocument(coverReader))
-                        {
-                            int coverPages = coverPdfDoc.GetNumberOfPages();
-                            for (int i = 1; i <= coverPages; i++)
-                            {
-                                finalPdfDoc.AddPage(coverPdfDoc.GetPage(i).CopyTo(finalPdfDoc));
-                            }
-                        }
+                var finalPdfBytes = await BuildPdfWithCoverAndSignatureAsync(
+                    coverTemplatePath,
+                    medicalReport.StudyFileBytes,
+                    signatureBytes,
+                    fullNameText,
+                    matriculaFormatted
+                );
 
-                        using (var studyStream = new MemoryStream(studyBytes))
-                        using (var studyReader = new PdfReader(studyStream))
-                        using (var studyPdfDoc = new PdfDocument(studyReader))
-                        {
-                            int studyPages = studyPdfDoc.GetNumberOfPages();
-                            var document = new Document(finalPdfDoc);
-
-                            for (int i = 1; i <= studyPages; i++)
-                            {
-                                var importedPage = studyPdfDoc.GetPage(i).CopyTo(finalPdfDoc);
-                                finalPdfDoc.AddPage(importedPage);
-
-                                int finalPageNumber = finalPdfDoc.GetNumberOfPages();
-                                var page = finalPdfDoc.GetPage(finalPageNumber);
-                                var pageSize = page.GetPageSize();
-                                float pageWidth = pageSize.GetWidth();
-                                float pageHeight = pageSize.GetHeight();
-
-                                float imageWidth = 73;
-                                float imageHeight = 85;
-                                float signatureX = pageWidth - imageWidth - 85;
-                                float signatureY = 125;
-
-                                var signatureImage = new Image(ImageDataFactory.Create(signatureBytes))
-                                    .ScaleAbsolute(imageWidth, imageHeight)
-                                    .SetFixedPosition(finalPageNumber, signatureX, signatureY);
-                                document.Add(signatureImage);
-
-                                Paragraph nameParagraph = new Paragraph(fullNameText)
-                                    .SetFontSize(10)
-                                    .SetFontColor(ColorConstants.BLACK)
-                                    .SetFixedPosition(finalPageNumber, signatureX, signatureY - 15, 190);
-                                document.Add(nameParagraph);
-
-                                Paragraph matriculaParagraph = new Paragraph(matriculaFormatted)
-                                    .SetFontSize(10)
-                                    .SetFontColor(ColorConstants.BLACK)
-                                    .SetFixedPosition(finalPageNumber, signatureX, signatureY - 30, imageWidth);
-                                document.Add(matriculaParagraph);
-                            }
-
-                            document.Close();
-                        }
-                    }
-                    finalPdfBytes = outputStream.ToArray();
-                }
-
-                using (MemoryStream memoryStream = new MemoryStream(finalPdfBytes))
-                {
-                    var pdfResult = await _fileService.InsertFileStudyAsync(memoryStream, medicalReport.UserName, medicalReport.PdfFileName);
-                }
+                await SavePdfAsync(finalPdfBytes, medicalReport.UserName, medicalReport.PdfFileName);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 throw ex;
             }
         }
 
+        private async Task SavePdfAsync(byte[] pdfBytes, string userName, string fileName)
+        {
+            using var memoryStream = new MemoryStream(pdfBytes);
+            await _fileService.InsertFileStudyAsync(memoryStream, userName, fileName);
+        }
 
+        private async Task<byte[]> BuildPdfWithCoverAndSignatureAsync(
+            string coverTemplatePath,
+            byte[] studyBytes,
+            byte[] signatureBytes,
+            string fullNameText,
+            string matriculaFormatted)
+        {
+            using var outputStream = new MemoryStream();
+            using var writer = new PdfWriter(outputStream);
+            using var finalPdfDoc = new PdfDocument(writer);
+
+            AddCoverPages(finalPdfDoc, coverTemplatePath);
+            AddStudyPagesWithSignature(finalPdfDoc, studyBytes, signatureBytes, fullNameText, matriculaFormatted);
+
+            return outputStream.ToArray();
+        }
+
+        private void AddCoverPages(PdfDocument finalDoc, string coverTemplatePath)
+        {
+            using var coverReader = new PdfReader(coverTemplatePath);
+            using var coverPdfDoc = new PdfDocument(coverReader);
+            for (int i = 1; i <= coverPdfDoc.GetNumberOfPages(); i++)
+            {
+                finalDoc.AddPage(coverPdfDoc.GetPage(i).CopyTo(finalDoc));
+            }
+        }
+
+        private void AddStudyPagesWithSignature(
+            PdfDocument finalDoc,
+            byte[] studyBytes,
+            byte[] signatureBytes,
+            string fullName,
+            string matricula)
+        {
+            using var studyStream = new MemoryStream(studyBytes);
+            using var studyReader = new PdfReader(studyStream);
+            using var studyPdfDoc = new PdfDocument(studyReader);
+            var document = new Document(finalDoc);
+
+            for (int i = 1; i <= studyPdfDoc.GetNumberOfPages(); i++)
+            {
+                var importedPage = studyPdfDoc.GetPage(i).CopyTo(finalDoc);
+                finalDoc.AddPage(importedPage);
+
+                int pageNumber = finalDoc.GetNumberOfPages();
+                var pageSize = finalDoc.GetPage(pageNumber).GetPageSize();
+
+                float imageWidth = 73, imageHeight = 85;
+                float signatureX = pageSize.GetWidth() - imageWidth - 85;
+                float signatureY = 125;
+
+                var signatureImage = new Image(ImageDataFactory.Create(signatureBytes))
+                    .ScaleAbsolute(imageWidth, imageHeight)
+                    .SetFixedPosition(pageNumber, signatureX, signatureY);
+
+                var nameParagraph = new Paragraph(fullName)
+                    .SetFontSize(10)
+                    .SetFontColor(ColorConstants.BLACK)
+                    .SetFixedPosition(pageNumber, signatureX, signatureY - 15, 190);
+
+                var matriculaParagraph = new Paragraph(matricula)
+                    .SetFontSize(10)
+                    .SetFontColor(ColorConstants.BLACK)
+                    .SetFixedPosition(pageNumber, signatureX, signatureY - 30, imageWidth);
+
+                document.Add(signatureImage);
+                document.Add(nameParagraph);
+                document.Add(matriculaParagraph);
+            }
+
+            document.Close();
+        }
     }
 }

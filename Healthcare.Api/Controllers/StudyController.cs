@@ -200,12 +200,13 @@ namespace Healthcare.Api.Controllers
             try
             {
                 StudyResponse studyResponse = new StudyResponse();
-
-                var user = await _userManager.GetUserById(Convert.ToInt32(study.UserId));
-                if (user == null)
+                var patientUser = await _userManager.GetUserById(Convert.ToInt32(study.UserId));
+                if (patientUser == null)
                 {
-                    return NotFound("Usuario no encontrado.");
+                    return NotFound("Paciente no encontrado.");
                 }
+
+                Doctor? doctorUser = await _doctorService.GetDoctorByUserIdAsync(Convert.ToInt32(study.DoctorUserId));
 
                 var studyType = await _studyTypeService.GetStudyTypeByIdAsync(study.StudyTypeId);
                 if (studyType == null)
@@ -214,7 +215,7 @@ namespace Healthcare.Api.Controllers
                 }
 
                 var pdfFile = study.StudyFiles.SingleOrDefault(f => f.FileName.Contains(".pdf", StringComparison.InvariantCultureIgnoreCase));
-                string pdfFileName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), null, Path.GetExtension(pdfFile.FileName)));
+                string pdfFileName = _studyService.GenerateFileName(new FileNameParameters(patientUser, studyType, study.Date.ToShortDateString(), null, Path.GetExtension(pdfFile.FileName)));
 
                 Study newStudy = new Study()
                 {
@@ -222,9 +223,9 @@ namespace Healthcare.Api.Controllers
                     Date = study.Date,
                     Created = DateTime.UtcNow.ToArgentinaTime(),
                     Note = study.Note,
-                    UserId = user.Id,
+                    UserId = patientUser.Id,
                     StudyTypeId = study.StudyTypeId,
-                    SignedDoctorId = study.DoctorId
+                    SignedDoctorId = doctorUser?.Id
                 };
 
                 var insertedStudy = await _studyService.Add(newStudy);
@@ -235,8 +236,17 @@ namespace Healthcare.Api.Controllers
                     await pdfFile.CopyToAsync(ms);
                     studyBytes = ms.ToArray();
                 }
-                await _pdfFileService.BuildMedicalReport(new GenerateMedicalReportPdf(study.DoctorId, studyBytes, pdfFileName, user.UserName, study.StudyTypeId));
-                studyResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, user.UserName, pdfFileName);
+
+                await _pdfFileService.BuildMedicalReport(
+                    new GenerateMedicalReportPdf(
+                        study.DoctorUserId,
+                        studyBytes, 
+                        pdfFileName,
+                        patientUser.UserName,
+                        study.StudyTypeId
+                    ));
+
+                studyResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, pdfFileName);
 
                 switch (study.StudyTypeId)
                 {
@@ -280,7 +290,7 @@ namespace Healthcare.Api.Controllers
                         List<UltrasoundImageResponse> ultrasoundImageResponse = new List<UltrasoundImageResponse>();
                         foreach (var imageFile in imageFiles) 
                         {
-                            var imageName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), index, Path.GetExtension(imageFile.FileName)));
+                            var imageName = _studyService.GenerateFileName(new FileNameParameters(patientUser, studyType, study.Date.ToShortDateString(), index, Path.GetExtension(imageFile.FileName)));
                             UltrasoundImage newUltrasoundImage = new UltrasoundImage()
                             {
                                 IdStudy = newStudy.Id,
@@ -291,7 +301,7 @@ namespace Healthcare.Api.Controllers
                             using (var memoryStream = new MemoryStream())
                             {
                                 imageFile.CopyTo(memoryStream);
-                                var imageResult = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, imageName);
+                                var imageResult = await _fileService.InsertFileStudyAsync(memoryStream, patientUser.UserName, imageName);
                                 if (imageResult != HttpStatusCode.OK)
                                 {
                                     return StatusCode((int)imageResult, "Error al cargar las imagenes.");
@@ -305,7 +315,7 @@ namespace Healthcare.Api.Controllers
 
                 }
 
-                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
+                await _emailService.SendEmailForNewStudyAsync(patientUser.Email, $"{patientUser.FirstName} {patientUser.LastName}", study.Date);
 
                 return Ok(studyResponse);
             }
