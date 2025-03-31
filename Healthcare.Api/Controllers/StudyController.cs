@@ -2,6 +2,7 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Entities.DTO;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.Utilities;
@@ -21,6 +22,7 @@ namespace Healthcare.Api.Controllers
         private readonly IStudyService _studyService;
         private readonly IStudyTypeService _studyTypeService;
         private readonly IPatientService _patientService;
+        private readonly IDoctorService _doctorService;
         private readonly IFileService _fileService;
         private readonly IPdfFileService _pdfFileService;
         private readonly IJwtService _jwtService;
@@ -37,6 +39,7 @@ namespace Healthcare.Api.Controllers
             IFileService fileService,
             IPdfFileService pdfFileService,
             IPatientService patientService,
+            IDoctorService doctorService,
             IStudyService studyService,
             IJwtService jwtService,
             IStudyTypeService studyTypeService,
@@ -50,6 +53,7 @@ namespace Healthcare.Api.Controllers
             _fileService = fileService;
             _pdfFileService = pdfFileService;
             _patientService = patientService;
+            _doctorService = doctorService;
             _studyService = studyService;
             _studyTypeService = studyTypeService;
             _jwtService = jwtService;
@@ -212,16 +216,6 @@ namespace Healthcare.Api.Controllers
                 var pdfFile = study.StudyFiles.SingleOrDefault(f => f.FileName.Contains(".pdf", StringComparison.InvariantCultureIgnoreCase));
                 string pdfFileName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), null, Path.GetExtension(pdfFile.FileName)));
 
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    pdfFile.CopyTo(memoryStream);
-                    var pdfResult = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, pdfFileName);
-                    if (pdfResult != HttpStatusCode.OK)
-                    {
-                        return StatusCode((int)pdfResult, "Error al cargar el archivo PDF.");
-                    }
-                }
-
                 Study newStudy = new Study()
                 {
                     LocationS3 = pdfFileName,
@@ -230,10 +224,18 @@ namespace Healthcare.Api.Controllers
                     Note = study.Note,
                     UserId = user.Id,
                     StudyTypeId = study.StudyTypeId,
+                    SignedDoctorId = study.DoctorId
                 };
 
                 var insertedStudy = await _studyService.Add(newStudy);
                 _mapper.Map(newStudy, studyResponse);
+                byte[] studyBytes;
+                using (var ms = new MemoryStream())
+                {
+                    await pdfFile.CopyToAsync(ms);
+                    studyBytes = ms.ToArray();
+                }
+                await _pdfFileService.BuildMedicalReport(new GenerateMedicalReportPdf(study.DoctorId, studyBytes, pdfFileName, user.UserName, study.StudyTypeId));
                 studyResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, user.UserName, pdfFileName);
 
                 switch (study.StudyTypeId)

@@ -1,11 +1,46 @@
 ﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Entities.DTO;
+using Healthcare.Api.Core.Extensions;
+using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Helper;
+using iText.IO.Image;
+using iText.Kernel.Colors;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Signatures;
+using Microsoft.Extensions.Options;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Healthcare.Api.Service.Services
 {
     public class PdfFileService : IPdfFileService
     {
+        private readonly TemplateConfiguration _templateConfiguration;
+        private readonly IDoctorRepository _doctorRepository;
+        private readonly IFileHelper _fileHelper;
+        private readonly IFileService _fileService;
+        private readonly HttpClient _httpClient;
+        private readonly string _photosFolder = "photos";
+        private readonly string _studiesFolder = "studies";
+
+        public PdfFileService(
+            IOptions<TemplateConfiguration> templateConfiguration,
+            IFileHelper fileHelper,
+            IFileService fileService,
+            IHttpClientFactory httpClientFactory,
+            IDoctorRepository doctorRepository
+            )
+        {
+            _fileHelper = fileHelper;
+            _templateConfiguration = templateConfiguration?.Value ?? throw new ArgumentNullException(nameof(templateConfiguration));
+            _httpClient = httpClientFactory.CreateClient();
+            _fileService = fileService;
+            _doctorRepository = doctorRepository;
+        }
+
         /// <summary>
         /// Parses PDF text to extract blood test data based on provided properties.
         /// </summary>
@@ -132,5 +167,104 @@ namespace Healthcare.Api.Service.Services
 
             return string.Empty;
         }
+
+        public async Task BuildMedicalReport(GenerateMedicalReportPdf medicalReport)
+        {
+            byte[] finalPdfBytes;
+            if (medicalReport.DoctorId == null)
+            {
+                finalPdfBytes = medicalReport.StudyFileBytes;
+                using (MemoryStream memoryStream = new MemoryStream(finalPdfBytes))
+                {
+                    var pdfResult = await _fileService.InsertFileStudyAsync(memoryStream, medicalReport.UserName, medicalReport.PdfFileName);
+                }
+                return;
+            }
+
+            Doctor? doctor = await _doctorRepository.GetDoctorByIdAsync(medicalReport.DoctorId.Value);
+            string fullNameText = StringExtensions.Gender(doctor.User.Gender) + doctor.User.FirstName + " " + doctor.User.LastName;
+            string matriculaFormatted = "Mt. " + int.Parse(doctor.Matricula).ToString("N0").Replace(",", ".");
+            string coverTemplatePath = Path.Combine(_fileHelper.GetExecutingDirectory(), _templateConfiguration.MedicalReport);
+
+            try
+            {
+                string signatureUrl = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, doctor.Firma, expiryHours: 1);
+                byte[] signatureBytes = await _httpClient.GetByteArrayAsync(signatureUrl);
+                byte[] studyBytes = medicalReport.StudyFileBytes;
+
+                using (MemoryStream outputStream = new MemoryStream())
+                {
+                    using (var writer = new PdfWriter(outputStream))
+                    using (var finalPdfDoc = new PdfDocument(writer))
+                    {
+                        using (var coverReader = new PdfReader(coverTemplatePath))
+                        using (var coverPdfDoc = new PdfDocument(coverReader))
+                        {
+                            int coverPages = coverPdfDoc.GetNumberOfPages();
+                            for (int i = 1; i <= coverPages; i++)
+                            {
+                                finalPdfDoc.AddPage(coverPdfDoc.GetPage(i).CopyTo(finalPdfDoc));
+                            }
+                        }
+
+                        using (var studyStream = new MemoryStream(studyBytes))
+                        using (var studyReader = new PdfReader(studyStream))
+                        using (var studyPdfDoc = new PdfDocument(studyReader))
+                        {
+                            int studyPages = studyPdfDoc.GetNumberOfPages();
+                            var document = new Document(finalPdfDoc);
+
+                            for (int i = 1; i <= studyPages; i++)
+                            {
+                                var importedPage = studyPdfDoc.GetPage(i).CopyTo(finalPdfDoc);
+                                finalPdfDoc.AddPage(importedPage);
+
+                                int finalPageNumber = finalPdfDoc.GetNumberOfPages();
+                                var page = finalPdfDoc.GetPage(finalPageNumber);
+                                var pageSize = page.GetPageSize();
+                                float pageWidth = pageSize.GetWidth();
+                                float pageHeight = pageSize.GetHeight();
+
+                                float imageWidth = 73;
+                                float imageHeight = 85;
+                                float signatureX = pageWidth - imageWidth - 85;
+                                float signatureY = 125;
+
+                                var signatureImage = new Image(ImageDataFactory.Create(signatureBytes))
+                                    .ScaleAbsolute(imageWidth, imageHeight)
+                                    .SetFixedPosition(finalPageNumber, signatureX, signatureY);
+                                document.Add(signatureImage);
+
+                                Paragraph nameParagraph = new Paragraph(fullNameText)
+                                    .SetFontSize(10)
+                                    .SetFontColor(ColorConstants.BLACK)
+                                    .SetFixedPosition(finalPageNumber, signatureX, signatureY - 15, 190);
+                                document.Add(nameParagraph);
+
+                                Paragraph matriculaParagraph = new Paragraph(matriculaFormatted)
+                                    .SetFontSize(10)
+                                    .SetFontColor(ColorConstants.BLACK)
+                                    .SetFixedPosition(finalPageNumber, signatureX, signatureY - 30, imageWidth);
+                                document.Add(matriculaParagraph);
+                            }
+
+                            document.Close();
+                        }
+                    }
+                    finalPdfBytes = outputStream.ToArray();
+                }
+
+                using (MemoryStream memoryStream = new MemoryStream(finalPdfBytes))
+                {
+                    var pdfResult = await _fileService.InsertFileStudyAsync(memoryStream, medicalReport.UserName, medicalReport.PdfFileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
     }
 }
