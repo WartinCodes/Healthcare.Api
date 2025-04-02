@@ -7,5 +7,6 @@ namespace Healthcare.Api.Core.ServiceInterfaces
     {
         List<BloodTestData> ParsePdfText(string text, int idStudy, IEnumerable<BloodTest> properties);
         Task BuildMedicalReport(GenerateMedicalReportPdf medicalReport);
+        Task SavePdfAsync(byte[] pdfBytes, string userName, string fileName);
     }
 }

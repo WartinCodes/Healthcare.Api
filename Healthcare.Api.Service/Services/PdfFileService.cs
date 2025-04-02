@@ -1,6 +1,5 @@
 ﻿using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Entities.DTO;
-using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Helper;
@@ -11,7 +10,6 @@ using iText.Layout;
 using iText.Layout.Element;
 using iText.Signatures;
 using Microsoft.Extensions.Options;
-using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Healthcare.Api.Service.Services
@@ -191,18 +189,19 @@ namespace Healthcare.Api.Service.Services
                     coverTemplatePath,
                     medicalReport.StudyFileBytes,
                     signatureBytes,
-                    doctor
+                    doctor,
+                    medicalReport.StudyType
                 );
 
                 await SavePdfAsync(finalPdfBytes, medicalReport.UserName, medicalReport.PdfFileName);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
         }
 
-        private async Task SavePdfAsync(byte[] pdfBytes, string userName, string fileName)
+        public async Task SavePdfAsync(byte[] pdfBytes, string userName, string fileName)
         {
             using var memoryStream = new MemoryStream(pdfBytes);
             await _fileService.InsertFileStudyAsync(memoryStream, userName, fileName);
@@ -212,16 +211,45 @@ namespace Healthcare.Api.Service.Services
             string coverTemplatePath,
             byte[] studyBytes,
             byte[] signatureBytes,
-            Doctor doctor)
+            Doctor doctor,
+            string studyType)
         {
             using var outputStream = new MemoryStream();
             using var writer = new PdfWriter(outputStream);
             using var finalPdfDoc = new PdfDocument(writer);
 
             AddCoverPages(finalPdfDoc, coverTemplatePath);
+            AddCoverText(finalPdfDoc, studyType);
             AddStudyPagesWithSignature(finalPdfDoc, studyBytes, signatureBytes, doctor);
 
             return outputStream.ToArray();
+        }
+
+        private void AddCoverText(PdfDocument finalDoc, string studyType)
+        {
+            int coverPageNumber = 1;
+            var coverPage = finalDoc.GetPage(coverPageNumber);
+            var pageSize = coverPage.GetPageSize();
+
+            float centerX = pageSize.GetWidth() / 2;
+            float centerY = pageSize.GetHeight() / 2;
+
+            var paragraph = new Paragraph()
+                .SetFontSize(42)
+                .SetTextAlignment(iText.Layout.Properties.TextAlignment.CENTER)
+                .SetMultipliedLeading(1.2f)
+                .Add(new Text("INFORME"))
+                .Add("\n")
+                .Add(new Text("DE"))
+                .Add("\n")
+                .Add(new Text("ESTUDIO"))
+                .Add("\n")
+                .Add(new Text("MEDICO"))
+                .Add("\n")
+                .Add(new Text(studyType));
+
+            var doc = new Document(finalDoc);
+            doc.Add(paragraph);
         }
 
         private void AddCoverPages(PdfDocument finalDoc, string coverTemplatePath)
@@ -258,7 +286,7 @@ namespace Healthcare.Api.Service.Services
                 var pageSize = finalDoc.GetPage(pageNumber).GetPageSize();
 
                 float imageWidth = 64, imageHeight = 75;
-                float signatureX = pageSize.GetWidth() - imageWidth - 85;
+                float signatureX = pageSize.GetWidth() - imageWidth - 125;
                 float signatureY = 125;
 
                 var signatureImage = new Image(ImageDataFactory.Create(signatureBytes))
@@ -286,8 +314,8 @@ namespace Healthcare.Api.Service.Services
                 document.Add(matriculaParagraph);
             }
 
-
             document.Close();
         }
+
     }
 }
