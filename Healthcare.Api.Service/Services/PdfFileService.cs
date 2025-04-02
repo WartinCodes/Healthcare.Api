@@ -180,8 +180,6 @@ namespace Healthcare.Api.Service.Services
             if (string.IsNullOrEmpty(doctor.Firma))
                 throw new InvalidOperationException("Archivo subido. Doctor sin firma asociada.");
 
-            string fullNameText = $"{StringExtensions.Gender(doctor.User.Gender)}{doctor.User.FirstName} {doctor.User.LastName}";
-            string matriculaFormatted = $"Mt. {int.Parse(doctor.Matricula).ToString("N0").Replace(",", ".")}";
             string coverTemplatePath = Path.Combine(_fileHelper.GetExecutingDirectory(), _templateConfiguration.MedicalReport);
 
             try
@@ -193,8 +191,7 @@ namespace Healthcare.Api.Service.Services
                     coverTemplatePath,
                     medicalReport.StudyFileBytes,
                     signatureBytes,
-                    fullNameText,
-                    matriculaFormatted
+                    doctor
                 );
 
                 await SavePdfAsync(finalPdfBytes, medicalReport.UserName, medicalReport.PdfFileName);
@@ -215,15 +212,14 @@ namespace Healthcare.Api.Service.Services
             string coverTemplatePath,
             byte[] studyBytes,
             byte[] signatureBytes,
-            string fullNameText,
-            string matriculaFormatted)
+            Doctor doctor)
         {
             using var outputStream = new MemoryStream();
             using var writer = new PdfWriter(outputStream);
             using var finalPdfDoc = new PdfDocument(writer);
 
             AddCoverPages(finalPdfDoc, coverTemplatePath);
-            AddStudyPagesWithSignature(finalPdfDoc, studyBytes, signatureBytes, fullNameText, matriculaFormatted);
+            AddStudyPagesWithSignature(finalPdfDoc, studyBytes, signatureBytes, doctor);
 
             return outputStream.ToArray();
         }
@@ -242,9 +238,12 @@ namespace Healthcare.Api.Service.Services
             PdfDocument finalDoc,
             byte[] studyBytes,
             byte[] signatureBytes,
-            string fullName,
-            string matricula)
+            Doctor doctor)
         {
+            string fullNameText = BuildPdfSignature.FullName(doctor.User.Gender, doctor.User.FirstName, doctor.User.LastName);
+            string matriculaFormatted = BuildPdfSignature.Matricula(doctor.Matricula);
+            string specialityText = BuildPdfSignature.DoctorSpeciality(doctor.User.Gender, doctor.Specialities.Select(x => x.Name).ToList());
+
             using var studyStream = new MemoryStream(studyBytes);
             using var studyReader = new PdfReader(studyStream);
             using var studyPdfDoc = new PdfDocument(studyReader);
@@ -258,7 +257,7 @@ namespace Healthcare.Api.Service.Services
                 int pageNumber = finalDoc.GetNumberOfPages();
                 var pageSize = finalDoc.GetPage(pageNumber).GetPageSize();
 
-                float imageWidth = 73, imageHeight = 85;
+                float imageWidth = 64, imageHeight = 75;
                 float signatureX = pageSize.GetWidth() - imageWidth - 85;
                 float signatureY = 125;
 
@@ -266,20 +265,27 @@ namespace Healthcare.Api.Service.Services
                     .ScaleAbsolute(imageWidth, imageHeight)
                     .SetFixedPosition(pageNumber, signatureX, signatureY);
 
-                var nameParagraph = new Paragraph(fullName)
+                var nameParagraph = new Paragraph(fullNameText)
                     .SetFontSize(10)
                     .SetFontColor(ColorConstants.BLACK)
                     .SetFixedPosition(pageNumber, signatureX, signatureY - 15, 190);
 
-                var matriculaParagraph = new Paragraph(matricula)
+                var specialityParagraph = new Paragraph(specialityText)
                     .SetFontSize(10)
                     .SetFontColor(ColorConstants.BLACK)
-                    .SetFixedPosition(pageNumber, signatureX, signatureY - 30, imageWidth);
+                    .SetFixedPosition(pageNumber, signatureX, signatureY - 25, 190);
+
+                var matriculaParagraph = new Paragraph(matriculaFormatted)
+                    .SetFontSize(10)
+                    .SetFontColor(ColorConstants.BLACK)
+                    .SetFixedPosition(pageNumber, signatureX, signatureY - 35, imageWidth);
 
                 document.Add(signatureImage);
                 document.Add(nameParagraph);
+                document.Add(specialityParagraph);
                 document.Add(matriculaParagraph);
             }
+
 
             document.Close();
         }

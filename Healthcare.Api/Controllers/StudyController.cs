@@ -185,7 +185,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("upload-study")]
-        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
+        //[Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)
         {
             if (study.StudyFiles == null || study.StudyFiles.Count == 0)
