@@ -100,6 +100,41 @@ namespace Healthcare.Api.Controllers
             return Ok(studiesResponse);
         }
 
+        [HttpGet("byUserWithUrls/{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
+        public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesWithUrl([FromRoute] int userId)
+        {
+            var currentUserId = User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            if (!int.TryParse(currentUserId, out int parsedUserId))
+            {
+                return Unauthorized("Usuario no autorizado.");
+            }
+
+            var currentUser = await _userManager.FindByIdAsync(parsedUserId.ToString());
+            if (currentUser == null)
+            {
+                return Unauthorized("Usuario no encontrado.");
+            }
+
+            bool isValid = await _jwtService.ValidatePatientToken(currentUser);
+
+            if (!isValid && parsedUserId != userId)
+            {
+                return Forbid("No tiene permiso para acceder a los datos de este paciente.");
+            }
+
+            IEnumerable<Study> studiesEntity = await _studyService.GetStudiesByUserId(userId);
+            var studiesResponse = _mapper.Map<IEnumerable<StudyResponse>>(studiesEntity);
+            foreach (var study in studiesResponse)
+            {
+                study.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, currentUser.UserName, study.LocationS3) ?? String.Empty;
+                study.UltrasoundImages = _mapper.Map<List<UltrasoundImageResponse>>(await _ultrasoundImageService.GetUltrasoundImagesByStudyIdAsync(study.Id));
+            }
+
+            return Ok(studiesResponse);
+        }
+
+
         [HttpGet("getUrl/{userId}")]
         [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
         public async Task<ActionResult<string>> GetUrlByUserId([FromRoute] int userId, string fileName)

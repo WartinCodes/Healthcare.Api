@@ -1,13 +1,8 @@
 ﻿using Healthcare.Api.Core.Entities;
-using Healthcare.Api.Core.Entities.DTO;
 using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Service.Helper;
-using iText.IO.Image;
-using iText.Kernel.Colors;
-using iText.Kernel.Pdf;
 using iText.Layout;
-using iText.Layout.Element;
 using iText.Signatures;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
@@ -164,6 +159,12 @@ namespace Healthcare.Api.Service.Services
             }
 
             return string.Empty;
+        }
+
+        public async Task SavePdfAsync(byte[] pdfBytes, string userName, string fileName)
+        {
+            using var memoryStream = new MemoryStream(pdfBytes);
+            await _fileService.InsertFileStudyAsync(memoryStream, userName, fileName);
         }
     }
 }
