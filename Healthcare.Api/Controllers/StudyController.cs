@@ -6,6 +6,7 @@ using Healthcare.Api.Core.Entities.DTO;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.Utilities;
+using Healthcare.Api.Service.Helper;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +35,7 @@ namespace Healthcare.Api.Controllers
         private readonly UserManager<User> _userManager;
         private List<BloodTestData> _addedBloodTestData = new List<BloodTestData>();
         private readonly string _studiesFolder = "studies";
+        private readonly string _photosFolder = "photos";
 
         public StudyController(
             IFileService fileService,
@@ -434,6 +436,39 @@ namespace Healthcare.Api.Controllers
             {
                 return StatusCode(500, $"An error occurred while processing your request: {ex}");
             }
+        }
+
+
+        [HttpGet("signature")]
+        public async Task<ActionResult<SignatureResponse>> GetSignature([FromQuery] int doctorUserId, [FromQuery] int patientUserId)
+        {
+            Doctor doctor = await _doctorService.GetDoctorByUserIdAsync(doctorUserId);
+            if (doctor == null)
+                return NotFound($"El doctor con el ID usuario {doctorUserId} no existe.");
+
+            Patient patient = await _patientService.GetPatientByUserIdAsync(patientUserId);
+            if (patient == null)
+                return NotFound($"El paciente con el ID usuario {patientUserId} no existe.");
+
+            SignatureResponse signatureResponse = new SignatureResponse();
+            signatureResponse.DoctorSignature = new DoctorSignatureResponse
+            {
+                FullName = BuildPdfSignature.FullName(doctor.User.Gender, doctor.User.FirstName, doctor.User.LastName),
+                Matricula = BuildPdfSignature.Matricula(doctor.Matricula),
+                DoctorSpeciality = BuildPdfSignature.DoctorSpeciality(doctor.User.Gender, doctor.Specialities.Select(x => x.Name).ToList()),
+                Signature = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, doctor.Firma) ?? string.Empty,
+            };
+            signatureResponse.PatientSignature = new PatientSignatureResponse
+            {
+                FullName = patient.User.FirstName + " " + patient.User.LastName,
+                BirthDate = patient.User.BirthDate.Date.ToShortDateString(),
+                AffiliationNumber = patient.AffiliationNumber,
+                DNI = patient.User.UserName,
+                Date = String.Empty,
+                HealthInsurance = patient.HealthPlans.Select(x => x.HealthInsurance.Name).ToString() ?? String.Empty
+            };
+
+            return Ok(signatureResponse);
         }
     }
 }

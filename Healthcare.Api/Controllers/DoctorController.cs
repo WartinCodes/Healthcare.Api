@@ -97,28 +97,6 @@ namespace Healthcare.Api.Controllers
             return Ok(doctorIdResponse);
         }
 
-
-        [HttpGet("signature/{userId}")]
-        //[Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
-        public async Task<ActionResult<DoctorSignatureResponse>> GetSignature([FromRoute] int userId)
-        {
-            Doctor doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
-            if (doctor == null)
-            {
-                return NotFound($"El doctor con el ID usuario {userId} no existe.");
-            }
-
-            var doctorSignatureResponse = new DoctorSignatureResponse
-            {
-                FullName = BuildPdfSignature.FullName(doctor.User.Gender, doctor.User.FirstName, doctor.User.LastName),
-                Matricula = BuildPdfSignature.Matricula(doctor.Matricula),
-                DoctorSpeciality = BuildPdfSignature.DoctorSpeciality(doctor.User.Gender, doctor.Specialities.Select(x => x.Name).ToList()),
-                Signature = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, doctor.Firma) ?? string.Empty,
-            };
-
-            return Ok(doctorSignatureResponse);
-        }
-
         [HttpPost("create")]
         [Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> Post([FromBody] DoctorRequest userRequest)
