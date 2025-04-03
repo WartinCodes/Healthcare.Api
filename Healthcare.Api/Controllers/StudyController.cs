@@ -129,6 +129,10 @@ namespace Healthcare.Api.Controllers
             {
                 study.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, currentUser.UserName, study.LocationS3) ?? String.Empty;
                 study.UltrasoundImages = _mapper.Map<List<UltrasoundImageResponse>>(await _ultrasoundImageService.GetUltrasoundImagesByStudyIdAsync(study.Id));
+                foreach (var ultrasoundImage in study.UltrasoundImages)
+                {
+                    ultrasoundImage.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, currentUser.UserName, ultrasoundImage.LocationS3) ?? String.Empty;
+                }
             }
 
             return Ok(studiesResponse);
