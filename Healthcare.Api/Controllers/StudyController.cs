@@ -205,7 +205,6 @@ namespace Healthcare.Api.Controllers
                 {
                     return NotFound("Paciente no encontrado.");
                 }
-
                 Doctor? doctorUser = await _doctorService.GetDoctorByUserIdAsync(Convert.ToInt32(study.DoctorUserId));
 
                 var studyType = await _studyTypeService.GetStudyTypeByIdAsync(study.StudyTypeId);
@@ -237,15 +236,7 @@ namespace Healthcare.Api.Controllers
                     studyBytes = ms.ToArray();
                 }
 
-                await _pdfFileService.BuildMedicalReport(
-                    new GenerateMedicalReportPdf(
-                        study.DoctorUserId,
-                        studyBytes, 
-                        pdfFileName,
-                        patientUser.UserName,
-                        ((StudyTypeEnum)study.StudyTypeId).ToString()
-                ));
-
+                await _pdfFileService.SavePdfAsync(studyBytes, patientUser.UserName, pdfFileName);
                 studyResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, pdfFileName);
 
                 switch (study.StudyTypeId)
@@ -316,62 +307,6 @@ namespace Healthcare.Api.Controllers
                 }
 
                 await _emailService.SendEmailForNewStudyAsync(patientUser.Email, $"{patientUser.FirstName} {patientUser.LastName}", study.Date);
-
-                return Ok(studyResponse);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Ocurrió un error: {ex.Message}");
-            }
-        }
-
-        [HttpPost("upload-study-ergonometria")]
-        //[Authorize(Roles = $"{RoleEnum.Secretaria}")]
-        public async Task<IActionResult> UploadStudyErgonometria([FromForm] StudyRequestErgometria study)
-        {
-            try
-            {
-                StudyResponse studyResponse = new StudyResponse();
-                var patientUser = await _userManager.GetUserById(Convert.ToInt32(study.UserId));
-                if (patientUser == null)
-                {
-                    return NotFound("Paciente no encontrado.");
-                }
-                Doctor? doctorUser = await _doctorService.GetDoctorByUserIdAsync(Convert.ToInt32(study.DoctorUserId));
-
-                var studyType = await _studyTypeService.GetStudyTypeByIdAsync(study.StudyTypeId);
-                if (studyType == null)
-                {
-                    return NotFound("Tipo de estudio no encontrado.");
-                }
-
-                var pdfFile = study.StudyFiles.SingleOrDefault(f => f.FileName.Contains(".pdf", StringComparison.InvariantCultureIgnoreCase));
-                string pdfFileName = _studyService.GenerateFileName(new FileNameParameters(patientUser, studyType, study.Date.ToShortDateString(), null, Path.GetExtension(pdfFile.FileName)));
-
-                Study newStudy = new Study()
-                {
-                    LocationS3 = pdfFileName,
-                    Date = study.Date,
-                    Created = DateTime.UtcNow.ToArgentinaTime(),
-                    Note = study.Note,
-                    UserId = patientUser.Id,
-                    StudyTypeId = study.StudyTypeId,
-                    SignedDoctorId = doctorUser?.Id
-                };
-
-                var insertedStudy = await _studyService.Add(newStudy);
-                _mapper.Map(newStudy, studyResponse);
-                byte[] studyBytes;
-                using (var ms = new MemoryStream())
-                {
-                    await pdfFile.CopyToAsync(ms);
-                    studyBytes = ms.ToArray();
-                }
-
-                await _pdfFileService.SavePdfAsync(studyBytes, patientUser.UserName, pdfFileName);
-                studyResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, pdfFileName);
-
-                //await _emailService.SendEmailForNewStudyAsync(patientUser.Email, $"{patientUser.FirstName} {patientUser.LastName}", study.Date);
 
                 return Ok(studyResponse);
             }
