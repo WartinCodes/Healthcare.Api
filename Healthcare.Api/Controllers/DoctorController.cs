@@ -4,6 +4,7 @@ using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -94,6 +95,28 @@ namespace Healthcare.Api.Controllers
 
             _mapper.Map(doctorEntity, doctorIdResponse);
             return Ok(doctorIdResponse);
+        }
+
+
+        [HttpGet("signature/{userId}")]
+        //[Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}")]
+        public async Task<ActionResult<DoctorSignatureResponse>> GetSignature([FromRoute] int userId)
+        {
+            Doctor doctor = await _doctorService.GetDoctorByUserIdAsync(userId);
+            if (doctor == null)
+            {
+                return NotFound($"El doctor con el ID usuario {userId} no existe.");
+            }
+
+            var doctorSignatureResponse = new DoctorSignatureResponse
+            {
+                FullName = BuildPdfSignature.FullName(doctor.User.Gender, doctor.User.FirstName, doctor.User.LastName),
+                Matricula = BuildPdfSignature.Matricula(doctor.Matricula),
+                DoctorSpeciality = BuildPdfSignature.DoctorSpeciality(doctor.User.Gender, doctor.Specialities.Select(x => x.Name).ToList()),
+                Signature = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, doctor.Firma) ?? string.Empty,
+            };
+
+            return Ok(doctorSignatureResponse);
         }
 
         [HttpPost("create")]
