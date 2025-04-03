@@ -440,7 +440,7 @@ namespace Healthcare.Api.Controllers
 
 
         [HttpGet("signature")]
-        public async Task<ActionResult<SignatureResponse>> GetSignature([FromQuery] int doctorUserId, [FromQuery] int patientUserId)
+        public async Task<ActionResult<SignatureResponse>> GetSignature([FromQuery] string date, [FromQuery] int doctorUserId, [FromQuery] int patientUserId)
         {
             Doctor doctor = await _doctorService.GetDoctorByUserIdAsync(doctorUserId);
             if (doctor == null)
@@ -464,8 +464,8 @@ namespace Healthcare.Api.Controllers
                 BirthDate = patient.User.BirthDate.Date.ToShortDateString(),
                 AffiliationNumber = patient.AffiliationNumber,
                 DNI = patient.User.UserName,
-                Date = String.Empty,
-                HealthInsurance = patient.HealthPlans.Select(x => x.HealthInsurance.Name).ToString() ?? String.Empty
+                Date = date,
+                HealthInsurance = patient.HealthPlans.Select(x => x.HealthInsurance.Name)
             };
 
             return Ok(signatureResponse);
