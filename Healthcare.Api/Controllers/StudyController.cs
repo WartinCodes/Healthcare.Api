@@ -332,7 +332,6 @@ namespace Healthcare.Api.Controllers
                                 LocationS3 = imageName
                             };
                             await _ultrasoundImageService.Add(newUltrasoundImage);
-                            ultrasoundImageResponse.Add(_mapper.Map<UltrasoundImageResponse>(newUltrasoundImage));
                             using (var memoryStream = new MemoryStream())
                             {
                                 imageFile.CopyTo(memoryStream);
@@ -342,6 +341,9 @@ namespace Healthcare.Api.Controllers
                                     return StatusCode((int)imageResult, "Error al cargar las imagenes.");
                                 }
                             }
+                            UltrasoundImageResponse newUltrasoundImageResponse = _mapper.Map<UltrasoundImageResponse>(newUltrasoundImage);
+                            newUltrasoundImageResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, imageName);
+                            ultrasoundImageResponse.Add(newUltrasoundImageResponse);
                             index++;
                         }
                         studyResponse.UltrasoundImages = ultrasoundImageResponse;
