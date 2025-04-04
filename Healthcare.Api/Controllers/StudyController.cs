@@ -103,7 +103,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("byUserWithUrls/{userId}")]
-        //[Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
         public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesWithUrl([FromRoute] int userId)
         {
             var patientUser = await _userManager.GetUserById(userId);
