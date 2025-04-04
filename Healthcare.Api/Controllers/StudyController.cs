@@ -103,9 +103,13 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpGet("byUserWithUrls/{userId}")]
-        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
+        //[Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
         public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesWithUrl([FromRoute] int userId)
         {
+            var patientUser = await _userManager.GetUserById(userId);
+            if (patientUser == null)
+                return Unauthorized("Paciente no encontrado.");
+
             var currentUserId = User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
             if (!int.TryParse(currentUserId, out int parsedUserId))
             {
@@ -119,7 +123,6 @@ namespace Healthcare.Api.Controllers
             }
 
             bool isValid = await _jwtService.ValidatePatientToken(currentUser);
-
             if (!isValid && parsedUserId != userId)
             {
                 return Forbid("No tiene permiso para acceder a los datos de este paciente.");
@@ -129,11 +132,11 @@ namespace Healthcare.Api.Controllers
             var studiesResponse = _mapper.Map<IEnumerable<StudyResponse>>(studiesEntity);
             foreach (var study in studiesResponse)
             {
-                study.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, currentUser.UserName, study.LocationS3) ?? String.Empty;
+                study.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, study.LocationS3) ?? String.Empty;
                 study.UltrasoundImages = _mapper.Map<List<UltrasoundImageResponse>>(await _ultrasoundImageService.GetUltrasoundImagesByStudyIdAsync(study.Id));
                 foreach (var ultrasoundImage in study.UltrasoundImages)
                 {
-                    ultrasoundImage.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, currentUser.UserName, ultrasoundImage.LocationS3) ?? String.Empty;
+                    ultrasoundImage.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, ultrasoundImage.LocationS3) ?? String.Empty;
                 }
             }
 
