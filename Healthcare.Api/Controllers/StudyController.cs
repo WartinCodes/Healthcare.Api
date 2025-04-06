@@ -2,9 +2,11 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.Entities.DTO;
 using Healthcare.Api.Core.Extensions;
 using Healthcare.Api.Core.ServiceInterfaces;
 using Healthcare.Api.Core.Utilities;
+using Healthcare.Api.Service.Helper;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas.Parser;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +23,7 @@ namespace Healthcare.Api.Controllers
         private readonly IStudyService _studyService;
         private readonly IStudyTypeService _studyTypeService;
         private readonly IPatientService _patientService;
+        private readonly IDoctorService _doctorService;
         private readonly IFileService _fileService;
         private readonly IPdfFileService _pdfFileService;
         private readonly IJwtService _jwtService;
@@ -32,11 +35,13 @@ namespace Healthcare.Api.Controllers
         private readonly UserManager<User> _userManager;
         private List<BloodTestData> _addedBloodTestData = new List<BloodTestData>();
         private readonly string _studiesFolder = "studies";
+        private readonly string _photosFolder = "photos";
 
         public StudyController(
             IFileService fileService,
             IPdfFileService pdfFileService,
             IPatientService patientService,
+            IDoctorService doctorService,
             IStudyService studyService,
             IJwtService jwtService,
             IStudyTypeService studyTypeService,
@@ -50,6 +55,7 @@ namespace Healthcare.Api.Controllers
             _fileService = fileService;
             _pdfFileService = pdfFileService;
             _patientService = patientService;
+            _doctorService = doctorService;
             _studyService = studyService;
             _studyTypeService = studyTypeService;
             _jwtService = jwtService;
@@ -95,6 +101,48 @@ namespace Healthcare.Api.Controllers
 
             return Ok(studiesResponse);
         }
+
+        [HttpGet("byUserWithUrls/{userId}")]
+        [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
+        public async Task<ActionResult<IEnumerable<StudyResponse>>> GetStudiesWithUrl([FromRoute] int userId)
+        {
+            var patientUser = await _userManager.GetUserById(userId);
+            if (patientUser == null)
+                return Unauthorized("Paciente no encontrado.");
+
+            var currentUserId = User.Claims.FirstOrDefault(x => x.Type == "Id")?.Value;
+            if (!int.TryParse(currentUserId, out int parsedUserId))
+            {
+                return Unauthorized("Usuario no autorizado.");
+            }
+
+            var currentUser = await _userManager.FindByIdAsync(parsedUserId.ToString());
+            if (currentUser == null)
+            {
+                return Unauthorized("Usuario no encontrado.");
+            }
+
+            bool isValid = await _jwtService.ValidatePatientToken(currentUser);
+            if (!isValid && parsedUserId != userId)
+            {
+                return Forbid("No tiene permiso para acceder a los datos de este paciente.");
+            }
+
+            IEnumerable<Study> studiesEntity = await _studyService.GetStudiesByUserId(userId);
+            var studiesResponse = _mapper.Map<IEnumerable<StudyResponse>>(studiesEntity);
+            foreach (var study in studiesResponse)
+            {
+                study.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, study.LocationS3) ?? String.Empty;
+                study.UltrasoundImages = _mapper.Map<List<UltrasoundImageResponse>>(await _ultrasoundImageService.GetUltrasoundImagesByStudyIdAsync(study.Id));
+                foreach (var ultrasoundImage in study.UltrasoundImages)
+                {
+                    ultrasoundImage.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, ultrasoundImage.LocationS3) ?? String.Empty;
+                }
+            }
+
+            return Ok(studiesResponse);
+        }
+
 
         [HttpGet("getUrl/{userId}")]
         [Authorize(Roles = $"{RoleEnum.Medico},{RoleEnum.Secretaria}, {RoleEnum.Paciente}")]
@@ -181,7 +229,7 @@ namespace Healthcare.Api.Controllers
         }
 
         [HttpPost("upload-study")]
-        [Authorize(Roles = $"{RoleEnum.Secretaria}")]
+        //[Authorize(Roles = $"{RoleEnum.Secretaria}")]
         public async Task<IActionResult> UploadStudy([FromForm] StudyRequest study)
         {
             if (study.StudyFiles == null || study.StudyFiles.Count == 0)
@@ -196,12 +244,12 @@ namespace Healthcare.Api.Controllers
             try
             {
                 StudyResponse studyResponse = new StudyResponse();
-
-                var user = await _userManager.GetUserById(Convert.ToInt32(study.UserId));
-                if (user == null)
+                var patientUser = await _userManager.GetUserById(Convert.ToInt32(study.UserId));
+                if (patientUser == null)
                 {
-                    return NotFound("Usuario no encontrado.");
+                    return NotFound("Paciente no encontrado.");
                 }
+                Doctor? doctorUser = await _doctorService.GetDoctorByUserIdAsync(Convert.ToInt32(study.DoctorUserId));
 
                 var studyType = await _studyTypeService.GetStudyTypeByIdAsync(study.StudyTypeId);
                 if (studyType == null)
@@ -210,17 +258,7 @@ namespace Healthcare.Api.Controllers
                 }
 
                 var pdfFile = study.StudyFiles.SingleOrDefault(f => f.FileName.Contains(".pdf", StringComparison.InvariantCultureIgnoreCase));
-                string pdfFileName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), null, Path.GetExtension(pdfFile.FileName)));
-
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    pdfFile.CopyTo(memoryStream);
-                    var pdfResult = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, pdfFileName);
-                    if (pdfResult != HttpStatusCode.OK)
-                    {
-                        return StatusCode((int)pdfResult, "Error al cargar el archivo PDF.");
-                    }
-                }
+                string pdfFileName = _studyService.GenerateFileName(new FileNameParameters(patientUser, studyType, study.Date.ToShortDateString(), null, Path.GetExtension(pdfFile.FileName)));
 
                 Study newStudy = new Study()
                 {
@@ -228,13 +266,22 @@ namespace Healthcare.Api.Controllers
                     Date = study.Date,
                     Created = DateTime.UtcNow.ToArgentinaTime(),
                     Note = study.Note,
-                    UserId = user.Id,
+                    UserId = patientUser.Id,
                     StudyTypeId = study.StudyTypeId,
+                    SignedDoctorId = doctorUser?.Id
                 };
 
                 var insertedStudy = await _studyService.Add(newStudy);
                 _mapper.Map(newStudy, studyResponse);
-                studyResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, user.UserName, pdfFileName);
+                byte[] studyBytes;
+                using (var ms = new MemoryStream())
+                {
+                    await pdfFile.CopyToAsync(ms);
+                    studyBytes = ms.ToArray();
+                }
+
+                await _pdfFileService.SavePdfAsync(studyBytes, patientUser.UserName, pdfFileName);
+                studyResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, pdfFileName);
 
                 switch (study.StudyTypeId)
                 {
@@ -278,23 +325,25 @@ namespace Healthcare.Api.Controllers
                         List<UltrasoundImageResponse> ultrasoundImageResponse = new List<UltrasoundImageResponse>();
                         foreach (var imageFile in imageFiles) 
                         {
-                            var imageName = _studyService.GenerateFileName(new FileNameParameters(user, studyType, study.Date.ToShortDateString(), index, Path.GetExtension(imageFile.FileName)));
+                            var imageName = _studyService.GenerateFileName(new FileNameParameters(patientUser, studyType, study.Date.ToShortDateString(), index, Path.GetExtension(imageFile.FileName)));
                             UltrasoundImage newUltrasoundImage = new UltrasoundImage()
                             {
                                 IdStudy = newStudy.Id,
                                 LocationS3 = imageName
                             };
                             await _ultrasoundImageService.Add(newUltrasoundImage);
-                            ultrasoundImageResponse.Add(_mapper.Map<UltrasoundImageResponse>(newUltrasoundImage));
                             using (var memoryStream = new MemoryStream())
                             {
                                 imageFile.CopyTo(memoryStream);
-                                var imageResult = await _fileService.InsertFileStudyAsync(memoryStream, user.UserName, imageName);
+                                var imageResult = await _fileService.InsertFileStudyAsync(memoryStream, patientUser.UserName, imageName);
                                 if (imageResult != HttpStatusCode.OK)
                                 {
                                     return StatusCode((int)imageResult, "Error al cargar las imagenes.");
                                 }
                             }
+                            UltrasoundImageResponse newUltrasoundImageResponse = _mapper.Map<UltrasoundImageResponse>(newUltrasoundImage);
+                            newUltrasoundImageResponse.SignedUrl = _fileService.GetSignedUrl(_studiesFolder, patientUser.UserName, imageName);
+                            ultrasoundImageResponse.Add(newUltrasoundImageResponse);
                             index++;
                         }
                         studyResponse.UltrasoundImages = ultrasoundImageResponse;
@@ -303,7 +352,7 @@ namespace Healthcare.Api.Controllers
 
                 }
 
-                await _emailService.SendEmailForNewStudyAsync(user.Email, $"{user.FirstName} {user.LastName}", study.Date);
+                await _emailService.SendEmailForNewStudyAsync(patientUser.Email, $"{patientUser.FirstName} {patientUser.LastName}", study.Date);
 
                 return Ok(studyResponse);
             }
@@ -392,6 +441,38 @@ namespace Healthcare.Api.Controllers
             {
                 return StatusCode(500, $"An error occurred while processing your request: {ex}");
             }
+        }
+
+
+        [HttpGet("signature")]
+        public async Task<ActionResult<SignatureResponse>> GetSignature([FromQuery] int doctorUserId, [FromQuery] int patientUserId)
+        {
+            Doctor doctor = await _doctorService.GetDoctorByUserIdAsync(doctorUserId);
+            if (doctor == null)
+                return NotFound($"El doctor con el ID usuario {doctorUserId} no existe.");
+
+            Patient patient = await _patientService.GetPatientByUserIdAsync(patientUserId);
+            if (patient == null)
+                return NotFound($"El paciente con el ID usuario {patientUserId} no existe.");
+
+            SignatureResponse signatureResponse = new SignatureResponse();
+            signatureResponse.DoctorSignature = new DoctorSignatureResponse
+            {
+                FullName = BuildPdfSignature.FullName(doctor.User.Gender, doctor.User.FirstName, doctor.User.LastName),
+                Matricula = BuildPdfSignature.Matricula(doctor.Matricula),
+                DoctorSpeciality = BuildPdfSignature.DoctorSpeciality(doctor.User.Gender, doctor.Specialities.Select(x => x.Name).ToList()),
+                Signature = _fileService.GetSignedUrl(_photosFolder, doctor.User.UserName, doctor.Firma) ?? string.Empty,
+            };
+            signatureResponse.PatientSignature = new PatientSignatureResponse
+            {
+                FullName = patient.User.FirstName + " " + patient.User.LastName,
+                BirthDate = patient.User.BirthDate.Date.ToShortDateString(),
+                AffiliationNumber = patient.AffiliationNumber,
+                DNI = patient.User.UserName,
+                HealthInsurance = patient.HealthPlans.Select(x => x.HealthInsurance.Name)
+            };
+
+            return Ok(signatureResponse);
         }
     }
 }

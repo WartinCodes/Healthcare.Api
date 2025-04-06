@@ -4,5 +4,6 @@
     {
         public int Id { get; set; }
         public string LocationS3 { get; set; }
+        public string SignedUrl { get; set; }
     }
 }

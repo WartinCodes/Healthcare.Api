@@ -1,5 +1,4 @@
-﻿using Healthcare.Api.Core.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Healthcare.Api.Repository.EntitiesConfiguration
@@ -24,6 +23,12 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                 .WithMany(s => s.Studies)
                 .HasForeignKey(s => s.UserId)
                 .IsRequired();
+
+            builder.HasOne(s => s.SignedDoctor)
+                .WithMany(d => d.SignedStudies)
+                .HasForeignKey(s => s.SignedDoctorId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

@@ -2,13 +2,9 @@
 using Healthcare.Api.Contracts.Requests;
 using Healthcare.Api.Contracts.Responses;
 using Healthcare.Api.Core.Entities;
-using Healthcare.Api.Core.ServiceInterfaces;
-using Healthcare.Api.Service.Services;
-using iText.Kernel.Pdf.Canvas.Parser;
-using iText.Kernel.Pdf;
-using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using Healthcare.Api.Core.Extensions;
+using Healthcare.Api.Core.ServiceInterfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Healthcare.Api.Controllers
 {

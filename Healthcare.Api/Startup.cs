@@ -54,6 +54,7 @@ namespace Helthcare.Api
 
             services.AddRepository();
             services.AddService(this.Configuration);
+            services.AddHttpClient();
             // IActionFilter 
             services.AddScoped<ValidationUserFilter>();
             services.AddMappers();

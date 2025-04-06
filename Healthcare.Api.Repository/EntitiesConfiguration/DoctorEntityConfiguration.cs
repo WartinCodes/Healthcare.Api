@@ -16,10 +16,10 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
             builder.Property(x => x.Sello).IsRequired(false);
 
             builder.HasOne(p => p.User)
-               .WithOne()
-               .HasForeignKey<Doctor>(p => p.UserId)
-               .IsRequired()
-               .OnDelete(DeleteBehavior.Cascade);
+                .WithOne()
+                .HasForeignKey<Doctor>(p => p.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(d => d.HealthInsurances)
                 .WithMany(hp => hp.Doctors)
@@ -56,6 +56,11 @@ namespace Healthcare.Api.Repository.EntitiesConfiguration
                         j.ToTable("DoctorSpeciality");
                     }
                 );
+
+            builder.HasMany(d => d.SignedStudies)
+                .WithOne(s => s.SignedDoctor)
+                .HasForeignKey(s => s.SignedDoctorId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

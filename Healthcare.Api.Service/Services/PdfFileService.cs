@@ -1,11 +1,39 @@
 ﻿using Healthcare.Api.Core.Entities;
+using Healthcare.Api.Core.RepositoryInterfaces;
 using Healthcare.Api.Core.ServiceInterfaces;
+using Healthcare.Api.Service.Helper;
+using iText.Layout;
+using iText.Signatures;
+using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 
 namespace Healthcare.Api.Service.Services
 {
     public class PdfFileService : IPdfFileService
     {
+        private readonly TemplateConfiguration _templateConfiguration;
+        private readonly IDoctorRepository _doctorRepository;
+        private readonly IFileHelper _fileHelper;
+        private readonly IFileService _fileService;
+        private readonly HttpClient _httpClient;
+        private readonly string _photosFolder = "photos";
+        private readonly string _studiesFolder = "studies";
+
+        public PdfFileService(
+            IOptions<TemplateConfiguration> templateConfiguration,
+            IFileHelper fileHelper,
+            IFileService fileService,
+            IHttpClientFactory httpClientFactory,
+            IDoctorRepository doctorRepository
+            )
+        {
+            _fileHelper = fileHelper;
+            _templateConfiguration = templateConfiguration?.Value ?? throw new ArgumentNullException(nameof(templateConfiguration));
+            _httpClient = httpClientFactory.CreateClient();
+            _fileService = fileService;
+            _doctorRepository = doctorRepository;
+        }
+
         /// <summary>
         /// Parses PDF text to extract blood test data based on provided properties.
         /// </summary>
@@ -131,6 +159,12 @@ namespace Healthcare.Api.Service.Services
             }
 
             return string.Empty;
+        }
+
+        public async Task SavePdfAsync(byte[] pdfBytes, string userName, string fileName)
+        {
+            using var memoryStream = new MemoryStream(pdfBytes);
+            await _fileService.InsertFileStudyAsync(memoryStream, userName, fileName);
         }
     }
 }
