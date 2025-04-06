@@ -29,9 +29,6 @@
     <None Update="HtmlTemplate\NewStudyTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="HtmlTemplate\SupportTemplate.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="HtmlTemplate\WelcomeTemplate.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

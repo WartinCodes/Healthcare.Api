@@ -21,7 +21,6 @@ namespace Healthcare.Api.Core.UnitOfWorks
         IPatientHistoryRepository PatientHistoryRepository { get; }
         IStudyRepository StudyRepository { get; }
         IStudyTypeRepository StudyTypeRepository { get; }
-        ISupportRepository SupportRepository { get; }
         IUltrasoundImageRepository UltrasoundImageRepository { get; }
         IUnitRepository UnitRepository { get; }
         INutritionDataRepository NutritionDataRepository { get; }
